@@ -1,0 +1,85 @@
+export enum USER_ACCOUNT_STATUS {
+    ACTIVE = 'ACTIVE',
+    INACTIVE = 'INACTIVE',
+    BLOCKED =  'BLOCKED',
+    DELETED = 'DELETED'
+}
+
+export enum USER_VERIFY_STATUS {
+    UNVERIFIED = 'UNVERIFIED',
+    VERIFIED = 'VERIFIED'
+}
+
+export enum DEFAULT_USER_ROLES {
+    SELLER = "SELLER",
+    //BUYER = "BUYER",
+    USER = "USER",
+    MANAGER = "MANAGER",
+    ADMIN = "ADMINISTRATOR"
+}
+
+
+export enum USER_GROUP {
+    ADMIN = "ADMINISTRATOR",
+    USER = "USER"
+}
+
+export enum USER_GROUP_ROLE{
+}
+
+export enum SESSION_STATUS {
+    LOGGED_IN = "LOGGED_IN",
+    LOGGED_OUT = "LOGGED_OUT",
+    BLOCKED = "BLOCKED"
+}
+
+export enum OTP_TYPE {
+    REGISTER_OTP = "REGISTER_OTP",
+    LOGIN_OTP = "LOGIN_OTP",
+    FORGOT_PASSWORD_OTP = "FORGOT_PASSWORD_OTP",
+    ADD_EMAIL = "ADD_EMAIL",
+    ADD_PHONE_NO = "ADD_PHONE_NO",
+    CUSTOM_LOGIN = "CUSTOM_LOGIN"
+}
+
+export enum OTP_SEND_ON {
+    PHONE = "PHONE",
+    EMAIL = "EMAIL",
+}
+
+export enum LOGIN_BY
+{
+    PHONE = "PHONE",
+    EMAIL = "EMAIL",
+}
+
+export enum OTP_REQUEST_LIMITS {
+    RESEND_OTP = 200 
+}
+
+export enum ADD_UPDATE_EMAIL_STATUS
+{
+    'PENDING','VERIFIED'
+}
+
+export enum ADD_UPDATE_EMAIL_TYPE
+{
+    'ADD','UPDATE'
+}
+
+export enum USER_LOGIN_SOURCE {
+    LOCAL = "LOCAL",
+    GOOGLE = "GOOGLE",
+    FACEBOOK = "FACEBOOK"
+};
+
+export enum INVITE_MEMBER {
+    // BUYER = "BUYER",
+    // SELLER = "SELLER",
+}
+
+export enum INVITE_STATUS {
+    PENDING = "PENDING",
+    VERIFIED = "VERIFIED",
+    REJECTED = "REJECTED"
+}

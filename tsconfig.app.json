@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc",
+    "module": "commonjs",
+    "types": [
+      "node",
+      "Multer"
+    ],
+    "target": "es2021"
+  },
+  "exclude": [
+    "jest.config.ts",
+    "libs/**/*.spec.ts",
+    "libs/**/*.test.ts"
+  ],
+  "include": [
+    "libs/**/*.ts"
+// , "libs/database/src/typeorm.config.ts"  
+]
+}

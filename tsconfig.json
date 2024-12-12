@@ -1,0 +1,28 @@
+{
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ],
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "baseUrl": "./",
+    "paths": {
+      "//constants": [
+        "libs/constants/src"
+      ],
+      "//constants/*": [
+        "libs/constants/src/*"
+      ],
+      "//database": [
+        "libs/database/src"
+      ],
+      "//database/*": [
+        "libs/database/src/*"
+      ]
+    }
+  }
+}
