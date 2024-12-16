@@ -8,7 +8,7 @@ import { paginate } from '../../../utils/basicUtils';
 import { IPaginationObject } from '../../../interfaces/commonTypes/custom.interface';
 import { group, count } from 'console';
 import { UserFilterDto, PaginationDto } from 'libs/dtos/authentication/user.dto';
-import { Address } from '../entities';
+import { Address, Setting } from '../entities';
 
 @Injectable()
 export class UserRepositoryService {

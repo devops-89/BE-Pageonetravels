@@ -8,9 +8,10 @@ import {
     OtpVerificationService,
     UserRepositoryService,
     AddressRepositoryService,
+    SettingRepositoryService
  
 } from './';
-import { User, OtpVerification, LoginSession, Address} from './';
+import { User, OtpVerification, LoginSession, Address, Setting} from './';
 
 @Module({})
 export class DBModule {
@@ -28,6 +29,7 @@ export class DBModule {
                 OtpVerification,
                 LoginSession,
                 Address,
+                Setting
                 
             ],
             synchronize: true,
@@ -67,6 +69,7 @@ export class DBModule {
                     OtpVerification,
                     LoginSession,
                     Address,
+                    Setting
                    
                 ]),
             ],
@@ -76,6 +79,7 @@ export class DBModule {
                 OtpVerificationService,
                 LoginSessionService,
                 AddressRepositoryService,
+                SettingRepositoryService
                
             ],
             exports: [
@@ -83,6 +87,7 @@ export class DBModule {
                 OtpVerificationService,
                 LoginSessionService,
                 AddressRepositoryService,
+                SettingRepositoryService
 
             ],
         };

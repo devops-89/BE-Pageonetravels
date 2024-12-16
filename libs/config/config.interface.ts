@@ -27,8 +27,9 @@ export interface ConfigAuthorizationData {
 
 export interface ServicesPort {
   authentication: number;
-  product: number;
+  flight: number;
   userManagement: number
+  adminpanel: number
 }
 
 export interface SMTP  {
