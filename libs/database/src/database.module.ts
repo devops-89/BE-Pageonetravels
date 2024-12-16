@@ -9,7 +9,8 @@ import {
     PermissionService,
     UserRepositoryService,
     AddressRepositoryService,
- 
+    CommissionRepositoryService,
+    Commission
 } from './';
 import { User, Permission, OtpVerification, LoginSession, Address} from './';
 
@@ -30,6 +31,7 @@ export class DBModule {
                 OtpVerification,
                 LoginSession,
                 Address,
+                Commission
                 
             ],
             synchronize: true,
@@ -70,6 +72,7 @@ export class DBModule {
                     OtpVerification,
                     LoginSession,
                     Address,
+                    Commission
                    
                 ]),
             ],
@@ -80,7 +83,7 @@ export class DBModule {
                 OtpVerificationService,
                 LoginSessionService,
                 AddressRepositoryService,
-               
+                CommissionRepositoryService
             ],
             exports: [
                 UserRepositoryService,
@@ -88,7 +91,7 @@ export class DBModule {
                 OtpVerificationService,
                 LoginSessionService,
                 AddressRepositoryService,
-
+                CommissionRepositoryService
             ],
         };
     }

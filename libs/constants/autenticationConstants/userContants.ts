@@ -24,7 +24,7 @@ export enum USER_GROUP {
     USER = "USER"
 }
 
-export enum USER_GROUP_ROLE{
+export enum USER_GROUP_ROLE{    
 }
 
 export enum SESSION_STATUS {
