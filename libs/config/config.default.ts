@@ -18,9 +18,10 @@ export const DEFAULT_CONFIG: ConfigData = {
     JWT_EXPIRY_TIME: 0,
     AUTH_KEY: '',
     servicePorts: {
-        authentication: 8085,
-        product: 8087,
-        userManagement: 8086
+        adminpanel: 3005,
+        flight: 3001,
+        userManagement: 3002,
+        authentication: 3000
     },
     S3_bucket: { access_key_id: '', bucket_name: '', region: '', secret_access_key: '' },
     SMTP: { HOST: '', PASSWORD: '', PORT: 587, SENDER: '', SERVICE: 'gmail', SMTP_TLS: '', USERNAME: '' },

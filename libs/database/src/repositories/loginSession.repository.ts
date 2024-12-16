@@ -57,7 +57,7 @@ export class LoginSessionService {
         }
     }
 
-    async logoutAllSessionDb(userId: number): Promise<void> {
+    async logoutAllSessionDb(userId: string): Promise<void> {
         try {
             // await this.sessionRepository.update({ user: { id: userId } }, { loginStatus: SESSION_STATUS.LOGGED_OUT });
             await this.sessionRepository.delete({ user: { id: userId } });
@@ -66,7 +66,7 @@ export class LoginSessionService {
         }
     }
 
-    async logoutAllEmailSessionDb(userId: number, email: string): Promise<void> {
+    async logoutAllEmailSessionDb(userId: string, email: string): Promise<void> {
         try {
             // await this.sessionRepository.update({ user: { id: userId }, loginBy: LOGIN_BY.EMAIL, loginIdentity: email }, { loginStatus: SESSION_STATUS.LOGGED_OUT });
             await this.sessionRepository.delete( { user: { id: userId }, loginBy: LOGIN_BY.EMAIL, loginIdentity: email });
@@ -77,7 +77,7 @@ export class LoginSessionService {
         }
     }
 
-    async logoutAllPhoneSessionDb(userId: number, phoneNo: string): Promise<void> {
+    async logoutAllPhoneSessionDb(userId: string, phoneNo: string): Promise<void> {
         try {
             await this.sessionRepository.update({ user: { id: userId }, loginBy: LOGIN_BY.PHONE, loginIdentity: phoneNo }, { loginStatus: SESSION_STATUS.LOGGED_OUT });
         } catch (error) {
@@ -107,7 +107,7 @@ export class LoginSessionService {
         return success;
     }
 
-    async blockAllSessionDb(userId: number): Promise<void> {
+    async blockAllSessionDb(userId: string): Promise<void> {
         try {
             await this.sessionRepository.update({ user: { id: userId } }, { loginStatus: SESSION_STATUS.BLOCKED });
         } catch (error) {
@@ -115,7 +115,7 @@ export class LoginSessionService {
         }
     }
 
-    async getAllSessionByUserId(userId: number): Promise<LoginSession[]> {
+    async getAllSessionByUserId(userId: string): Promise<LoginSession[]> {
         try {
             const session = await this.sessionRepository.find({ where: { user: { id: userId}, loginStatus: SESSION_STATUS.LOGGED_IN } });
             return session;

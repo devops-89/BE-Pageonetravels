@@ -15,7 +15,7 @@ export class LoginService {
 async getLoginToken(input: LoginSessionI.GetLoginToken) 
 {
     try {
-        const { userId, loginBy, loginIdentity, roleName, permissionId, group, deviceType } = input
+        const { userId, loginBy, loginIdentity, roleName,  deviceType, user_type } = input
         const refreshToken = getRandomString(16, false, false);
         const expiryTimeStamp = Date.now() + 60 * 60 * 24 * 30 * 1000;   // 90 days
 
@@ -28,9 +28,8 @@ async getLoginToken(input: LoginSessionI.GetLoginToken)
             referenceId: userId,
             refreshToken,
             userRole: roleName,
-            permissionId,
             sessionId: session.id,
-            group,
+            user_type,
             tokenType: TOKEN_TYPE.USER_LOGIN
         });
 

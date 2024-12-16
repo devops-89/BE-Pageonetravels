@@ -6,7 +6,7 @@ import { JwtService } from '../jwt-service/jwt.service';
 import { LoginSessionService } from '../database/src';
 import { ResponseHandlerService } from '../response-handler/response-handler.service';
 import { JWTPayload } from '../interfaces/authentication/jwtPayload.interface';
-import { SESSION_STATUS, USER_GROUP } from '../constants/autenticationConstants/userContants';
+import { SESSION_STATUS, USER_TYPE } from '../constants/autenticationConstants/userContants';
 import { ConfigService } from '../config/config.service';
 import { COMMON_MSG } from '../constants/autenticationConstants/messageConstants';
 
@@ -204,7 +204,7 @@ export class checkIfAdmin implements NestMiddleware {
           };
         
           const payload: JWTPayload = req['userPayload'];
-          if (payload.group != USER_GROUP.ADMIN) {
+          if (payload.user_type != USER_TYPE.ADMIN) {
             this.ResponseHandler.sendErrorResponse(res, errorResponse)
           }
           else
@@ -223,7 +223,7 @@ export class checkIfAdminUser implements NestMiddleware {
           };
         console.log("payload",req['userPayload'])
           const payload: JWTPayload = req['userPayload'];
-          if (payload.group != USER_GROUP.ADMIN) {
+          if (payload.user_type != USER_TYPE.ADMIN) {
             this.ResponseHandler.sendErrorResponse(res, errorResponse)
           }
     next();

@@ -1,5 +1,5 @@
 import { IsString, IsEmail, IsIn, IsNumber, IsOptional, IsNotEmpty } from 'class-validator';
-import { DEFAULT_USER_ROLES, USER_GROUP } from '../../constants/autenticationConstants/userContants';
+import { DEFAULT_USER_ROLES, USER_TYPE } from '../../constants/autenticationConstants/userContants';
 
 export class GetUserListDto {
   @IsOptional()
@@ -17,8 +17,8 @@ export class GetUserListDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(Object.values(USER_GROUP))
-  group: string;
+  @IsIn(Object.values(USER_TYPE))
+  user_type: string;
 
   @IsOptional()
   sortBy: any;
@@ -46,8 +46,8 @@ export class AddMemberDto {
     // password: string;
 
     @IsString()
-    @IsIn(Object.values(USER_GROUP))
-    group: string;
+    @IsIn(Object.values(USER_TYPE))
+    user_type: string;
 
     @IsString()
     phoneNo: string;
@@ -62,9 +62,6 @@ export class AddMemberDto {
     @IsString()
     designation: string;
 
-    @IsOptional()
-    @IsString()
-    permissionId: string
   }
 
   export class AdminChangePasswordDto {
