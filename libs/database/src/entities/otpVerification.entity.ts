@@ -1,7 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, OneToMany, JoinColumn } from "typeorm";
 import "reflect-metadata";
 import { OTP_SEND_ON, OTP_TYPE, USER_ACCOUNT_STATUS, USER_LOGIN_SOURCE, USER_VERIFY_STATUS } from "../../../constants/autenticationConstants/userContants";
-import { PermissionManager } from "./permissionManager.entity";
 import { IsDefined } from "class-validator";
 import { User } from "./user.entity";
 
@@ -18,7 +17,7 @@ export class OtpVerification {
   @Column()
   otp: string
 
-  @ManyToOne(() => User, (u) => u.otpVerifications)
+  @ManyToOne(() => User, (u) => u.otp_verifications)
   @JoinColumn({ name: "user" })
   @IsDefined()
   user: User
