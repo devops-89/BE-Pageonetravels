@@ -46,7 +46,7 @@ export class DBModule {
             password,
             port,
             synchronize,
-            type: 'mysql',
+            type: 'postgres',
             username,
         };
     }
