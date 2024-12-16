@@ -1,4 +1,4 @@
-import { LOGIN_BY, SESSION_STATUS, USER_GROUP } from "../../constants/autenticationConstants/userContants"
+import { LOGIN_BY, SESSION_STATUS, USER_TYPE } from "../../constants/autenticationConstants/userContants"
 
 export declare namespace CustomAuthI
 {
@@ -33,7 +33,7 @@ export declare namespace CustomAuthI
         loginIdentity: string;
         roleName?: string;
         permissionId?: number;
-        group?: USER_GROUP;
+        group?: USER_TYPE;
     }
 
 

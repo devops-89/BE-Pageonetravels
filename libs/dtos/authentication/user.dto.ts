@@ -1,5 +1,5 @@
 import { IsString, IsEmail, IsNumber, Min, Max, Matches, IsOptional, IsNotEmpty, MinLength, IsEnum, isEmail, IsInt } from 'class-validator';
-import { LOGIN_BY, USER_ACCOUNT_STATUS, USER_GROUP } from '../../constants/autenticationConstants/userContants';
+import { LOGIN_BY, USER_ACCOUNT_STATUS, USER_TYPE } from '../../constants/autenticationConstants/userContants';
 import { DEVICE_TYPE } from '../../constants/commonConstants';
 
 export class LoginDto {
@@ -19,7 +19,7 @@ export class LoginDto {
 export class UserQueryDto {
   @IsOptional()
   @IsString()
-  group?: USER_GROUP;
+  user_type?: USER_TYPE;
 
   @IsOptional()
   @IsInt()
@@ -50,8 +50,8 @@ export class PaginationDto {
 }
 export class UserFilterDto {
   @IsOptional()
-  @IsEnum(USER_GROUP)
-  group: USER_GROUP; // Make status optional
+  @IsEnum(USER_TYPE)
+  user_type: USER_TYPE; // Make status optional
 
   @IsOptional()
   @IsString()
@@ -82,8 +82,8 @@ export class LoginOrRegisterDto {
   @IsString()
   countryCode?: string;
 
-  @IsEnum(USER_GROUP)
-  group: USER_GROUP
+  @IsEnum(USER_TYPE)
+  user_type: USER_TYPE
 }
 
 
@@ -233,9 +233,9 @@ export class RegisterDto {
   @IsString()
   name: string;
 
-  @IsEnum(USER_GROUP)
+  @IsEnum(USER_TYPE)
   @IsOptional()
-  group: USER_GROUP;
+  user_type: USER_TYPE;
 }
 
 export class CustomLoginDto {

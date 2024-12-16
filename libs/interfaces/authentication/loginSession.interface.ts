@@ -1,5 +1,5 @@
 import { DEVICE_TYPE } from "../../constants/commonConstants";
-import { LOGIN_BY, SESSION_STATUS, USER_GROUP } from "../../constants/autenticationConstants/userContants"
+import { LOGIN_BY, SESSION_STATUS, USER_TYPE } from "../../constants/autenticationConstants/userContants"
 
 export declare namespace LoginSessionI
 {
@@ -20,7 +20,7 @@ export declare namespace LoginSessionI
 
     interface insertLoginSession
     {
-        userId: number,
+        userId: string,
         refreshToken: string,
         loginStatus: SESSION_STATUS,
         refreshTokenExpiry: number,
@@ -36,7 +36,7 @@ export declare namespace LoginSessionI
         loginIdentity: string;
         roleName?: string;
         permissionId?: number;
-        group?: USER_GROUP;
+        user_type?: USER_TYPE;
         fcmToken?:string;
         deviceType?:DEVICE_TYPE;
     }
