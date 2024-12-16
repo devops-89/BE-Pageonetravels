@@ -76,7 +76,6 @@ export declare namespace UserI {
     interface UpdateRoleAndPermission
     {
         roleName: string, 
-        permission: number // permissionId
         userId:string
     }
 

@@ -32,7 +32,6 @@ export declare namespace CustomAuthI
         loginBy: LOGIN_BY;
         loginIdentity: string;
         roleName?: string;
-        permissionId?: number;
         group?: USER_TYPE;
     }
 

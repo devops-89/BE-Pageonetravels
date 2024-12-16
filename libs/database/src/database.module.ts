@@ -6,12 +6,11 @@ import { ConfigDatabase } from '../../config/config.interface';
 import {
     LoginSessionService,
     OtpVerificationService,
-    PermissionService,
     UserRepositoryService,
     AddressRepositoryService,
  
 } from './';
-import { User, Permission, OtpVerification, LoginSession, Address} from './';
+import { User, OtpVerification, LoginSession, Address} from './';
 
 @Module({})
 export class DBModule {
@@ -26,7 +25,6 @@ export class DBModule {
             ...connectionOptions,
             entities: [
                 User,
-                Permission,
                 OtpVerification,
                 LoginSession,
                 Address,
@@ -66,7 +64,6 @@ export class DBModule {
                 }),
                 TypeOrmModule.forFeature([
                     User,
-                    Permission,
                     OtpVerification,
                     LoginSession,
                     Address,
@@ -76,7 +73,6 @@ export class DBModule {
             controllers: [],
             providers: [
                 UserRepositoryService,
-                PermissionService,
                 OtpVerificationService,
                 LoginSessionService,
                 AddressRepositoryService,
@@ -84,7 +80,6 @@ export class DBModule {
             ],
             exports: [
                 UserRepositoryService,
-                PermissionService,
                 OtpVerificationService,
                 LoginSessionService,
                 AddressRepositoryService,

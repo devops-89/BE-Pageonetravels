@@ -10,12 +10,12 @@ export declare namespace AddressI
         country: string,
         postalCode: string,
         isDefault?:boolean,
-        userId?: number,
+        userId?: string,
         addressType: string
     }
 
     interface UpdateAdress extends Partial<AddAdress>
     {
-        id: number;
+        id: string;
     }
 }

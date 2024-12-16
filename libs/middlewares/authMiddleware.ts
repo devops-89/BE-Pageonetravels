@@ -204,7 +204,7 @@ export class checkIfAdmin implements NestMiddleware {
           };
         
           const payload: JWTPayload = req['userPayload'];
-          if (payload.group != USER_TYPE.ADMIN) {
+          if (payload.user_type != USER_TYPE.ADMIN) {
             this.ResponseHandler.sendErrorResponse(res, errorResponse)
           }
           else
@@ -223,7 +223,7 @@ export class checkIfAdminUser implements NestMiddleware {
           };
         console.log("payload",req['userPayload'])
           const payload: JWTPayload = req['userPayload'];
-          if (payload.group != USER_TYPE.ADMIN) {
+          if (payload.user_type != USER_TYPE.ADMIN) {
             this.ResponseHandler.sendErrorResponse(res, errorResponse)
           }
     next();

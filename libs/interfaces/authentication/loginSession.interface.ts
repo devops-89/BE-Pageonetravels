@@ -31,11 +31,10 @@ export declare namespace LoginSessionI
     }
 
     interface GetLoginToken {
-        userId: number;
+        userId: string;
         loginBy: LOGIN_BY;
         loginIdentity: string;
         roleName?: string;
-        permissionId?: number;
         user_type?: USER_TYPE;
         fcmToken?:string;
         deviceType?:DEVICE_TYPE;

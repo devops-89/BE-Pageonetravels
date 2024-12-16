@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import {  LoginSession, LoginSessionService, User, UserRepositoryService } from '../../../../../libs/database/src';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PermissionManagerService } from '../../../../../libs/database/src';
 import { DefaultUserService } from './services/defaultUserService';
 import { DBModule, OtpVerificationService} from '../../../../../libs/database/src';
 import { AuthService } from './services/auth.service';
@@ -24,7 +23,6 @@ import { ConfigService } from '../../../../../libs/config/config.service';
       LoginSession,
       User,
       UserRepositoryService,
-      PermissionManagerService,
       OtpVerificationService,
       LoginService,
       JwtService,

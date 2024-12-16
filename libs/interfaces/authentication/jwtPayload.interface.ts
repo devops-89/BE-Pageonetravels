@@ -1,15 +1,14 @@
-import { USER_GROUP } from "../../constants/autenticationConstants/userContants";
+import { USER_TYPE } from "../../constants/autenticationConstants/userContants";
 import { ERROR_CODES, ErrorMessages, TOKEN_TYPE } from "../../constants/commonConstants";
 
 export interface JWTPayload
 {
-    referenceId: number,  //userId
+    referenceId: string,  //userId
     guestId: string,
     refreshToken: string,
     userRole: string,
-    permissionId: number,
     sessionId: number,
-    group: USER_GROUP,
+    user_type: USER_TYPE,
     tokenType: TOKEN_TYPE
 }
 
