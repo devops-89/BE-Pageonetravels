@@ -15,7 +15,7 @@ export declare namespace ApiResponse
     {
         data?: any,
         statusCode?: number,
-        message: string,
+        message?: string,
         extraMessage?: any
         success?: boolean
     }
