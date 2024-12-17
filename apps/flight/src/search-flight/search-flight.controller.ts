@@ -1,8 +1,22 @@
-import { Controller } from '@nestjs/common';
+import { Controller , Req, Res, Get} from '@nestjs/common';
+import { SearchFlightService } from './search-flight.service';
+import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 
-@Controller('search-flight')
+@Controller('/flight')
 export class SearchFlightController {
-    constructor(){
-        
+    constructor(private readonly searchflightsearvice:SearchFlightService,
+        private readonly responseHandler: ResponseHandlerService,
+    ){}
+
+    @Get('/data')
+    async generateToken(@Req() req : Request, @Res() res: Response){
+        try {
+            const result = this.searchflightsearvice.generateToken();
+            return result
+            // return this.responseHandler.sendSuccessResponse(res,result)
+        }catch(error){
+            console.log("error in the generate token", error)
+            return this.responseHandler.sendErrorResponse(res,error)
+        }
     }
 }
