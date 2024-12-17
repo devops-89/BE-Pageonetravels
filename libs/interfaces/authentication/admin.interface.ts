@@ -23,16 +23,16 @@ export declare namespace AdminI {
     interface AddStaffMember {
         email: string,
         password: string,
-        name: string,
+        new_password: string,
         designation: string,
         user_type: USER_TYPE,
-        phoneNo: string,
-        countryCode: string
+        phone_no: string,
+        reference_id: string
     }
 
     interface ChangePassword {
-        oldPassword: string,
-        newPassword: string,
+        old_password: string,
+        new_password: string,
         email: string
     }
 

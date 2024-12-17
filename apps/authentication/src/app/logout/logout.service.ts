@@ -15,8 +15,8 @@ logoutCurrentSession(userPayload: JWTPayload): Promise<ApiResponse.ApiOK>
     return new Promise(async(resolve, reject)=>{
         try {
 
-            const { sessionId } = userPayload;
-            await this.LoginSessionModel.logoutCurrentSession(sessionId);
+            const { session_id } = userPayload;
+            await this.LoginSessionModel.logoutCurrentSession(session_id);
 
             resolve({ message: LOGOUT_MSG.LOGOUT_CURRENT, data: null });
             return;
@@ -33,8 +33,8 @@ logoutAllSession(userPayload: JWTPayload): Promise<ApiResponse.ApiOK>
     return new Promise(async(resolve, reject)=>{
         try {
 
-            const { referenceId } = userPayload;
-            await this.LoginSessionModel.logoutAllSessionDb(referenceId);
+            const { reference_id } = userPayload;
+            await this.LoginSessionModel.logoutAllSessionDb(reference_id);
 
             resolve({ message: LOGOUT_MSG.LOGOUT_ALL, data: null });
             return;

@@ -29,7 +29,7 @@ export class AddressRepositoryService {
 
     async insertAddress(input: AddressI.AddAdress): Promise<Address> {
         try {
-            const { city, country, houseNo, isDefault, postalCode, street, state,  addressType } = input;
+            const { city, country, houseNo, isDefault, postal_code, street, state,  addressType } = input;
             const isDefaultValue = isDefault || false;
             const addType = addressType || "HOME";
             
@@ -38,7 +38,7 @@ export class AddressRepositoryService {
                 country,
                 houseNo,
                 isDefault:isDefaultValue,
-                postalCode,
+                postal_code,
                 state,
                 street,
                 addressType : addType,
@@ -69,9 +69,9 @@ export class AddressRepositoryService {
 
     async updateAddress(input: AddressI.UpdateAdress): Promise<void> {
         try {
-            const { city, country, houseNo, isDefault, postalCode, street, addressType, id, userId } = input;
+            const { city, country, houseNo, isDefault, postal_code, street, addressType, id, userId } = input;
 
-            const updateFields = this.mapObject({ city, country, houseNo, isDefault, postalCode, street, addressType });
+            const updateFields = this.mapObject({ city, country, houseNo, isDefault, postal_code, street, addressType });
             // await this.addressRepository.update({ id, user: { id: userId } }, updateFields);
             return;
         } catch (error) {
@@ -81,9 +81,9 @@ export class AddressRepositoryService {
 
     async updateStoreAddress(id:string, input: AddressI.UpdateAdress): Promise<void> {
         try {
-            const { city, country, houseNo, isDefault, postalCode, street, addressType, userId } = input;
+            const { city, country, houseNo, isDefault, postal_code, street, addressType, userId } = input;
 
-            const updateFields = this.mapObject({ city, country, houseNo, isDefault, postalCode, street, addressType });
+            const updateFields = this.mapObject({ city, country, houseNo, isDefault, postal_code, street, addressType });
             // await this.addressRepository.update({ id, user: { id: userId } }, updateFields);
             return;
         } catch (error) {

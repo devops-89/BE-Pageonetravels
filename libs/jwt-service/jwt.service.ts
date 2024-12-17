@@ -56,7 +56,7 @@ export class JwtService {
   public verifyJWTToken(token: string | null): Promise<VerifyJWTTokenResult> {
     return new Promise((resolve) => {
       if (!token) {
-        resolve({ verified: false, errorCode: ERROR_CODES.NOT_AUTHORIZED, errorMessage: ErrorMessages.NOT_AUTHORIZED, payload: null });
+        resolve({ verified: false, error_code: ERROR_CODES.NOT_AUTHORIZED, error_message: ErrorMessages.NOT_AUTHORIZED, payload: null });
         return;
       }
 
@@ -65,14 +65,14 @@ export class JwtService {
       jwt.verify(token, Buffer.from(JWTSecretKey, 'base64'), { algorithms: ['HS512'] }, function (err, payload: any) {
         if (err || !payload) {
           if (err && err instanceof jwt.TokenExpiredError) {
-            resolve({ verified: false, errorCode: ERROR_CODES.JWT_TOKEN_EXPIRED, errorMessage: ErrorMessages.JWT_TOKEN_EXPIRED, payload: null });
+            resolve({ verified: false, error_code: ERROR_CODES.JWT_TOKEN_EXPIRED, error_message: ErrorMessages.JWT_TOKEN_EXPIRED, payload: null });
             return;
           } else {
-            resolve({ verified: false, errorCode: ERROR_CODES.JWT_TOKEN_INVALID, errorMessage: ErrorMessages.JWT_TOKEN_INVALID, payload: null });
+            resolve({ verified: false, error_code: ERROR_CODES.JWT_TOKEN_INVALID, error_message: ErrorMessages.JWT_TOKEN_INVALID, payload: null });
             return;
           }
         } else {
-          resolve({ verified: true, payload, errorCode: 0, errorMessage: null });
+          resolve({ verified: true, payload, error_code: 0, error_message: null });
           return;
         }
       });

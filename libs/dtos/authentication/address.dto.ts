@@ -24,7 +24,7 @@ export class InsertAddressDto {
 
     @IsString()
     // @IsNotEmpty({ message: 'PostalCode is required' })
-    postalCode: string;
+    postal_code: string;
 
     @IsBoolean()
     @IsOptional()
@@ -74,7 +74,7 @@ export class InsertAddressDto {
     @IsString()
     @IsOptional()
     // @IsNotEmpty({ message: 'PostalCode is required' })
-    postalCode: string;
+    postal_code: string;
 
     @IsBoolean()
     @IsOptional()

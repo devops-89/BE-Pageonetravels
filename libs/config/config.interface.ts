@@ -10,6 +10,7 @@ export interface ConfigDatabase {
   type: string,
   synchronize: boolean,
   logging: boolean,
+  url?: string,
   entities: any[]//[path.join(__dirname, '**', '*.entity.{ts,js}')]
 }
 

@@ -12,7 +12,7 @@ export class ResetPasswordDto {
 
   @IsNumber()
   @IsNotEmpty({ message: 'Reference ID is required' })
-  referenceId: number;
+  reference_id: number;
 
   @IsString()
   @IsNotEmpty({ message: 'Password is required' })
