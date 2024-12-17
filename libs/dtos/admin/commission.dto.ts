@@ -1,10 +1,11 @@
 import { IsString, IsNotEmpty, IsNumber, IsBoolean, IsOptional,IsUUID } from 'class-validator';
+import { COMMISSION } from 'libs/constants/adminConstants';
 
 export class AddCommissionDto{
 
 @IsString()
 @IsNotEmpty()
-type: string
+type: COMMISSION
 
 @IsNumber()
 @IsNotEmpty()
@@ -27,7 +28,7 @@ export class UpdateCommissionDto{
 
     @IsString()
     @IsNotEmpty()
-    type: string
+    type: COMMISSION
 
     @IsNumber()
     @IsNotEmpty()

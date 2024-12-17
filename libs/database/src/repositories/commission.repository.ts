@@ -5,6 +5,7 @@ import { Commission } from '../entities/commission.entity';
 import { Icommission } from '../../../../libs/interfaces/commonTypes/commission.interface';
 import { Ucommission } from '../../../../libs/interfaces/commonTypes/commission.interface';
 import { retry } from 'rxjs';
+import { COMMISSION } from 'libs/constants/adminConstants';
 
 @Injectable()
 export class CommissionRepositoryService {
@@ -22,10 +23,11 @@ export class CommissionRepositoryService {
         try {
             const { type, percentage, status } = input;
 
+            const percent = parseFloat(percentage.toFixed(2));
             // Create a new commission entity
             const newCommission = this.commissionRepository.create({
                 type,
-                percentage,
+                percentage: percent,
                 status,
             });
 
@@ -76,6 +78,12 @@ export class CommissionRepositoryService {
             if (!existingCommission) {
                 throw `Commission not found with ID: ${commission_id}`;
             }
+            
+             
+            
+            const comm_percent = parseFloat((input.percentage).toFixed(2));
+            input.percentage = comm_percent;
+            
             // Assign new values to the existing commission entity
             Object.assign(existingCommission, input);
             // Save the updated commission
