@@ -37,5 +37,21 @@ export const DEFAULT_CONFIG: ConfigData = {
     },
     FIREBASE_SERVICE_ACCOUNT: '',
     PaypalCredentials: { PAYPAL_MODE: '', PAYPAL_CLIENT_ID: '', PAYPAL_CLIENT_SECRET: ''},
-    RAZORPAY_CREDENTIAL: { RAZORPAY_KEY: '', RAZORPAY_KEY_SECRET: ''}
+    RAZORPAY_CREDENTIAL: { RAZORPAY_KEY: '', RAZORPAY_KEY_SECRET: ''},
+    TBO_CREDENTIALS: {
+        FLIGHT_AUTHENTICATION : '',
+        FLIGHT_SEARCH : '',
+        FLIGHT_FARERULE : '',
+        FLIGHT_FAREQUOTE : '',
+        FLIGHT_BOOKING : '',
+        FLIGHT_TICKET : '',
+        FLIGHT_BOOKING_DETAILS : '',
+        FLIGHT_CALENDER_DETAILS : '',
+      
+      
+        FLIGHT_CLIENT_ID :  '',
+        FLIGHT_USERNAME :  '',
+        FLIGHT_PASSWORD : '',
+        FLIGHT_ENDUSERIP : '',
+    }
 };

@@ -8,10 +8,11 @@ import {
     OtpVerificationService,
     UserRepositoryService,
     AddressRepositoryService,
+    CommissionRepositoryService,
     SettingRepositoryService
  
 } from './';
-import { User, OtpVerification, LoginSession, Address, Setting} from './';
+import { User, OtpVerification, LoginSession, Address, Setting,Commission} from './';
 
 @Module({})
 export class DBModule {
@@ -29,6 +30,7 @@ export class DBModule {
                 OtpVerification,
                 LoginSession,
                 Address,
+                Commission,
                 Setting
                 
             ],
@@ -71,6 +73,7 @@ export class DBModule {
                     OtpVerification,
                     LoginSession,
                     Address,
+                    Commission,
                     Setting
                    
                 ]),
@@ -81,6 +84,7 @@ export class DBModule {
                 OtpVerificationService,
                 LoginSessionService,
                 AddressRepositoryService,
+                CommissionRepositoryService,
                 SettingRepositoryService
                
             ],
@@ -89,6 +93,7 @@ export class DBModule {
                 OtpVerificationService,
                 LoginSessionService,
                 AddressRepositoryService,
+                CommissionRepositoryService,
                 SettingRepositoryService
 
             ],

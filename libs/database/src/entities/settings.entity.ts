@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity()
+@Entity('setting')
 export class Setting {
   @PrimaryGeneratedColumn("uuid")
   id: string;  // UUID is a string, so change the type to string
@@ -8,15 +8,15 @@ export class Setting {
   @Column({ type: 'varchar', unique: true })
   key: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'json' })
   value: string;
 
   @Column({ type: 'varchar', nullable: true })
   description: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updated_at: Date;
 }

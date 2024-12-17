@@ -25,7 +25,7 @@ export enum USER_TYPE {
     HOTEL = "HOTEL"
 }
 
-export enum USER_GROUP_ROLE{
+export enum USER_GROUP_ROLE{    
 }
 
 export enum SESSION_STATUS {

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigData, ConfigDatabase, ConfigS3Bucket, GoogleAuth, PaypalPaymentGatewayCred, RAZORPAY, SMTP, ServicesPort, TWILIO_SECRETE } from './config.interface';
+import { ConfigData, ConfigDatabase, ConfigS3Bucket, FLIGHTDATA, GoogleAuth, PaypalPaymentGatewayCred, RAZORPAY, SMTP, ServicesPort, TWILIO_SECRETE } from './config.interface';
 import { DEFAULT_CONFIG } from './config.default';
 import { config } from 'dotenv';
 import { url } from 'inspector';
@@ -8,7 +8,9 @@ config();
 @Injectable()
 export class ConfigService {
     private config: ConfigData;
-    constructor(data: ConfigData = DEFAULT_CONFIG) {
+    constructor(data: ConfigData = DEFAULT_CONFIG, 
+      // private readonly settingRepo : SettingRepositoryService
+    ) {
       this.config = data;
     }
 
@@ -34,9 +36,13 @@ export class ConfigService {
       FIREBASE_SERVICE_ACCOUNT: env.FIREBASE_SERVICE_ACCOUNT,
       PaypalCredentials:this.parsePaypalConfig(env),
       SERVER_BASE_PATH: process.env.SERVER_BASE_PATH,
-      RAZORPAY_CREDENTIAL: this.parseRazorpayConfig(env)
+      RAZORPAY_CREDENTIAL: this.parseRazorpayConfig(env),
+      
     };
   }
+
+
+
   private parseDBConfig(env: NodeJS.ProcessEnv, defaultConfig: Readonly<ConfigDatabase> ) {
     return {
       host: process.env.DB_HOST || "",
@@ -114,5 +120,13 @@ export class ConfigService {
   
   public get(): Readonly<ConfigData> {
     return this.config;
+  }
+
+  setTBOConfig(flightData:FLIGHTDATA){
+    // if (!this.config) {
+    //   this.config = {}; // Ensure the config object exists
+    // }
+  
+    this.config.TBO_CREDENTIALS = { ...flightData }; // Shallow copy to avoid direct reference
   }
 }

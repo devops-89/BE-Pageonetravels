@@ -100,4 +100,20 @@ export interface ConfigData {
   FIREBASE_SERVICE_ACCOUNT:string,
   PaypalCredentials :PaypalPaymentGatewayCred
   RAZORPAY_CREDENTIAL :RAZORPAY
+  TBO_CREDENTIALS?: FLIGHTDATA
+}
+
+export interface FLIGHTDATA {
+  FLIGHT_AUTHENTICATION : string
+  FLIGHT_SEARCH : string
+  FLIGHT_FARERULE : string
+  FLIGHT_FAREQUOTE : string
+  FLIGHT_BOOKING : string
+  FLIGHT_TICKET : string
+  FLIGHT_BOOKING_DETAILS : string
+  FLIGHT_CALENDER_DETAILS : string
+  FLIGHT_CLIENT_ID :  string
+  FLIGHT_USERNAME :  string
+  FLIGHT_PASSWORD : string
+  FLIGHT_ENDUSERIP : string
 }
