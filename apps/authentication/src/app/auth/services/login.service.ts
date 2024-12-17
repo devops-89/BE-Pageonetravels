@@ -16,24 +16,24 @@ async getLoginToken(input: LoginSessionI.GetLoginToken)
 {
     try {
         const { userId, loginBy, loginIdentity, roleName,  deviceType, user_type } = input
-        const refreshToken = getRandomString(16, false, false);
+        const refresh_token = getRandomString(16, false, false);
         const expiryTimeStamp = Date.now() + 60 * 60 * 24 * 30 * 1000;   // 90 days
 
         const loginSession: LoginSessionI.insertLoginSession = {
-            loginStatus: SESSION_STATUS.LOGGED_IN, refreshToken, refreshTokenExpiry: expiryTimeStamp, userId, loginBy, loginIdentity ,deviceType
+            loginStatus: SESSION_STATUS.LOGGED_IN, refresh_token, refreshTokenExpiry: expiryTimeStamp, userId, loginBy, loginIdentity ,deviceType
         }
 
         const session = await this.LoginSessionModel.insertLoginSession(loginSession);
         const jwtToken = await this.jwtService.generateJWTToken({
-            referenceId: userId,
-            refreshToken,
-            userRole: roleName,
-            sessionId: session.id,
+            reference_id: userId,
+            refresh_token,
+            user_role: roleName,
+            session_id: session.id,
             user_type,
-            tokenType: TOKEN_TYPE.USER_LOGIN
+            token_type: TOKEN_TYPE.USER_LOGIN
         });
 
-        return { jwtToken, refreshToken };
+        return { jwtToken, refresh_token };
     }
     catch (error) {
         console.log("Error generate login token", error)

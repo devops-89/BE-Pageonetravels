@@ -10,6 +10,7 @@ export interface ConfigDatabase {
   type: string,
   synchronize: boolean,
   logging: boolean,
+  url?: string,
   entities: any[]//[path.join(__dirname, '**', '*.entity.{ts,js}')]
 }
 
@@ -27,8 +28,9 @@ export interface ConfigAuthorizationData {
 
 export interface ServicesPort {
   authentication: number;
-  product: number;
+  flight: number;
   userManagement: number
+  adminpanel: number
 }
 
 export interface SMTP  {

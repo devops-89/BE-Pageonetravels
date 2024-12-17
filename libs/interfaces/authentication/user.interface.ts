@@ -8,7 +8,7 @@ export declare namespace UserI {
     interface AddressSchema {
         street: string;
         houseNo: string;
-        postalCode: string;
+        postal_code: string;
         city: string;
         country: string;
         state: string;
@@ -19,8 +19,10 @@ export declare namespace UserI {
         full_name: string,
         avatar: string,
         email: string,
-        phone_number: string,
         country_code: string,
+        status: USER_ACCOUNT_STATUS,
+        verify_status: USER_VERIFY_STATUS,
+        phone_number: string,
         password: string,
         user_type: USER_TYPE,
         is_phone_verified: boolean,
@@ -45,7 +47,7 @@ export declare namespace UserI {
     interface InsertUserByPhone
     {
         phone_number: string,
-        country_code: string
+        country_code:string,
         id?: string,
         user_type: USER_TYPE,
     }
@@ -54,13 +56,13 @@ export declare namespace UserI {
     {
         full_name?: string,
         password?: string,
-        phone_number?: string,
+        email: string,
+        is_email_verified?: boolean,
         country_code?: string,
+        phone_number?: string,
         id?: string,
         roleName?: string,
         user_type?: USER_TYPE,
-        email: string,
-        is_email_verified?: boolean,
         avatar?:string
     }
 
@@ -81,9 +83,9 @@ export declare namespace UserI {
 
     interface UpdateUserStatus
     {
-        userId: string,
+        user_id:string,
         status: USER_ACCOUNT_STATUS,
-        verifyStatus: USER_VERIFY_STATUS,
+        verify_status: USER_VERIFY_STATUS,
         isPhoneNoVerified?: boolean,
         is_email_verified?: boolean,
         password?: string
@@ -94,7 +96,7 @@ export declare namespace UserI {
     {
         email: string,
         password: string,
-        // userRole: string,
+        // user_role: string,
         name: string,
         user_type: USER_TYPE
     }
@@ -106,23 +108,23 @@ export declare namespace UserI {
 
 
     interface LoginWithPhone {
-        phoneNo: string,
-        countryCode: string,
+        phone_number: string,
+        country_code: string,
         user_type: USER_TYPE
     }
     
     interface VerifyByOtp {
-        referenceId: number,
+        reference_id: number,
         otp:string
     }
 
   
     interface LoginWithEmailOrPhone {
         // email: string,
-        // phoneNo: string,
-        countryCode:string,
+        // phone_no: string,
+        country_code:string,
         identity: string
-        userRole:string,
+        user_role:string,
         user_type: string
     }
 
@@ -134,9 +136,8 @@ export declare namespace UserI {
         country_code: string,
         password: string,
         avatar: string,
-        is_phone_verirfied: boolean,
+        phone_no: boolean,
     }
-    
     export interface UpdatePersonalDetailRequest
     {
         name: string,
@@ -157,24 +158,24 @@ export declare namespace UserI {
         phone_number: string,
         userId: number,
         isPhoneNoVerified: boolean,
-        countryCode: string
+        country_code: string
     }
 
     interface AddUser
     {
         name: string,
         email: string,
-        // phoneNo: string,
-        userRole: DEFAULT_USER_ROLES,
+        // phone_no: string,
+        user_role: DEFAULT_USER_ROLES,
         roleId: string,
     }
 
     interface VerifyAddUser
     {
-        userName: string,
+        user_name: string,
         password: string,
-        phoneNo: string,
-        countryCode: string
+        phone_no: string,
+        country_code: string
         // avatar
     }
 
@@ -182,10 +183,10 @@ export declare namespace UserI {
     {
         userId: string,
         fullName: string,
-        userRole: string,
-        userName: string,
+        user_role: string,
+        user_name: string,
         email?: string,
-        phoneNo?: string,
+        phone_no?: string,
         password?: string,
     }
 
@@ -209,14 +210,14 @@ export declare namespace UserI {
 
     interface RenewAccessToken {
         accessToken: string,
-        refreshToken: string
+        refresh_token: string
     }
 
     interface ChangePassword {
-        oldPassword: string,
-        newPassword: string,
+        old_password: string,
+        new_password: string,
         otp: string;
-        referenceId:number
+        reference_id:number
     }
 
     interface UpdateUserAccountStatus

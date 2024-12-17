@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigData, ConfigDatabase, ConfigS3Bucket, GoogleAuth, PaypalPaymentGatewayCred, RAZORPAY, SMTP, ServicesPort, TWILIO_SECRETE } from './config.interface';
 import { DEFAULT_CONFIG } from './config.default';
 import { config } from 'dotenv';
+import { url } from 'inspector';
 config();
 
 @Injectable()
@@ -43,10 +44,10 @@ export class ConfigService {
       username: process.env.DB_USERNAME || "",
       password: process.env.DB_PASSWORD || "",
       database: process.env.DB_DATABASE || "",
-      type: 'mysql',
+      type: 'postgres',
       synchronize: true,
       logging: false,
-      entities: [] as any
+      entities: [] as any,
     };
   }
 
@@ -62,8 +63,9 @@ export class ConfigService {
   private parseServicePorts( env: NodeJS.ProcessEnv, defaultConfig: Readonly<ServicesPort>): ServicesPort  {
     return {
       authentication: parseInt(env.AUTHENTICATION_PORT, 10) || defaultConfig.authentication,
-      product: parseInt(env.PRODUCT_PORT, 10) || defaultConfig.product,
+      flight: parseInt(env.FLIGHT_PORT, 10) || defaultConfig.flight,
       userManagement: parseInt(env.USER_MANAGEMENT) || defaultConfig.userManagement,
+      adminpanel: parseInt(env.ADMIN_PANEL) || defaultConfig.adminpanel,
     };
   }
 

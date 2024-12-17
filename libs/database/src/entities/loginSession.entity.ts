@@ -7,8 +7,8 @@ import { DEVICE_TYPE } from "../../../../libs/constants/commonConstants";
 
 @Entity('loginsession')
 export class LoginSession {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Column({ type: 'timestamp', default: () => 'now()' })
   createdAt: Date
@@ -37,7 +37,7 @@ export class LoginSession {
   deviceType: DEVICE_TYPE 
 
   @Column()
-  refreshToken: string
+  refresh_token: string
 
   @Column({
     type: 'enum',

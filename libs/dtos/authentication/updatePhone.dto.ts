@@ -7,9 +7,9 @@ export class AdminVerifyPhoneDto
 
         @IsString()
         @IsOptional()
-        phoneNo:string
+        phone_no:string
         
         @IsString()
         @IsOptional()
-        countryCode:string
+        reference_id:string
     }

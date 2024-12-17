@@ -8,8 +8,8 @@ import { User } from "./user.entity";
 @Entity('otpverification')
 export class OtpVerification {
 
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryGeneratedColumn("uuid")
+  id: string;  
 
   @Column({ type: 'timestamp', default: () => 'now()' })
   createdAt: Date
@@ -40,7 +40,7 @@ export class OtpVerification {
 
   @Column({nullable:true})
   @IsDefined()
-  countryCode: string
+  reference_id: string
 
   @Column({type:"bigint"})
   expiryTime: number

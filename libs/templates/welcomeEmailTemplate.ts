@@ -1,7 +1,7 @@
 import { LOGO } from '../constants/commonConstants'; // Adjust path as needed
 
 // Email template function
-export const welcomeEmailTemplate = (userName: string) => {
+export const welcomeEmailTemplate = (user_name: string) => {
     const html = `<!DOCTYPE html>
 <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
 <head>
@@ -114,7 +114,7 @@ export const welcomeEmailTemplate = (userName: string) => {
                                                         <tr>
                                                             <td class="pad">
                                                                 <h1 style="margin: 0; color: #1e0e4b; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 15px; font-weight: 700; text-align: left;">
-                                                                    <strong>Dear ${userName || "User"},</strong>
+                                                                    <strong>Dear ${user_name || "User"},</strong>
                                                                 </h1>
                                                             </td>
                                                         </tr>

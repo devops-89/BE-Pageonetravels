@@ -89,7 +89,7 @@ export interface IProductMedia {
 
 export interface IProductFilter {
   productName?: string,
-  referenceId?: number,
+  reference_id?: number,
   isSeller?: boolean,
   productStatus?: string
   productId?: number,

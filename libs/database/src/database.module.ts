@@ -37,7 +37,9 @@ export class DBModule {
     }
 
     private static getConnectionOptionsPostgres(dbData: ConfigDatabase): TypeOrmModuleOptions {
-        const { database, entities, host, logging, password, port, synchronize, type, username } = dbData;
+        const { database, entities, host, logging, password, port, synchronize, type, username, url } = dbData;
+        // return {url, type:'postgres'}
+        
         return {
             database,
             entities,
