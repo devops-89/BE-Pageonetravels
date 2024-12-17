@@ -36,7 +36,7 @@ export declare namespace UserI {
 
     interface InsertUserByEmail
     {
-        name?: string,
+        full_name?: string,
         email: string,
         password?: string,
         user_type?: USER_TYPE,
@@ -72,7 +72,9 @@ export declare namespace UserI {
         password: string,
         user_type: USER_TYPE,
         full_name: string,
-        is_email_verified?: boolean
+        status: USER_ACCOUNT_STATUS,
+        verify_status?: USER_VERIFY_STATUS,
+        is_email_verified:boolean
     }
 
     interface UpdateRoleAndPermission
@@ -110,7 +112,7 @@ export declare namespace UserI {
     interface LoginWithPhone {
         phone_number: string,
         country_code: string,
-        user_type: USER_TYPE
+        user_type: USER_TYPE,
     }
     
     interface VerifyByOtp {
@@ -130,13 +132,12 @@ export declare namespace UserI {
 
     interface UpdateProfile {
         userId: string,
-        name: string,
+        full_name: string,
         email: string,
         phone_number: string,
         country_code: string,
         password: string,
         avatar: string,
-        phone_no: boolean,
     }
     export interface UpdatePersonalDetailRequest
     {
@@ -182,7 +183,7 @@ export declare namespace UserI {
     export interface UpdateUserProfile
     {
         userId: string,
-        fullName: string,
+        full_name: string,
         user_role: string,
         user_name: string,
         email?: string,

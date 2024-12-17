@@ -35,7 +35,7 @@ export class UserRepositoryService {
         try {
             const selectFields = {
                 id: true,
-                name: true,
+                full_name: true,
                 email: true,
                 phone_no: true,
                 reference_id: true,
@@ -66,19 +66,18 @@ export class UserRepositoryService {
     async getUnverifiedUserByEmail(email: string, getPassword = false): Promise<(UserI.UserSchema & { passwordExist: boolean }) | null> {
         try {
             const selectFields = {
-                name: true,
+                full_name: true,
                 email: true,
-                phone_no: true,
+                phone_number: true,
                 reference_id: true,
                 verify_status: true,
                 password: true,
                 avatar: true,
-                roleName: true,
-                group: true,
+                user_type: true,
                 // designation: true,
                 status: true,
                 id: true,
-                isPhoneNoVerified: true,
+                is_phone_verified: true,
                 is_email_verified: true
             };
 
@@ -107,10 +106,10 @@ export class UserRepositoryService {
 
     async insertDefaultUser(input: UserI.InsertDefaultUser): Promise<User> {
         try {
-            const { email, password, user_type, full_name, is_email_verified } = input;
+            const { email, status, password, user_type, full_name, is_email_verified } = input;
 
 
-            const insertVal = { email, password, user_type, full_name, is_email_verified: is_email_verified ? is_email_verified : false };
+            const insertVal = { email, status, password, user_type, full_name, is_email_verified: is_email_verified ? is_email_verified : false , verify_status:USER_VERIFY_STATUS.VERIFIED};
 
             const user = await this.userRepository.save(this.userRepository.create(insertVal));
             return user;
@@ -133,6 +132,8 @@ export class UserRepositoryService {
                 password, 
                 full_name, 
                 is_email_verified,
+                status:'ACTIVE',
+                verify_status: 'UNVERIFIED'
             };
     
             const fields = this.mapObject(insertVal);

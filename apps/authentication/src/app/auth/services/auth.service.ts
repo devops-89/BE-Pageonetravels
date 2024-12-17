@@ -3,7 +3,7 @@
 /* eslint-disable no-async-promise-executor */
 import { Injectable } from '@nestjs/common';
 import { LoginSessionService, OtpVerificationService, User, UserRepositoryService } from '../../../../../../libs/database/src';
-import { LOGIN_BY, OTP_REQUEST_LIMITS, OTP_SEND_ON, OTP_TYPE, SESSION_STATUS, USER_ACCOUNT_STATUS, USER_LOGIN_SOURCE, USER_VERIFY_STATUS } from '../../../../../../libs/constants/autenticationConstants/userContants';
+import { LOGIN_BY, OTP_REQUEST_LIMITS, OTP_SEND_ON, OTP_TYPE, SESSION_STATUS, USER_ACCOUNT_STATUS, USER_LOGIN_SOURCE, USER_TYPE, USER_VERIFY_STATUS } from '../../../../../../libs/constants/autenticationConstants/userContants';
 import { DEVICE_TYPE, ERROR_CODES, TOKEN_TYPE } from '../../../../../../libs/constants/commonConstants';
 import { COMMON_MSG, LOGIN_MSG, OTP_VERIFY_MSG, SIGNUP_MSG } from '../../../../../../libs/constants/autenticationConstants/messageConstants';
 import { UserI } from '../../../../../../libs/interfaces/authentication/user.interface';
@@ -180,19 +180,19 @@ export class AuthService {
                     userId = insertedId
                     otpType = OTP_TYPE.REGISTER_OTP
                 }
-                // else if(user.group == USER_GROUP.SELLER || user.group == USER_GROUP.BUYER)
-                // {
-                //     reject({ message: "You are not authorised to access the website.", statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
-                //     return;
-                // }
-                // else if (user.status == USER_ACCOUNT_STATUS.BLOCKED) {
-                //     reject({ message: COMMON_MSG.BLOCKED_USER, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
-                //     return;
-                // }
-                // else if (user.status != USER_ACCOUNT_STATUS.ACTIVE) {
-                //     reject({ message: LOGIN_MSG.INACTIVE_ACCOUNT, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
-                //     return;
-                // }
+                else if(user.user_type == USER_TYPE.USER || user.user_type == USER_TYPE.HOTEL)
+                {
+                    reject({ message: "You are not authorised to access the website.", statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
+                    return;
+                }
+                else if (user.status == USER_ACCOUNT_STATUS.BLOCKED) {
+                    reject({ message: COMMON_MSG.BLOCKED_USER, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
+                    return;
+                }
+                else if (user.status != USER_ACCOUNT_STATUS.ACTIVE) {
+                    reject({ message: LOGIN_MSG.INACTIVE_ACCOUNT, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
+                    return;
+                }
                 else {
                     userId = user.id;
                 }

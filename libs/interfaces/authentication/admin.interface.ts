@@ -23,7 +23,7 @@ export declare namespace AdminI {
     interface AddStaffMember {
         email: string,
         password: string,
-        name: string,
+        new_password: string,
         designation: string,
         user_type: USER_TYPE,
         phone_no: string,
