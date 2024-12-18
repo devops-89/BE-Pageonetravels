@@ -31,6 +31,28 @@ export class UserRepositoryService {
         return resObj;
     }
 
+
+    async getUserWithFilters(pagination: PaginationDto){
+        try{
+            const user_type = USER_TYPE.USER;
+            const { page = 1, limit = 10 } = pagination;
+
+            const queryBuilder = this.userRepository.createQueryBuilder('user')
+                                .select([ 'user.id', 'user.full_name','user.email', 'user.phone_number','user.createdAt'])
+                                 .where('user.user_type = :user_type', { user_type })
+                                 .orderBy('user.createdAt','DESC')
+                                 .skip((page-1)*limit)
+                                 .take(limit);
+            const [data, count] = await queryBuilder.getManyAndCount();
+            console.log(data); 
+            return data;
+        }catch(error){
+            console.log("Error in user list ");
+            throw error;
+        }
+    }
+
+
     async getUnverifiedUserById(userId: string): Promise<(UserI.UserSchema & { passwordExist: boolean }) | null> {
         try {
             const selectFields = {
