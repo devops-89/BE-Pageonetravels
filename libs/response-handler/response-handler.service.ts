@@ -4,9 +4,9 @@ import { ApiResponse } from '../interfaces/commonTypes/apiResponse.interface';
 
 @Injectable()
 export class ResponseHandlerService {
-  sendSuccessResponse(res: any, response: ApiResponse.ApiOK) {
-    // response.statusCode = 200;
-    // response.success = true;
+  sendSuccessResponse(res: any, response:any){
+    response.statusCode = 200;
+    response.success = true;
     res.status(200).json(response);
   }
 

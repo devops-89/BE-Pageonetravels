@@ -11,22 +11,27 @@ export class SearchFlightController {
     @Get('/data')
     async generateToken(@Req() req : Request, @Res() res: Response){
         try {
-            const result = this.searchflightsearvice.generateToken();
-            return result
-            // return this.responseHandler.sendSuccessResponse(res,result)
+            const result = await this.searchflightsearvice.generateToken();
+            return this.responseHandler.sendSuccessResponse(res,result)
         }catch(error){
             console.log("error in the generate token", error)
             return this.responseHandler.sendErrorResponse(res,error)
         }
     }
 
-    // @Get('/search-airport')
-    // async searchAirport(){
-    //     try {
-    //         return this.searchflightsearvice.searchAirport()
-    //     }catch(error){
-    //         console.log("Failed in the search airport", error)
-    //         throw error
-    //     }
-    // }
+    @Get('/searchairport/:search_query')
+    async searchAirport(
+        // @Param('search_query ') searchQuery :string, 
+        @Req() req : Request, @Res() res : Response){
+        try {
+            const {search_query} = req['params'];
+            const result = await this.searchflightsearvice.searchAirport(search_query);
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch(error){
+            console.error("Failed in the search airport", error)
+            return this.responseHandler.sendErrorResponse(res,error)
+        }
+    }
+
+
 }

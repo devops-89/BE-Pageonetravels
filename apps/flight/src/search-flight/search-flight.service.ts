@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { SettingRepositoryService } from '../../../../libs/database/src';
-// import { ApiResponse } from 'libs/interfaces/commonTypes/apiResponse.interface';
+import { SearchRepositoryService, SettingRepositoryService } from '../../../../libs/database/src';
 import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
 import axios from 'axios';
+import { ApiResponse } from '../../../../libs/interfaces/commonTypes/apiResponse.interface';
 @Injectable()
 export class SearchFlightService {
     constructor(
         private readonly settingRepo : SettingRepositoryService,
-        private readonly tboConfigService : TBO_CredentialsService
+        private readonly tboConfigService : TBO_CredentialsService,
+        private readonly searchrepositoryService : SearchRepositoryService
     ){}
 
     async generateToken(){
@@ -43,11 +44,13 @@ export class SearchFlightService {
         }
     }
 
-    // async searchAirport(){
-    //     try {
-    //         let airport = await this.sea
-    //     }catch(error){
-    //         throw error
-    //     }
-    // }
+    async searchAirport(search_query:string):Promise<ApiResponse.ApiOK>{
+        try {
+            const airport_list = await this.searchrepositoryService.searchAirport(search_query);
+            return { message :"Airport List fetched", data : airport_list}
+        } catch(error){
+            console.log(error);
+            throw error
+        }
+    }
 }
