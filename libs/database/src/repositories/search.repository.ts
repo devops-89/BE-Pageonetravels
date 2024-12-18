@@ -2,13 +2,14 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Airport } from "../entities";
-
+import { IFlightSearch } from "../../../../libs/interfaces/flight/search.interface";
 @Injectable()
 export class SearchRepositoryService{
     constructor(
         @InjectRepository(Airport)
         private readonly airportRepository: Repository<Airport>
     ){}
+
 
     async searchAirport(search_query:string):Promise<Airport[]>{
         try {
@@ -25,4 +26,14 @@ export class SearchRepositoryService{
             throw error
         }
     }
+
+    async searcflight( body: IFlightSearch){
+        try{
+
+        }catch(error){
+
+        }
+    }
+    
+
 }

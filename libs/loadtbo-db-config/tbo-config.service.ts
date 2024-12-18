@@ -48,8 +48,6 @@ export class TBO_CredentialsService {
           const result = await this.settingRepo.getFlightKeysAndValues();
           const flightConfig = result.value as any;
 
-
-
             this.configService.setTBOConfig({
             FLIGHT_AUTHENTICATION : flightConfig.FLIGHT_AUTHENTICATION,
             FLIGHT_SEARCH : flightConfig.FLIGHT_SEARCH,
