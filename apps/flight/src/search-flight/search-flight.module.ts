@@ -4,7 +4,7 @@ import { SearchFlightService } from './search-flight.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '../../../../libs/config/config.module';
 import {DBModule } from '../../../../libs/database/src/database.module'
-import { Setting, SettingRepositoryService } from 'libs/database/src';
+import { Airport, SearchRepositoryService, Setting, SettingRepositoryService } from '../../../../libs/database/src';
 import { ResponseHandlerModule } from '../../../../libs/response-handler/response-handler.module';
 import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.module';
 @Module({
@@ -15,7 +15,9 @@ import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.m
         TBOConfigModule,
         TypeOrmModule.forFeature([
             Setting,
-            SettingRepositoryService
+            Airport,
+            SettingRepositoryService,
+            SearchRepositoryService
         ]),
     ],
     controllers: [SearchFlightController],

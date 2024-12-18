@@ -19,4 +19,14 @@ export class SearchFlightController {
             return this.responseHandler.sendErrorResponse(res,error)
         }
     }
+
+    // @Get('/search-airport')
+    // async searchAirport(){
+    //     try {
+    //         return this.searchflightsearvice.searchAirport()
+    //     }catch(error){
+    //         console.log("Failed in the search airport", error)
+    //         throw error
+    //     }
+    // }
 }

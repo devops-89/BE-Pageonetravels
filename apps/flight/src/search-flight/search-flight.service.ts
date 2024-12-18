@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { SettingRepositoryService } from 'libs/database/src';
+import { SettingRepositoryService } from '../../../../libs/database/src';
 // import { ApiResponse } from 'libs/interfaces/commonTypes/apiResponse.interface';
 import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
 import axios from 'axios';
@@ -8,9 +8,7 @@ export class SearchFlightService {
     constructor(
         private readonly settingRepo : SettingRepositoryService,
         private readonly tboConfigService : TBO_CredentialsService
-    ){
-        
-    }
+    ){}
 
     async generateToken(){
         try {
@@ -28,7 +26,6 @@ export class SearchFlightService {
             const getToken = await axios.post(base_url,payload).then(function (response) {
                 console.table(
                     response.data.TokenId
-    
                 );
             })
             .catch(function (error) {
@@ -37,9 +34,7 @@ export class SearchFlightService {
 
             console.log("Result", getToken);
 
-            // store in the login table
-           // Perform runtime checks before using the value
-           //front end shoudl manage this key for every record check
+          
 
             return { message :"Token and values aee gere", data :result}
         }catch(error){
@@ -47,4 +42,12 @@ export class SearchFlightService {
             throw error
         }
     }
+
+    // async searchAirport(){
+    //     try {
+    //         let airport = await this.sea
+    //     }catch(error){
+    //         throw error
+    //     }
+    // }
 }
