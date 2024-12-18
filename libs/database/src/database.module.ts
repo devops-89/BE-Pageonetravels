@@ -6,12 +6,14 @@ import { ConfigDatabase } from '../../config/config.interface';
 import {
     LoginSessionService,
     OtpVerificationService,
-    PermissionService,
     UserRepositoryService,
     AddressRepositoryService,
+    CommissionRepositoryService,
+    SettingRepositoryService,
+    SearchRepositoryService
  
 } from './';
-import { User, Permission, OtpVerification, LoginSession, Address} from './';
+import { User, OtpVerification, LoginSession, Address, Setting,Commission, Airport} from './';
 
 @Module({})
 export class DBModule {
@@ -26,10 +28,12 @@ export class DBModule {
             ...connectionOptions,
             entities: [
                 User,
-                Permission,
                 OtpVerification,
                 LoginSession,
                 Address,
+                Commission,
+                Setting,
+                Airport
                 
             ],
             synchronize: true,
@@ -39,7 +43,9 @@ export class DBModule {
     }
 
     private static getConnectionOptionsPostgres(dbData: ConfigDatabase): TypeOrmModuleOptions {
-        const { database, entities, host, logging, password, port, synchronize, type, username } = dbData;
+        const { database, entities, host, logging, password, port, synchronize, type, username, url } = dbData;
+        // return {url, type:'postgres'}
+        
         return {
             database,
             entities,
@@ -48,7 +54,7 @@ export class DBModule {
             password,
             port,
             synchronize,
-            type: 'mysql',
+            type: 'postgres',
             username,
         };
     }
@@ -66,28 +72,33 @@ export class DBModule {
                 }),
                 TypeOrmModule.forFeature([
                     User,
-                    Permission,
                     OtpVerification,
                     LoginSession,
                     Address,
-                   
+                    Commission,
+                    Setting,
+                    Airport
                 ]),
             ],
             controllers: [],
             providers: [
                 UserRepositoryService,
-                PermissionService,
                 OtpVerificationService,
                 LoginSessionService,
                 AddressRepositoryService,
+                CommissionRepositoryService,
+                SettingRepositoryService,
+                SearchRepositoryService
                
             ],
             exports: [
                 UserRepositoryService,
-                PermissionService,
                 OtpVerificationService,
                 LoginSessionService,
                 AddressRepositoryService,
+                CommissionRepositoryService,
+                SettingRepositoryService,
+                SearchRepositoryService
 
             ],
         };

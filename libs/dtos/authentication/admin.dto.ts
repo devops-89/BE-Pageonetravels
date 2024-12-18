@@ -1,11 +1,11 @@
 import { IsString, IsEmail, IsIn, IsNumber, IsOptional, IsNotEmpty } from 'class-validator';
-import { DEFAULT_USER_ROLES, USER_GROUP } from '../../constants/autenticationConstants/userContants';
+import { DEFAULT_USER_ROLES, USER_TYPE } from '../../constants/autenticationConstants/userContants';
 
 export class GetUserListDto {
   @IsOptional()
   @IsString()
   @IsIn(Object.values(DEFAULT_USER_ROLES))
-  userRole: string;
+  user_role: string;
 
   @IsOptional()
   @IsNumber({}, { message: 'Page must be a number greater than or equal to 1' })
@@ -17,8 +17,8 @@ export class GetUserListDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(Object.values(USER_GROUP))
-  group: string;
+  @IsIn(Object.values(USER_TYPE))
+  user_type: string;
 
   @IsOptional()
   sortBy: any;
@@ -46,14 +46,14 @@ export class AddMemberDto {
     // password: string;
 
     @IsString()
-    @IsIn(Object.values(USER_GROUP))
-    group: string;
+    @IsIn(Object.values(USER_TYPE))
+    user_type: string;
 
     @IsString()
-    phoneNo: string;
+    phone_no: string;
   
     @IsString()
-    countryCode: string;
+    reference_id: string;
 
     @IsString()
     name: string;
@@ -62,19 +62,16 @@ export class AddMemberDto {
     @IsString()
     designation: string;
 
-    @IsOptional()
-    @IsString()
-    permissionId: string
   }
 
   export class AdminChangePasswordDto {
     @IsString()
     @IsNotEmpty({ message: 'Old password is required' })
-    oldPassword: string;
+    old_password: string;
   
     @IsString()
     @IsNotEmpty({ message: 'New password is required' })
-    newPassword: string;
+    new_password: string;
   
     @IsEmail()
     @IsNotEmpty({ message: 'Email is required' })

@@ -1,13 +1,13 @@
 import { DEVICE_TYPE } from "../../constants/commonConstants";
-import { LOGIN_BY, SESSION_STATUS, USER_GROUP } from "../../constants/autenticationConstants/userContants"
+import { LOGIN_BY, SESSION_STATUS, USER_TYPE } from "../../constants/autenticationConstants/userContants"
 
 export declare namespace LoginSessionI
 {
     interface LoginSessionSchema
     {
-        id: number,
-        userId: number,
-        refreshToken: string,
+        id: string,
+        userId: string,
+        refresh_token: string,
         loginBy: LOGIN_BY,
         loginIdentity: string,
         loginStatus: SESSION_STATUS,
@@ -20,8 +20,8 @@ export declare namespace LoginSessionI
 
     interface insertLoginSession
     {
-        userId: number,
-        refreshToken: string,
+        userId: string,
+        refresh_token: string,
         loginStatus: SESSION_STATUS,
         refreshTokenExpiry: number,
         loginBy: LOGIN_BY,
@@ -31,12 +31,11 @@ export declare namespace LoginSessionI
     }
 
     interface GetLoginToken {
-        userId: number;
+        userId: string;
         loginBy: LOGIN_BY;
         loginIdentity: string;
         roleName?: string;
-        permissionId?: number;
-        group?: USER_GROUP;
+        user_type?: USER_TYPE;
         fcmToken?:string;
         deviceType?:DEVICE_TYPE;
     }

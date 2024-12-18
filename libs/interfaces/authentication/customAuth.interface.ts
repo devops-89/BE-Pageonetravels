@@ -1,4 +1,4 @@
-import { LOGIN_BY, SESSION_STATUS, USER_GROUP } from "../../constants/autenticationConstants/userContants"
+import { LOGIN_BY, SESSION_STATUS, USER_TYPE } from "../../constants/autenticationConstants/userContants"
 
 export declare namespace CustomAuthI
 {
@@ -6,7 +6,7 @@ export declare namespace CustomAuthI
     {
         id: number,
         userId: number,
-        refreshToken: string,
+        refresh_token: string,
         loginBy: LOGIN_BY,
         loginIdentity: string,
         loginStatus: SESSION_STATUS,
@@ -20,7 +20,7 @@ export declare namespace CustomAuthI
     interface insertLoginSession
     {
         userId: number,
-        refreshToken: string,
+        refresh_token: string,
         loginStatus: SESSION_STATUS,
         refreshTokenExpiry: number,
         loginBy: LOGIN_BY,
@@ -32,8 +32,7 @@ export declare namespace CustomAuthI
         loginBy: LOGIN_BY;
         loginIdentity: string;
         roleName?: string;
-        permissionId?: number;
-        group?: USER_GROUP;
+        group?: USER_TYPE;
     }
 
 

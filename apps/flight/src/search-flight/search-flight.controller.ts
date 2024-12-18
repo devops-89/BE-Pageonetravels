@@ -1,34 +1,32 @@
-import { Controller, Get, Query, Req } from '@nestjs/common';
+import { Controller , Req, Res, Get} from '@nestjs/common';
 import { SearchFlightService } from './search-flight.service';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 
-@Controller('flight')
+@Controller('/flight')
 export class SearchFlightController {
-    constructor(
-        private readonly searchflightservice: SearchFlightService,
-        private readonly responseHandlerService: ResponseHandlerService
-    ) { }
-    
-    @Get('search')
-    async searchFlight(
-        @Req() req:Request,
-        @Query('to') to: string,
-        @Query('from') from: string,
-        @Query('departure_date') departure_date: string,
-        @Query('arrival_date') arrival_date: string,
-        @Query('adult') adult: string,
-        @Query('child') child: string,
-        @Query('infant') infant: string,
-        @Query('class_type') class_type: string,
-    ) {
-        try {
-            const {to, from, departure_date, adult, arrival_date, child, infant, class_type } = req['query'];
-            let result = this.searchflightservice.searchFlight(to, from,departure_date,adult, arrival_date, child, infant, class_type);
-            return this.responseHandlerService.sendSuccessResponse(, result)
+    constructor(private readonly searchflightsearvice:SearchFlightService,
+        private readonly responseHandler: ResponseHandlerService,
+    ){}
 
-        } catch (error) {
-            console.log("Search Flight Failed", error);
-            return this.responseHandlerService.sendErrorResponse( , 'error')
+    @Get('/data')
+    async generateToken(@Req() req : Request, @Res() res: Response){
+        try {
+            const result = this.searchflightsearvice.generateToken();
+            return result
+            // return this.responseHandler.sendSuccessResponse(res,result)
+        }catch(error){
+            console.log("error in the generate token", error)
+            return this.responseHandler.sendErrorResponse(res,error)
         }
     }
+
+    // @Get('/search-airport')
+    // async searchAirport(){
+    //     try {
+    //         return this.searchflightsearvice.searchAirport()
+    //     }catch(error){
+    //         console.log("Failed in the search airport", error)
+    //         throw error
+    //     }
+    // }
 }

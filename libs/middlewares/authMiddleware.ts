@@ -6,13 +6,13 @@ import { JwtService } from '../jwt-service/jwt.service';
 import { LoginSessionService } from '../database/src';
 import { ResponseHandlerService } from '../response-handler/response-handler.service';
 import { JWTPayload } from '../interfaces/authentication/jwtPayload.interface';
-import { SESSION_STATUS, USER_GROUP } from '../constants/autenticationConstants/userContants';
+import { SESSION_STATUS, USER_TYPE } from '../constants/autenticationConstants/userContants';
 import { ConfigService } from '../config/config.service';
 import { COMMON_MSG } from '../constants/autenticationConstants/messageConstants';
 
 // interface NestMiddlewareExtended
 // {
-//   use(req: Request, res: Response, tokenType: TOKEN_TYPE, next: (error?: Error | any) => void): any;
+//   use(req: Request, res: Response, token_type: TOKEN_TYPE, next: (error?: Error | any) => void): any;
 // }
 
 @Injectable()
@@ -28,17 +28,17 @@ export class TokenValidationMiddleware implements NestMiddleware
       try 
       {
         const accessToken = req.headers['accesstoken'] as string || null;
-        const { verified, payload, errorCode, errorMessage } = await this.jwtService.verifyJWTToken(accessToken);
+        const { verified, payload, error_code, error_message } = await this.jwtService.verifyJWTToken(accessToken);
         if (verified && payload) 
         {
 
-          if (payload.tokenType != TOKEN_TYPE.USER_LOGIN) 
+          if (payload.token_type != TOKEN_TYPE.USER_LOGIN) 
           {
               this.ResponseHandler.sendErrorResponse(res, errorResponse);
           }
           else
           {
-          const loginSession = await this.LoginSessionModel.getLoginSession(payload.sessionId);
+          const loginSession = await this.LoginSessionModel.getLoginSession(payload.session_id);
           if (loginSession && loginSession.loginStatus == SESSION_STATUS.LOGGED_IN) 
           {
               req['userPayload'] = payload;
@@ -58,8 +58,8 @@ export class TokenValidationMiddleware implements NestMiddleware
         }
         else 
         {
-          errorResponse.statusCode = errorCode;
-          errorResponse.message = errorMessage as string;
+          errorResponse.statusCode = error_code;
+          errorResponse.message = error_message as string;
           this.ResponseHandler.sendErrorResponse(res, errorResponse)
         }
       } 
@@ -89,18 +89,18 @@ export class TokenValidationAndGuestMiddleware implements NestMiddleware {
         }
         else
         {
-        const { verified, payload, errorCode, errorMessage } = await this.jwtService.verifyJWTToken(accessToken);
+        const { verified, payload, error_code, error_message } = await this.jwtService.verifyJWTToken(accessToken);
         if (verified && payload) 
         {
 
-          if (payload.tokenType && payload.tokenType == TOKEN_TYPE.GUEST_LOGIN) 
+          if (payload.token_type && payload.token_type == TOKEN_TYPE.GUEST_LOGIN) 
           {
               req['userPayload'] = payload;
               next();
           } 
-          else if (payload.tokenType && payload.tokenType == TOKEN_TYPE.USER_LOGIN) 
+          else if (payload.token_type && payload.token_type == TOKEN_TYPE.USER_LOGIN) 
           {
-              const loginSession = await this.LoginSessionModel.getLoginSession(payload.sessionId);
+              const loginSession = await this.LoginSessionModel.getLoginSession(payload.session_id);
               if (loginSession && loginSession.loginStatus == SESSION_STATUS.LOGGED_IN) 
               {
                   req['userPayload'] = payload;
@@ -126,8 +126,8 @@ export class TokenValidationAndGuestMiddleware implements NestMiddleware {
         }
         else 
         {
-          errorResponse.statusCode = errorCode;
-          errorResponse.message = errorMessage as string;
+          errorResponse.statusCode = error_code;
+          errorResponse.message = error_message as string;
           this.ResponseHandler.sendErrorResponse(res, errorResponse)
         }
       }
@@ -159,9 +159,9 @@ export class OptionalTokenValidationAndGuestMiddleware implements NestMiddleware
         }
         else 
         {
-            const { verified, payload, errorCode, errorMessage } = await this.jwtService.verifyJWTToken(accessToken);
+            const { verified, payload, error_code, error_message } = await this.jwtService.verifyJWTToken(accessToken);
             if (verified && payload) {
-                if (payload.tokenType && payload.tokenType == TOKEN_TYPE.GUEST_LOGIN) {
+                if (payload.token_type && payload.token_type == TOKEN_TYPE.GUEST_LOGIN) {
                     req['userPayload'] = payload;
                 }
             } 
@@ -204,7 +204,7 @@ export class checkIfAdmin implements NestMiddleware {
           };
         
           const payload: JWTPayload = req['userPayload'];
-          if (payload.group != USER_GROUP.ADMIN) {
+          if (payload.user_type != USER_TYPE.ADMIN) {
             this.ResponseHandler.sendErrorResponse(res, errorResponse)
           }
           else
@@ -223,7 +223,7 @@ export class checkIfAdminUser implements NestMiddleware {
           };
         console.log("payload",req['userPayload'])
           const payload: JWTPayload = req['userPayload'];
-          if (payload.group != USER_GROUP.ADMIN) {
+          if (payload.user_type != USER_TYPE.ADMIN) {
             this.ResponseHandler.sendErrorResponse(res, errorResponse)
           }
     next();

@@ -5,7 +5,7 @@ export declare namespace UpdateEmailI
     }
 
     interface VerifyEmail {
-        referenceId:number,
+        reference_id:number,
         otp: string 
     }
 }

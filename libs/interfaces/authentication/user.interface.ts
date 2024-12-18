@@ -1,5 +1,5 @@
 import { DEVICE_TYPE } from "libs/constants/commonConstants";
-import { DEFAULT_USER_ROLES, USER_ACCOUNT_STATUS, USER_GROUP, USER_LOGIN_SOURCE, USER_VERIFY_STATUS } from "../../constants/autenticationConstants/userContants";
+import { DEFAULT_USER_ROLES, USER_ACCOUNT_STATUS, USER_LOGIN_SOURCE, USER_TYPE, USER_VERIFY_STATUS } from "../../constants/autenticationConstants/userContants";
 import { IPagination } from "../commonTypes/custom.interface";
 // import { MultiFileType } from "../commonTypes/fastifyTypes";
 // import { IPagination } from "../commonTypes/custom.interface";
@@ -8,34 +8,26 @@ export declare namespace UserI {
     interface AddressSchema {
         street: string;
         houseNo: string;
-        postalCode: string;
+        postal_code: string;
         city: string;
         country: string;
         state: string;
-        addressType: string; // "HOME", "OFFICE"
-        isDefault: boolean; 
     }
+
     interface UserSchema {
-        id: number,
-        name: string,
+        id: string,
+        full_name: string,
         avatar: string,
         email: string,
-        phoneNo: string,
-        countryCode: string,
-        password: string,
+        country_code: string,
         status: USER_ACCOUNT_STATUS,
-        verifyStatus: USER_VERIFY_STATUS,
-        roleName: string, 
-        permission: number // permissionId
-        parent: number,
-        addedBy: number,
-        group: USER_GROUP,
-        loginSource: USER_LOGIN_SOURCE,
-        isPhoneNoVerified: boolean,
-        isEmailVerified: boolean,
-        guestUserId: string,
+        verify_status: USER_VERIFY_STATUS,
+        phone_number: string,
+        password: string,
+        user_type: USER_TYPE,
+        is_phone_verified: boolean,
+        is_email_verified: boolean,
         createdAt: Date,
-        lastLogin?: Date,
         addresses?: AddressSchema[];
     }
 
@@ -44,89 +36,60 @@ export declare namespace UserI {
 
     interface InsertUserByEmail
     {
-        name?: string,
+        full_name?: string,
         email: string,
         password?: string,
-        status: USER_ACCOUNT_STATUS,
-        parent?: number,
-        addedBy?: number,
-        roleName?: string, 
-        permission?: number
-        verifyStatus: USER_VERIFY_STATUS,
-        group?: USER_GROUP,
-        loginSource: USER_LOGIN_SOURCE,
-        id?:number,
-        guestUserId?: string
+        user_type?: USER_TYPE,
+        id?:string,
     }
 
 
     interface InsertUserByPhone
     {
-        phoneNo: string,
-        countryCode: string
-        status: USER_ACCOUNT_STATUS,
-        verifyStatus: USER_VERIFY_STATUS,
-        id?: number,
-        roleName: string,
-        group: USER_GROUP,
-        permission: number
+        phone_number: string,
+        country_code:string,
+        id?: string,
+        user_type: USER_TYPE,
     }
 
     interface AddOrUpdateUser
     {
-        name?: string,
+        full_name?: string,
         password?: string,
-        parent?: number,
-        phoneNo?: string,
-        countryCode?: string,
-        status?: USER_ACCOUNT_STATUS,
-        verifyStatus?: USER_VERIFY_STATUS,
-        id?: number,
-        roleName?: string,
-        group?: USER_GROUP,
-        permission?: number,
         email: string,
-        isEmailVerified?: boolean,
-        avatar?:string,
-        loginSource?:USER_LOGIN_SOURCE,
-        lastLogin?: Date;
-
-    }
-
-    interface PermissionObj {
-        roleName?: string;
-        group?: string;
-        permission?: number;
+        is_email_verified?: boolean,
+        country_code?: string,
+        phone_number?: string,
+        id?: string,
+        roleName?: string,
+        user_type?: USER_TYPE,
+        avatar?:string
     }
 
     interface InsertDefaultUser 
     {
         email: string,
         password: string,
+        user_type: USER_TYPE,
+        full_name: string,
         status: USER_ACCOUNT_STATUS,
-        // isVerified: boolean,
-        verifyStatus: USER_VERIFY_STATUS,
-        parentId: string,
-        group: USER_GROUP,
-        loginSource:USER_LOGIN_SOURCE,
-        name: string,
-        isEmailVerified?: boolean
+        verify_status?: USER_VERIFY_STATUS,
+        is_email_verified:boolean
     }
 
     interface UpdateRoleAndPermission
     {
         roleName: string, 
-        permission: number // permissionId
-        userId:number
+        userId:string
     }
 
     interface UpdateUserStatus
     {
-        userId: number,
+        user_id:string,
         status: USER_ACCOUNT_STATUS,
-        verifyStatus: USER_VERIFY_STATUS,
+        verify_status: USER_VERIFY_STATUS,
         isPhoneNoVerified?: boolean,
-        isEmailVerified?: boolean,
+        is_email_verified?: boolean,
         password?: string
 
     }
@@ -135,62 +98,52 @@ export declare namespace UserI {
     {
         email: string,
         password: string,
-        // userRole: string,
+        // user_role: string,
         name: string,
-        group: USER_GROUP
+        user_type: USER_TYPE
     }
 
     interface LoginWithEmail {
         email:string,
-        group: USER_GROUP
+        user_type: USER_TYPE
     }
 
 
     interface LoginWithPhone {
-        phoneNo: string,
-        countryCode: string,
-        userRole?: string,
-        group: USER_GROUP
+        phone_number: string,
+        country_code: string,
+        user_type: USER_TYPE,
     }
     
     interface VerifyByOtp {
-        referenceId: number,
+        reference_id: number,
         otp:string
     }
 
   
     interface LoginWithEmailOrPhone {
         // email: string,
-        // phoneNo: string,
-        countryCode:string,
+        // phone_no: string,
+        country_code:string,
         identity: string
-        userRole:string,
-        group: string
+        user_role:string,
+        user_type: string
     }
 
     interface UpdateProfile {
-        userId: number,
-        name: string,
+        userId: string,
+        full_name: string,
         email: string,
-        phoneNo: string,
-        countryCode: string,
+        phone_number: string,
+        country_code: string,
         password: string,
         avatar: string,
-        status: USER_ACCOUNT_STATUS,
-        verifyStatus: USER_VERIFY_STATUS,
-        // countryName: string,
-        isPhoneNoVerified: boolean,
-        zipCode: string
     }
-    // interface ProfileImages extends MultiFileType
-    // {    }
     export interface UpdatePersonalDetailRequest
     {
         name: string,
-        // countryName: string,
-        zipCode: string,
-        phoneNo: string,
-        countryCode: string,
+        phone_number: string,
+        country_code: string,
         email: string
     }
 
@@ -198,43 +151,43 @@ export declare namespace UserI {
     {
         userId: number,
         email: string,
-        isEmailVerified: boolean
+        is_email_verified: boolean
     }
 
     interface UpdatePhoneById
     {
-        phoneNo: string,
+        phone_number: string,
         userId: number,
         isPhoneNoVerified: boolean,
-        countryCode: string
+        country_code: string
     }
 
     interface AddUser
     {
         name: string,
         email: string,
-        // phoneNo: string,
-        userRole: DEFAULT_USER_ROLES,
+        // phone_no: string,
+        user_role: DEFAULT_USER_ROLES,
         roleId: string,
     }
 
     interface VerifyAddUser
     {
-        userName: string,
+        user_name: string,
         password: string,
-        phoneNo: string,
-        countryCode: string
+        phone_no: string,
+        country_code: string
         // avatar
     }
 
     export interface UpdateUserProfile
     {
         userId: string,
-        fullName: string,
-        userRole: string,
-        userName: string,
+        full_name: string,
+        user_role: string,
+        user_name: string,
         email?: string,
-        phoneNo?: string,
+        phone_no?: string,
         password?: string,
     }
 
@@ -258,29 +211,29 @@ export declare namespace UserI {
 
     interface RenewAccessToken {
         accessToken: string,
-        refreshToken: string
+        refresh_token: string
     }
 
     interface ChangePassword {
-        oldPassword: string,
-        newPassword: string,
+        old_password: string,
+        new_password: string,
         otp: string;
-        referenceId:number
+        reference_id:number
     }
 
     interface UpdateUserAccountStatus
     {
-        userId: number,
+        userId: string,
         status: USER_ACCOUNT_STATUS
     }
     interface GetUsersByFilter extends IPagination
     {
-        group?: USER_GROUP,
+        user_type?: USER_TYPE,
         status?: USER_ACCOUNT_STATUS,
         parentId?: number,
         search?: string,
         isPhoneNoVerified?: boolean, 
-        isEmailVerified?: boolean 
+        is_email_verified?: boolean 
 
     }
 }

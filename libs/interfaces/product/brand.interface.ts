@@ -28,7 +28,7 @@ export interface addStore {
     status?: string;
     address_id: number;
     store_logo?:string
-    user_id:number
+    id:number
 }
 export interface UpdateStoreI {
     store_id: number;
@@ -39,7 +39,7 @@ export interface UpdateStoreI {
 }
 export interface getStore {
     group?:string;
-    referenceId?:number;
+    reference_id?:number;
     page?: number;
     pageSize?: number;
     sortBy?: {

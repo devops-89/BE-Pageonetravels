@@ -1,5 +1,5 @@
 import { IsString, IsEmail, IsNumber, Min, Max, Matches, IsOptional, IsNotEmpty, MinLength, IsEnum, isEmail, IsInt } from 'class-validator';
-import { LOGIN_BY, USER_ACCOUNT_STATUS, USER_GROUP } from '../../constants/autenticationConstants/userContants';
+import { LOGIN_BY, USER_ACCOUNT_STATUS, USER_TYPE } from '../../constants/autenticationConstants/userContants';
 import { DEVICE_TYPE } from '../../constants/commonConstants';
 
 export class LoginDto {
@@ -13,13 +13,13 @@ export class LoginDto {
 
   @IsOptional()
   @IsString()
-  countryCode: string;
+  reference_id: string;
 }
 
 export class UserQueryDto {
   @IsOptional()
   @IsString()
-  group?: USER_GROUP;
+  user_type?: USER_TYPE;
 
   @IsOptional()
   @IsInt()
@@ -49,9 +49,9 @@ export class PaginationDto {
   limit?: number;
 }
 export class UserFilterDto {
-  @IsOptional()
-  @IsEnum(USER_GROUP)
-  group: USER_GROUP; // Make status optional
+  @IsOptional() 
+  @IsEnum(USER_TYPE)
+  user_type: USER_TYPE; // Make status optional
 
   @IsOptional()
   @IsString()
@@ -60,7 +60,7 @@ export class UserFilterDto {
   @IsOptional()
   @IsEnum(USER_ACCOUNT_STATUS)
   status: USER_ACCOUNT_STATUS;
-}
+} 
 
 export class notificationData {
 
@@ -73,29 +73,28 @@ export class notificationData {
   deviceType: DEVICE_TYPE
 
 }
-// loginOrRegister.dto.ts
+
+
 export class LoginOrRegisterDto {
   @IsString()
   identity: string;
 
   @IsOptional()
   @IsString()
-  countryCode?: string;
+  country_code?: string;
 
-  @IsEnum(USER_GROUP)
-  group: USER_GROUP
+  @IsEnum(USER_TYPE)
+  user_type: USER_TYPE
 }
 
 
-
-// verify.dto.ts
 export class VerifyDto {
   @IsString()
-  @MinLength(6, { message: 'OTP must be at least 6 characters long' })
+  @MinLength(6, { message: 'OTP Has 6 Characters ' })
   otp: string;
 
-  @IsNumber()
-  referenceId: number;
+  @IsString()
+  reference_id: string;
 
   
   @IsString()
@@ -103,40 +102,38 @@ export class VerifyDto {
   deviceType: DEVICE_TYPE
 }
 
-// addEmail.dto.ts
 export class AddEmailDto {
   @IsEmail()
   email: string;
 }
 
-// addPhone.dto.ts
+
 export class AddPhoneDto {
   @IsString()
-  phoneNo: string;
+  phone_no: string;
 
   @IsString()
-  countryCode: string;
+  country_code: string;
 }
 
-// verifyPhoneNo.dto.ts
+
 export class VerifyPhoneNoDto {
   @IsNumber()
-  referenceId: number;
+  reference_id: number;
 
   @IsString()
   @Matches(/^\d{6}$/)
   otp: string;
 }
 
-// updatePersonalDetail.dto.ts
 export class UpdatePersonalDetailDto {
   @IsOptional()
   @IsString()
   name: string;
 
-  // @IsOptional()
-  // @IsString()
-  // password: string;
+  @IsOptional()
+  @IsString()
+  password: string;
 
   @IsOptional()
   @IsEmail()
@@ -144,11 +141,11 @@ export class UpdatePersonalDetailDto {
 
   @IsOptional()
   @IsString()
-  phoneNo: string;
+  phone_no: string;
 
   @IsOptional()
   @IsString()
-  countryCode: string;
+  reference_id: string;
 
   // @IsOptional()
   // @IsString()
@@ -175,18 +172,17 @@ export class RenewTokenDto {
 
   @IsNotEmpty()
   @IsString()
-  refreshToken: string;
+  refresh_token: string;
 }
 
-// changePassword.dto.ts
 export class ChangePasswordDto {
   @IsString()
   @IsNotEmpty({ message: 'Old password is required' })
-  oldPassword: string;
+  old_password: string;
 
   @IsString()
   @IsNotEmpty({ message: 'New password is required' })
-  newPassword: string;
+  new_password: string;
 
   @IsString()
   @IsNotEmpty()
@@ -194,7 +190,7 @@ export class ChangePasswordDto {
 
   @IsString()
   @IsNotEmpty()
-  referenceId: number;
+  reference_id: number;
   
   
   @IsString()
@@ -203,7 +199,7 @@ export class ChangePasswordDto {
 
 }
 
-// registerWithEmailPassword.dto.ts
+
 export class RegisterWithEmailPasswordDto {
   @IsEmail()
   email: string;
@@ -227,15 +223,15 @@ export class RegisterDto {
 
   // @IsNotEmpty()
   // @IsString()
-  // userRole: string;
+  // user_role: string;
 
   @IsNotEmpty()
   @IsString()
   name: string;
 
-  @IsEnum(USER_GROUP)
+  @IsEnum(USER_TYPE)
   @IsOptional()
-  group: USER_GROUP;
+  user_type: USER_TYPE;
 }
 
 export class CustomLoginDto {
@@ -251,11 +247,11 @@ export class CustomLoginDto {
 
   @IsOptional()
   @IsString()
-  phoneNo: string;
+  phone_no: string;
 
   @IsOptional()
   @IsString()
-  countryCode: string;
+  reference_id: string;
 
   @IsOptional()
   @IsString()

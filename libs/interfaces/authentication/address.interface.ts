@@ -8,14 +8,14 @@ export declare namespace AddressI
         city: string,
         state: string,
         country: string,
-        postalCode: string,
+        postal_code: string,
         isDefault?:boolean,
-        userId?: number,
+        userId?: string,
         addressType: string
     }
 
     interface UpdateAdress extends Partial<AddAdress>
     {
-        id: number;
+        id: string;
     }
 }

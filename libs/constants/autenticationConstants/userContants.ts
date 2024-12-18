@@ -19,12 +19,13 @@ export enum DEFAULT_USER_ROLES {
 }
 
 
-export enum USER_GROUP {
-    ADMIN = "ADMINISTRATOR",
-    USER = "USER"
+export enum USER_TYPE {
+    ADMIN = "ADMIN",
+    USER = "USER",
+    HOTEL = "HOTEL"
 }
 
-export enum USER_GROUP_ROLE{
+export enum USER_GROUP_ROLE{    
 }
 
 export enum SESSION_STATUS {
