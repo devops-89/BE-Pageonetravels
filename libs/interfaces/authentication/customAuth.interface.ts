@@ -6,7 +6,7 @@ export declare namespace CustomAuthI
     {
         id: number,
         userId: number,
-        refreshToken: string,
+        refresh_token: string,
         loginBy: LOGIN_BY,
         loginIdentity: string,
         loginStatus: SESSION_STATUS,
@@ -20,7 +20,7 @@ export declare namespace CustomAuthI
     interface insertLoginSession
     {
         userId: number,
-        refreshToken: string,
+        refresh_token: string,
         loginStatus: SESSION_STATUS,
         refreshTokenExpiry: number,
         loginBy: LOGIN_BY,

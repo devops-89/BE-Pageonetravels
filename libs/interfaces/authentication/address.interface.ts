@@ -8,7 +8,7 @@ export declare namespace AddressI
         city: string,
         state: string,
         country: string,
-        postalCode: string,
+        postal_code: string,
         isDefault?:boolean,
         userId?: string,
         addressType: string

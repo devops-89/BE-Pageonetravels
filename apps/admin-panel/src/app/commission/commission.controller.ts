@@ -1,10 +1,10 @@
 import { Controller, Body, Post, Req, Res, Get, Query, } from '@nestjs/common';
-import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
+import { ResponseHandlerService } from '../../../../../libs/response-handler/response-handler.service';
 import { CommissionService } from './commission.service';
 import { retry } from 'rxjs';
 import { IntegerType } from 'typeorm';
-import { AddCommissionDto } from '../../../../libs/dtos/admin/commission.dto';
-import { UpdateCommissionDto } from '../../../../libs/dtos/admin/commission.dto';
+import { AddCommissionDto } from '../../../../../libs/dtos/admin/commission.dto';
+import { UpdateCommissionDto } from '../../../../../libs/dtos/admin/commission.dto';
 import { ApiResponse } from 'libs/interfaces/commonTypes/apiResponse.interface';
 import { ERROR_CODES } from 'libs/constants/commonConstants';
 
@@ -19,7 +19,7 @@ export class CommissionController {
 
     @Post('add-commission')
     async addCommisson(@Body() body:AddCommissionDto, @Req() req: Request, @Res() res:Response ){
-        try{
+        try{ 
             const result = await this.commissionService.addCommissionData(body);
             return this.ResponseHandler.sendSuccessResponse(res, result);
         }catch(error){
@@ -40,9 +40,9 @@ export class CommissionController {
     }
 
 
-    @Get('update')
+    @Post('update')
     async updateCommission(@Body() body: UpdateCommissionDto ,@Req() req:Request,@Res() res:Response){
-        try{
+        try{ 
             const result = await this.commissionService.updateCommissionData(body);
             return this.ResponseHandler.sendSuccessResponse(res,result);
         }catch(error){

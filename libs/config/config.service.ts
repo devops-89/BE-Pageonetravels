@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigData, ConfigDatabase, ConfigS3Bucket, FLIGHTDATA, GoogleAuth, PaypalPaymentGatewayCred, RAZORPAY, SMTP, ServicesPort, TWILIO_SECRETE } from './config.interface';
 import { DEFAULT_CONFIG } from './config.default';
 import { config } from 'dotenv';
+import { url } from 'inspector';
 config();
 
 @Injectable()
@@ -52,7 +53,7 @@ export class ConfigService {
       type: 'postgres',
       synchronize: true,
       logging: false,
-      entities: [] as any
+      entities: [] as any,
     };
   }
 

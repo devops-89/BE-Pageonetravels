@@ -5,7 +5,7 @@ export class GetUserListDto {
   @IsOptional()
   @IsString()
   @IsIn(Object.values(DEFAULT_USER_ROLES))
-  userRole: string;
+  user_role: string;
 
   @IsOptional()
   @IsNumber({}, { message: 'Page must be a number greater than or equal to 1' })
@@ -50,10 +50,10 @@ export class AddMemberDto {
     user_type: string;
 
     @IsString()
-    phoneNo: string;
+    phone_no: string;
   
     @IsString()
-    countryCode: string;
+    reference_id: string;
 
     @IsString()
     name: string;
@@ -67,11 +67,11 @@ export class AddMemberDto {
   export class AdminChangePasswordDto {
     @IsString()
     @IsNotEmpty({ message: 'Old password is required' })
-    oldPassword: string;
+    old_password: string;
   
     @IsString()
     @IsNotEmpty({ message: 'New password is required' })
-    newPassword: string;
+    new_password: string;
   
     @IsEmail()
     @IsNotEmpty({ message: 'Email is required' })

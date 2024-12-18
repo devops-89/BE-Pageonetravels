@@ -69,11 +69,11 @@ export function paginate(page: number, pageSize: number )
   };
 
 
-export function validPhoneNo(phoneNo: string) {
-    if (!phoneNo) {
+export function validPhoneNo(phone_no: string) {
+    if (!phone_no) {
         return false;
     }
-    let parseNo = parsePhoneNumber(phoneNo);
+    let parseNo = parsePhoneNumber(phone_no);
 
     return (parseNo && parseNo.isPossible())
 

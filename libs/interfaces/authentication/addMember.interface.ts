@@ -26,9 +26,9 @@ export declare namespace MemberI
     interface UpdateProfile 
     {
         password: string,
-        phoneNo: string,
+        phone_no: string,
         name: string,
-        countryCode: string,
+        reference_id: string,
         interest?: string[]
         // avatar
     }
@@ -36,9 +36,9 @@ export declare namespace MemberI
     interface UpdateProfileRequest {
         salutation: string,
         fullName: string,
-        userName: string,
-        phoneNo: string,
-        countryCode: string,
+        user_name: string,
+        phone_no: string,
+        reference_id: string,
         password: string,
         socialLink?: {
             facebook: string,
@@ -54,8 +54,8 @@ export declare namespace MemberI
         fullName: string,
         email: string,
         birthDate: Date,
-        // phoneNo: string,
-        userRole: DEFAULT_USER_ROLES,
+        // phone_no: string,
+        user_role: DEFAULT_USER_ROLES,
         roleId: string
     }
     
