@@ -26,8 +26,8 @@ export class TBO_CredentialsService {
             FLIGHT_TICKET : flightConfig.FLIGHT_TICKET,
             FLIGHT_BOOKING_DETAILS : flightConfig.FLIGHT_BOOKING_DETAILS,
             FLIGHT_CALENDER_DETAILS : flightConfig.FLIGHT_CALENDER_DETAILS,
-  
-            
+
+
             FLIGHT_CLIENT_ID :  flightConfig.FLIGHT_CLIENT_ID,
             FLIGHT_USERNAME :  flightConfig.FLIGHT_USERNAME,
             FLIGHT_PASSWORD : flightConfig.FLIGHT_PASSWORD,
@@ -42,7 +42,7 @@ export class TBO_CredentialsService {
         }
     }
 
-    async generateToken(){
+    async getTBOCredentials(){
         try {
             
           const result = await this.settingRepo.getFlightKeysAndValues();
@@ -68,8 +68,7 @@ export class TBO_CredentialsService {
         console.log('Configuration updated successfully');
 
           const tboConfig = this.configService.get().TBO_CREDENTIALS;
-          console.log("TBOCOFNGI",tboConfig);
-            return tboConfig;
+          return tboConfig as FLIGHTDATA;
 
         }catch(error){
             console.log(error);

@@ -1,15 +1,24 @@
-export interface IFlightSearch{
-    journey_type:string,
-    origin:string,
-    destination:string,
-    journey_date:Date,
-    adult:number,
-    child: number,
-    infant: number,
-    direct_flight: boolean,
-    one_stop_flight: boolean,
-    cabin_class: number
+export interface IFlightSearch {
+  EndUserIp: string;
+  TokenId: any;
+  AdultCount: number;
+  ChildCount: number;
+  InfantCount: number;
+  DirectFlight?: boolean;         // Optional
+  OneStopFlight: boolean;
+  JourneyType?: any;           // Optional
+  PreferredAirlines?: string;     // Optional
+  Segments: {
+    Origin: string;
+    Destination: string;
+    FlightCabinClass: any;
+    PreferredDepartureTime: string;
+    PreferredArrivalTime: string;
+  }[];
+  Sources?: string[] | null;      // Optional
 }
+
+  
  
 export interface CabinClass {
     ALL: 1,
