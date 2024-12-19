@@ -27,13 +27,13 @@ export class SearchRepositoryService{
         }
     }
 
-    async searcflight( body: IFlightSearch){
-        try{
+    // async searcflight( body: IFlightSearch){
+    //     try{
 
-        }catch(error){
+    //     }catch(error){
 
-        }
-    }
+    //     }
+    // }
     
 
 }

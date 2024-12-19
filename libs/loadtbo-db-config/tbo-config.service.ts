@@ -42,7 +42,7 @@ export class TBO_CredentialsService {
         }
     }
 
-    async generateToken(){
+    async getTBOCredentials(){
         try {
             
           const result = await this.settingRepo.getFlightKeysAndValues();
@@ -68,8 +68,7 @@ export class TBO_CredentialsService {
         console.log('Configuration updated successfully');
 
           const tboConfig = this.configService.get().TBO_CREDENTIALS;
-          // console.log("TBOCOFNGI",tboConfig);
-            return tboConfig;
+          return tboConfig as FLIGHTDATA;
 
         }catch(error){
             console.log(error);
