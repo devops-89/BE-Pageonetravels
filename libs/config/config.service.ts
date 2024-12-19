@@ -36,15 +36,14 @@ export class ConfigService {
       FIREBASE_SERVICE_ACCOUNT: env.FIREBASE_SERVICE_ACCOUNT,
       PaypalCredentials:this.parsePaypalConfig(env),
       SERVER_BASE_PATH: process.env.SERVER_BASE_PATH,
-      RAZORPAY_CREDENTIAL: this.parseRazorpayConfig(env),
-      
+      RAZORPAY_CREDENTIAL: this.parseRazorpayConfig(env), 
     };
   }
 
 
 
   private parseDBConfig(env: NodeJS.ProcessEnv, defaultConfig: Readonly<ConfigDatabase> ) {
-    return {
+    return { 
       host: process.env.DB_HOST || "",
       port: Number(process.env.DB_PORT) || 0,
       username: process.env.DB_USERNAME || "",
@@ -122,7 +121,7 @@ export class ConfigService {
     return this.config;
   }
 
-  setTBOConfig(flightData:FLIGHTDATA){
+  setTBOConfig(flightData:FLIGHTDATA){ 
     // if (!this.config) {
     //   this.config = {}; // Ensure the config object exists
     // }

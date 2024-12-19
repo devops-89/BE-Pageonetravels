@@ -3,17 +3,17 @@ import { SearchFlightService } from './search-flight.service';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { SearchFlightDto } from '../../../../libs/dtos/flight/flights.dto';
 
-@Controller('/flight')
+@Controller('/flight') 
 export class SearchFlightController { 
-    constructor(private readonly searchflightsearvice:SearchFlightService,
+    constructor(private readonly searchflightservice:SearchFlightService,
         private readonly responseHandler: ResponseHandlerService,
     ){}
 
     @Get('/data') 
     async generateToken(@Req() req : Request, @Res() res: Response){
         try {
-            const result = this.searchflightsearvice.generateToken();
-            return result
+            const result = this.searchflightservice.generateToken();
+            return result;
             // return this.responseHandler.sendSuccessResponse(res,result)
         }catch(error){
             console.log("error in the generate token", error);
@@ -35,7 +35,7 @@ export class SearchFlightController {
     async searchAirport(@Req() req: Request, @Body(new ValidationPipe()) body: SearchFlightDto,  @Res() res: Response){
         try{
             console.log(body);
-            const result = this.searchflightsearvice.searchFlight(body);
+            const result = this.searchflightservice.searchFlight(body);
             return result
         }catch(error){
             console.log("Error in the Search Flight", error);

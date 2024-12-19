@@ -17,7 +17,7 @@ export class SettingRepositoryService {
     async getFlightKeysAndValues() {
         try {
             const doc = await this.settingRepository.findOne({where : { key : 'flight_settings' }});
-            return doc;
+            return doc; 
         } catch (error) {
             console.error('Error fetching settings from the database:', error);
             throw error;
