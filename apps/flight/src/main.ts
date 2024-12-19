@@ -7,6 +7,7 @@ import { BadRequestException, Logger, ValidationError, ValidationPipe } from '@n
 import { NestFactory } from '@nestjs/core';
 import {ConfigService } from '../../../libs/config/config.service';
 import { AppModule } from './app/app.module';
+// import { TBO_CredentialsService } from '../../../libs/loadtbo-db-config/tbo-config.service';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -32,6 +33,8 @@ async function bootstrap() {
     );
     
     const config = new ConfigService()
+    // const config_service = new TBO_CredentialsService(a,b)
+    // await TBO_CredentialsService.getSettingValues();
     config.loadFromEnv()
     const port = config.get().servicePorts.flight || 3002;
     await app.listen(port);

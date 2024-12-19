@@ -39,8 +39,7 @@ export class SearchFlightController {
     @Post('/search-flight')
     async searchFlight(@Req() req: Request, @Body(new ValidationPipe()) body: SearchFlightDto,  @Res() res: Response){
         try{
-            console.log(body);
-            const result = this.searchflightsearvice.searchFlight(body);
+            const result = await this.searchflightsearvice.searchFlight(body);
             return this.responseHandler.sendSuccessResponse(res, result);
         }catch(error){
             console.error("Error in the Search Flight", error);

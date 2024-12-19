@@ -17,6 +17,7 @@ export class GenerateTokenService {
         try {
 
             this.tbo_credentials = await this.tboConfigService.getTBOCredentials();
+            console.log("TOB", this.tbo_credentials);
 
             const base_url = this.tbo_credentials.FLIGHT_AUTHENTICATION;
 
@@ -28,20 +29,11 @@ export class GenerateTokenService {
             }
 
             const result = await axios.post(base_url, payload)
-            // .then((response) => {
-            //     console.log("Response", response.data.TokenId);
-                this.tbo_token = result.data.TokenId;
 
-                console.log("Tokennnnnnnnn", this.tbo_token);
-
-
-                return this.tbo_token;
-            // // })
-            //     .catch(function (error) {
-            //         console.log(error);
-            //     });
-
-            // return this.tbo_token;
+            this.tbo_token = result.data.TokenId;
+            console.log("Tojen", result.data, this.tbo_token);
+            return this.tbo_token;
+           
         } catch (error) {
             console.log(error);
             throw error
@@ -51,20 +43,16 @@ export class GenerateTokenService {
     async getToken() {
         try {
             if (!this.tbo_token) {
-                console.log("I am generate token calling");
-                //time set
-                //again call the generate token function
                 await this.generateToken();
-
             }
-            console.log("TBO token", this.tbo_token);
+            console.log("Tokennnn", this.tbo_token);
             const payload = {
                 TBO_data: this.tbo_credentials,
                 token: this.tbo_token
             }
             return payload
         } catch (error) {
-            console.error(error);
+            console.error("failed in get token api",error);
             throw error
         }
     }
