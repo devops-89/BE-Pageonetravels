@@ -9,7 +9,7 @@ import { ResponseHandlerModule } from '../../../../libs/response-handler/respons
 import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.module';
 import { GenerateTokenService } from './generateToken.service';
 import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
-import { HTTPSTboAPIService } from "../../../../libs/tboapi-service/http-api.service";
+import { HTTPSTboAPIService } from "../../../../libs/http-api-service/tbo-api-service";
 
 @Module({
     imports:[

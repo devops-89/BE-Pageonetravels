@@ -1,8 +1,3 @@
-export enum CartStatus {
-    ACTIVE = 'ACTIVE',
-    CHECKED_OUT = 'CHECKED_OUT',
-    ABANDONED = 'ABANDONED',
-}
 
 export enum ORDER_STATUS {
     INITIATED = 'INITIATED',

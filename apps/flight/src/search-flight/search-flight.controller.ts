@@ -21,7 +21,7 @@ export class SearchFlightController {
     // }
 
 
-    @Get('/searchairport/:search_query')
+    @Get('/search-airport/:search_query')
     async searchAirport(
         // @Param('search_query ') searchQuery :string, 
         @Req() req : Request, @Res() res : Response){
