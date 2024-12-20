@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import axios from "axios";
-import { IFlightSearch } from "libs/interfaces/flight/search.interface";
+import { SearchFlightDto } from "libs/dtos/flight/flights.dto";
+import { IFlightSearch } from "../../libs/interfaces/flight/search.interface";
 
 @Injectable()
 export class HTTPSTboAPIService {
@@ -25,7 +26,7 @@ export class HTTPSTboAPIService {
         }
     }
 
-    async searchFlightAPI(token, base_url, base_ip, body){
+    async searchFlightAPI(token:string, base_url:string, base_ip:string, body:SearchFlightDto){
         try {
             const {
                 journey_type,
