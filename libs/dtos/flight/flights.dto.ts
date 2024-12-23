@@ -1,6 +1,7 @@
 import { IsArray, IsBoolean, IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Length } from 'class-validator';
 import { Type } from 'class-transformer';
-import { JOURNEY_TYPE } from 'libs/constants/flightConstant';
+import { JOURNEY_TYPE } from '../../../libs/constants/flightConstant';
+import { TimeFilter } from '../../../libs/constants/flightConstant';
 
 export class SearchFlightDto {
     @IsString()
@@ -10,6 +11,10 @@ export class SearchFlightDto {
     @IsString()
     @IsOptional()
     max_price: string;
+
+    @IsString()
+    @IsNotEmpty()
+    ip_address: string;
 
     @IsString()
     @IsNotEmpty()
@@ -23,22 +28,32 @@ export class SearchFlightDto {
     @IsNotEmpty()
     departure_date: string; 
 
-    @IsDateString()
-    @IsNotEmpty()
-    preferred_time: string; 
+    @IsString()
+    @IsNotEmpty({
+        message: 'preferred_time is required and cannot be empty',
+      })
+      @IsEnum(TimeFilter, {
+        message: `preferred_time must be one of: ${Object.values(TimeFilter).join(', ')}`,
+      })
+    preferred_time: TimeFilter; 
+
 
     @IsDateString()
-    @IsNotEmpty()
+    @IsOptional()
     return_date: string; 
 
     @IsArray()
     @IsOptional()
-    @IsArray({ each: true }) // Ensures every element is validated against the class
+    @IsArray({ each: true })
     multicity: MulticityItem[];
 
     @IsString()
-    // @Type(() => enum) 
-    @IsNotEmpty()
+    @IsNotEmpty({
+        message: 'journey_type is required and cannot be empty',
+      })
+      @IsEnum(JOURNEY_TYPE, {
+        message: `journey_type must be one of: ${Object.values(JOURNEY_TYPE).join(', ')}`,
+      })
     journey_type: JOURNEY_TYPE;
 
     @IsNumber()
@@ -89,7 +104,6 @@ class MulticityItem {
     departure_date: string;
 
     @IsString()
-    @Length(3, 4) // Ensures time is 3 or 4 characters (e.g., '090' or '0900')
     @IsNotEmpty()
     preferred_time: string;
 }

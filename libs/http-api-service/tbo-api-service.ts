@@ -20,7 +20,7 @@ export class HTTPSTboAPIService {
     }
 
     async searchFlightAPI(
-        token: string, 
+        token: any, 
         base_url: string, 
         base_ip: string, 
         body: SearchFlightDto

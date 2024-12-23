@@ -34,6 +34,26 @@ export class SearchRepositoryService{
 
     //     }
     // }
-    
+    // async findAllAirports(): Promise<{ message: string; success: boolean; data: Airport[] }> {
+    //     try {
+    //         const expirationTime = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+
+    //         let airportList = await this.cacheManager.get('airportList') as any;
+
+    //         if (!airportList) {
+    //             let airportdata = await this.AirportModel.find();
+
+    //             await this.cacheManager.set('airportList', airportdata, expirationTime);
+
+    //             return { message: 'Airport Codes searched Successfully', success: true, data: airportdata };
+    //         }
+    //         return { message: 'Airport Codes searched Successfully', success: true, data: airportList };
+            
+    //     } catch (err) {
+    //         console.log(err);
+    //         throw new InternalServerException('Internal Server Error')
+    //     }
+
+    // }
 
 }

@@ -4,9 +4,23 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SearchFlightModule } from '../search-flight/search-flight.module';
 // import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
     imports: [
+        CacheModule.registerAsync({
+            isGlobal: true,
+            useFactory: () => ({
+                store: redisStore.create({ // Use `create` to initialize the store
+                  host: 'localhost',
+                  port: 6379,
+                  ttl: 600, // Default time-to-live in seconds
+                  max: 100000,
+                }),
+            }),
+            
+        }),
        SearchFlightModule
 ],
     controllers: [AppController],
