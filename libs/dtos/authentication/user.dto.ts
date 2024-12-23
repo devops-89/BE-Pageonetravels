@@ -49,7 +49,7 @@ export class PaginationDto {
   limit?: number;
 }
 export class UserFilterDto {
-  @IsOptional()
+  @IsOptional() 
   @IsEnum(USER_TYPE)
   user_type: USER_TYPE; 
   @IsOptional()
@@ -59,7 +59,7 @@ export class UserFilterDto {
   @IsOptional()
   @IsEnum(USER_ACCOUNT_STATUS)
   status: USER_ACCOUNT_STATUS;
-}
+} 
 
 export class notificationData {
 

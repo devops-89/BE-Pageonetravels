@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CommissionRepositoryService } from '../../../../libs/database/src/repositories/commission.repository';
-import { AddCommissionDto } from '../../../../libs/dtos/admin/commission.dto';
-import { UpdateCommissionDto } from '../../../../libs/dtos/admin/commission.dto';
-import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
-import { ApiResponse } from '../../../../libs/interfaces/commonTypes/apiResponse.interface';
+import { CommissionRepositoryService } from '../../../../../libs/database/src/repositories/commission.repository';
+import { AddCommissionDto } from '../../../../../libs/dtos/admin/commission.dto';
+import { UpdateCommissionDto } from '../../../../../libs/dtos/admin/commission.dto';
+import { ERROR_CODES } from '../../../../../libs/constants/commonConstants';
+import { ApiResponse } from '../../../../../libs/interfaces/commonTypes/apiResponse.interface';
 
 @Injectable()
 export class CommissionService {
@@ -11,7 +11,7 @@ export class CommissionService {
     
     async addCommissionData(commissionDto: AddCommissionDto) {
         try { 
-            const { type, percentage, status } = commissionDto;
+            const { type, percentage, status } = commissionDto;           
             const commission = await this.commissionRepositoryService.insertCommission({ type, percentage, status });
             return { message: 'Successfully Inserted Commission', commission: commission };
         } catch (error) {
@@ -25,6 +25,7 @@ export class CommissionService {
             const commissionlist = await this.commissionRepositoryService.getCommissionList();
             return { message: 'Commission Service List', commissionlist: commissionlist };
         }catch(error){
+            console.log('Commission Service List Error:', error);
             throw (`Commission Service List Error: ${error.message}`);
         }
     }
@@ -48,6 +49,7 @@ export class CommissionService {
             return { message: 'Successfully updated Brand', data: updateCommission }; ;
 
         }catch(error){
+            console.log('Commission Update Error:', error);
             throw (`Commission Update Error: ${error.message}`);
         }
     }

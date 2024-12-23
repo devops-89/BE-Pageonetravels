@@ -9,10 +9,11 @@ import {
     UserRepositoryService,
     AddressRepositoryService,
     CommissionRepositoryService,
-    SettingRepositoryService
+    SettingRepositoryService,
+    SearchRepositoryService
  
 } from './';
-import { User, OtpVerification, LoginSession, Address, Setting,Commission} from './';
+import { User, OtpVerification, LoginSession, Address, Setting,Commission, Airport} from './';
 
 @Module({})
 export class DBModule {
@@ -31,7 +32,8 @@ export class DBModule {
                 LoginSession,
                 Address,
                 Commission,
-                Setting
+                Setting,
+                Airport
                 
             ],
             synchronize: true,
@@ -74,8 +76,8 @@ export class DBModule {
                     LoginSession,
                     Address,
                     Commission,
-                    Setting
-                   
+                    Setting,
+                    Airport
                 ]),
             ],
             controllers: [],
@@ -85,7 +87,8 @@ export class DBModule {
                 LoginSessionService,
                 AddressRepositoryService,
                 CommissionRepositoryService,
-                SettingRepositoryService
+                SettingRepositoryService,
+                SearchRepositoryService
                
             ],
             exports: [
@@ -94,7 +97,8 @@ export class DBModule {
                 LoginSessionService,
                 AddressRepositoryService,
                 CommissionRepositoryService,
-                SettingRepositoryService
+                SettingRepositoryService,
+                SearchRepositoryService
 
             ],
         };

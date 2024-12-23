@@ -18,7 +18,6 @@ export class UserService {
     private readonly addressRepository: AddressRepositoryService,
   ) { }
 
-
   async updateUserProfile(payload: JWTPayload, userDto: UpdatePersonalDetailDto, file): Promise<ApiResponse.ApiOK> {
     try {
       const { reference_id } = payload;
