@@ -29,19 +29,19 @@ export class AddressRepositoryService {
 
     async insertAddress(input: AddressI.AddAdress): Promise<Address> {
         try {
-            const { city, country, houseNo, isDefault, postal_code, street, state,  addressType } = input;
-            const isDefaultValue = isDefault || false;
-            const addType = addressType || "HOME";
+            const { city, country, house_number, is_default, postal_code, street, state,  address_type } = input;
+            const isDefaultValue = is_default || false;
+            const addType = address_type || "HOME";
             
             const address = this.addressRepository.create({
                 city,
                 country,
-                houseNo,
-                isDefault:isDefaultValue,
+                house_number,
+                isdefault:isDefaultValue,
                 postal_code,
                 state,
                 street,
-                addressType : addType,
+                address_type : addType,
             });
 
             const res = await this.addressRepository.save(address);
@@ -52,8 +52,8 @@ export class AddressRepositoryService {
         }
     }
 
-    async getAllAddressesForUser(userId: string) {
-        const addresses = await this.addressRepository.find({ where: { user: { id: userId } } });
+    async getAllAddressesForUser(user_id: string) {
+        const addresses = await this.addressRepository.find({ where: { user: { id: user_id } } });
 
         if (addresses && addresses.length > 0) {
             return addresses;
@@ -69,10 +69,10 @@ export class AddressRepositoryService {
 
     async updateAddress(input: AddressI.UpdateAdress): Promise<void> {
         try {
-            const { city, country, houseNo, isDefault, postal_code, street, addressType, id, userId } = input;
+            const { city, country, house_number, is_default, postal_code, street, address_type, id, user_id } = input;
 
-            const updateFields = this.mapObject({ city, country, houseNo, isDefault, postal_code, street, addressType });
-            // await this.addressRepository.update({ id, user: { id: userId } }, updateFields);
+            const updateFields = this.mapObject({ city, country, house_number, is_default, postal_code, street, address_type });
+            // await this.addressRepository.update({ id, user: { id: user_id } }, updateFields);
             return;
         } catch (error) {
             throw error;
@@ -81,10 +81,10 @@ export class AddressRepositoryService {
 
     async updateStoreAddress(id:string, input: AddressI.UpdateAdress): Promise<void> {
         try {
-            const { city, country, houseNo, isDefault, postal_code, street, addressType, userId } = input;
+            const { city, country, house_number, is_default, postal_code, street, address_type, user_id } = input;
 
-            const updateFields = this.mapObject({ city, country, houseNo, isDefault, postal_code, street, addressType });
-            // await this.addressRepository.update({ id, user: { id: userId } }, updateFields);
+            const updateFields = this.mapObject({ city, country, house_number, is_default, postal_code, street, address_type });
+            // await this.addressRepository.update({ id, user: { id: user_id } }, updateFields);
             return;
         } catch (error) {
             console.log("Error in update store addreess query",error)
@@ -92,10 +92,10 @@ export class AddressRepositoryService {
         }
     }
 
-    async updateDefaultByIds(ids: string[], userId: string): Promise<void> {
+    async updateDefaultByIds(ids: string[], user_id: string): Promise<void> {
         try {
    
-            await this.addressRepository.update({ id: In(ids), user: { id: userId } }, { isDefault: false });
+            await this.addressRepository.update({ id: In(ids), user: { id: user_id } }, { isdefault: false });
             return;
         } catch (error) {
             throw error;

@@ -13,7 +13,7 @@ export class LoginDto {
 
   @IsOptional()
   @IsString()
-  reference_id: string;
+  country_code: string;
 }
 
 export class UserQueryDto {
@@ -51,11 +51,10 @@ export class PaginationDto {
 export class UserFilterDto {
   @IsOptional()
   @IsEnum(USER_TYPE)
-  user_type: USER_TYPE; // Make status optional
-
+  user_type: USER_TYPE; 
   @IsOptional()
   @IsString()
-  search: string; // To search by name, email, or phone number
+  search: string;
 
   @IsOptional()
   @IsEnum(USER_ACCOUNT_STATUS)
@@ -70,7 +69,7 @@ export class notificationData {
 
   @IsString()
   @IsOptional()
-  deviceType: DEVICE_TYPE
+  device_type: DEVICE_TYPE
 
 }
 
@@ -99,7 +98,7 @@ export class VerifyDto {
   
   @IsString()
   @IsOptional()
-  deviceType: DEVICE_TYPE
+  device_type: DEVICE_TYPE
 }
 
 export class AddEmailDto {
@@ -110,7 +109,7 @@ export class AddEmailDto {
 
 export class AddPhoneDto {
   @IsString()
-  phone_no: string;
+  phone_number: string;
 
   @IsString()
   country_code: string;
@@ -129,7 +128,7 @@ export class VerifyPhoneNoDto {
 export class UpdatePersonalDetailDto {
   @IsOptional()
   @IsString()
-  name: string;
+  full_name: string;
 
   @IsOptional()
   @IsString()
@@ -141,11 +140,15 @@ export class UpdatePersonalDetailDto {
 
   @IsOptional()
   @IsString()
-  phone_no: string;
+  phone_number: string;
 
   @IsOptional()
   @IsString()
   reference_id: string;
+
+  @IsOptional()
+  @IsString()
+  country_code: string;
 
   // @IsOptional()
   // @IsString()
@@ -161,14 +164,14 @@ export class UpdatePersonalDetailDto {
 
   @IsOptional()
   @IsNumber()
-  userId: number
+  user_id: number
 }
 
 // renewToken.dto.ts
 export class RenewTokenDto {
   @IsNotEmpty()
   @IsString()
-  accessToken: string;
+  access_token: string;
 
   @IsNotEmpty()
   @IsString()
@@ -195,10 +198,9 @@ export class ChangePasswordDto {
   
   @IsString()
   @IsOptional()
-  deviceType: DEVICE_TYPE
+  device_type: DEVICE_TYPE
 
 }
-
 
 export class RegisterWithEmailPasswordDto {
   @IsEmail()
@@ -227,7 +229,7 @@ export class RegisterDto {
 
   @IsNotEmpty()
   @IsString()
-  name: string;
+  full_name: string;
 
   @IsEnum(USER_TYPE)
   @IsOptional()
@@ -247,13 +249,13 @@ export class CustomLoginDto {
 
   @IsOptional()
   @IsString()
-  phone_no: string;
+  phone_number: string;
 
   @IsOptional()
   @IsString()
-  reference_id: string;
+  country_code: string;
 
   @IsOptional()
   @IsString()
-  verifyBy: LOGIN_BY
+  verify_by: LOGIN_BY
 }

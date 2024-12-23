@@ -12,7 +12,7 @@ export class OtpVerification {
   id: string;  
 
   @Column({ type: 'timestamp', default: () => 'now()' })
-  createdAt: Date
+  created_at: Date
 
   @Column()
   otp: string
@@ -27,23 +27,23 @@ export class OtpVerification {
     type: 'enum',
     enum: OTP_TYPE,
   })
-  otpType:OTP_TYPE
+  otp_type:OTP_TYPE
 
   @Column({
     type: 'enum',
     enum: OTP_SEND_ON,
   })
-   sendOn: OTP_SEND_ON
+   send_on: OTP_SEND_ON
 
    @Column()
-  emailOrPhone: string
+  email_or_phone: string
 
   @Column({nullable:true})
   @IsDefined()
   reference_id: string
 
   @Column({type:"bigint"})
-  expiryTime: number
+  expiry_time: number
 
 }
 

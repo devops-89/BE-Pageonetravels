@@ -15,7 +15,7 @@ export class Commission {
     status: boolean;
 
     @CreateDateColumn({ type: 'timestamp' })
-    createdAt: Date;
+    created_at: Date;
 
     @UpdateDateColumn({ type: 'timestamp' })
     updatedAt: Date;

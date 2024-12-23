@@ -6,13 +6,13 @@ export declare namespace LoginSessionI
     interface LoginSessionSchema
     {
         id: string,
-        userId: string,
+        user_id: string,
         refresh_token: string,
         loginBy: LOGIN_BY,
-        loginIdentity: string,
+        login_identity: string,
         loginStatus: SESSION_STATUS,
         refreshTokenExpiry: number,
-        createdAt: Date,
+        created_at: Date,
         updatedAt: Date
     }
 
@@ -20,24 +20,24 @@ export declare namespace LoginSessionI
 
     interface insertLoginSession
     {
-        userId: string,
+        user_id: string,
         refresh_token: string,
         loginStatus: SESSION_STATUS,
         refreshTokenExpiry: number,
         loginBy: LOGIN_BY,
-        loginIdentity: string,
+        login_identity: string,
         fcmToken?:string,
-        deviceType?:DEVICE_TYPE
+        device_type?:DEVICE_TYPE
     }
 
     interface GetLoginToken {
-        userId: string;
+        user_id: string;
         loginBy: LOGIN_BY;
-        loginIdentity: string;
-        roleName?: string;
+        login_identity: string;
+        // role_name?: string;
         user_type?: USER_TYPE;
         fcmToken?:string;
-        deviceType?:DEVICE_TYPE;
+        device_type?:DEVICE_TYPE;
     }
 
 

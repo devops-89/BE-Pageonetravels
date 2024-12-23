@@ -3,7 +3,7 @@ import { CommissionRepositoryService } from '../../../../libs/database/src/repos
 import { AddCommissionDto } from '../../../../libs/dtos/admin/commission.dto';
 import { UpdateCommissionDto } from '../../../../libs/dtos/admin/commission.dto';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
-import { ApiResponse } from 'libs/interfaces/commonTypes/apiResponse.interface';
+import { ApiResponse } from '../../../../libs/interfaces/commonTypes/apiResponse.interface';
 
 @Injectable()
 export class CommissionService {
@@ -36,7 +36,7 @@ export class CommissionService {
             // check if brand Exists
             const existingCommission = await this.commissionRepositoryService.getCommissionbyId(commission_id);
             if (!existingCommission) {
-                throw { statusCode: ERROR_CODES.NOT_FOUND, message: `Commission not found` };
+                throw { status_code: ERROR_CODES.NOT_FOUND, message: `Commission not found` };
             }
 
             const updateCommission = await this.commissionRepositoryService.updateCommission({commission_id,

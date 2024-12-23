@@ -7,7 +7,7 @@ export class InsertAddressDto {
   
     @IsString()
     // @IsNotEmpty({ message: 'House No is required' })
-    houseNo: string;
+    house_number: string;
 
     @IsString()
     // @IsNotEmpty({ message: 'City is required' })
@@ -28,14 +28,14 @@ export class InsertAddressDto {
 
     @IsBoolean()
     @IsOptional()
-    isDefault:boolean
-
-    @IsNumber()
-    @IsOptional()
-    addressId:Number
+    isdefault:boolean
 
     @IsString()
-    addressType: string
+    @IsOptional()
+    address_id:string
+
+    @IsString()
+    address_type: string
   }
 
 
@@ -58,7 +58,7 @@ export class InsertAddressDto {
     @IsString()
     @IsOptional()
     // @IsNotEmpty({ message: 'House No is required' })
-    houseNo: string;
+    house_number: string;
 
     @IsString()
     @IsOptional()
@@ -78,11 +78,11 @@ export class InsertAddressDto {
 
     @IsBoolean()
     @IsOptional()
-    isDefault:boolean
+    isdefault:boolean
 
     @IsString()
     @IsOptional()
-    addressType: string
+    address_type: string
   }
 
   export class GetAddressByIdDto {

@@ -9,6 +9,7 @@ import { TokenValidationMiddleware } from '../../../../../libs/middlewares/authM
 import { ConfigModule } from '../../../../../libs/config/config.module';
 import { ResponseHandlerModule } from '../../../../../libs/response-handler/response-handler.module';
 import { ConfigService } from 'aws-sdk';
+import { ResponseHandlerService } from '../../../../../libs/response-handler/response-handler.service';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { ConfigService } from 'aws-sdk';
       LoginSessionService,
       ConfigService,
       ConfigModule,
-      //  ResponseHandlerService,
+      ResponseHandlerService,
     ]),
   ],
   controllers: [LogoutController],

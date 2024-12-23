@@ -14,7 +14,7 @@ export function getAuthPayload(req: any)
 
 export function getAuthenticationToken(req: any) 
 {
-    const accessToken = req.headers['accesstoken'] as string || null;
-    return accessToken;
+    const access_token = req.headers['accesstoken'] as string || null;
+    return access_token;
 }
 

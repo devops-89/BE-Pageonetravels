@@ -8,20 +8,20 @@ export class Address {
   id: string;  
 
   @Column({ type: 'timestamp', default: () => 'now()' })
-  createdAt: Date
+  created_at: Date
 
   @ManyToOne(() => User, user => user.addresses)
-  // @JoinColumn({ name: "userId" })
+  @JoinColumn({ name: "user_id" })
   user: User
 
   @Column()
-  isDefault: boolean
+  isdefault: boolean
 
   @Column()
   street: string
 
   @Column()
-  houseNo: string
+  house_number: string
 
   @Column()
   postal_code: string
@@ -40,6 +40,6 @@ export class Address {
     enum: ["OFFICE", "HOME", "OTHER"],
     default: "HOME"
   })
-  addressType: string
+  address_type: string
 
 }

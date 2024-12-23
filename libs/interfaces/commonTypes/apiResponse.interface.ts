@@ -3,7 +3,7 @@ export declare namespace ApiResponse
     interface ApiResponseType 
     {
         data: any,
-        statusCode: number,
+        status_code: number,
         message: string,
         extraError?: any,
         extraMessage?: any,
@@ -14,7 +14,7 @@ export declare namespace ApiResponse
     interface ApiOK
     {
         data?: any,
-        statusCode?: number,
+        status_code?: number,
         message?: string,
         extraMessage?: any
         success?: boolean
@@ -22,7 +22,7 @@ export declare namespace ApiResponse
 
     interface ApiErrorType extends Error
     {
-        statusCode: number,
+        status_code: number,
         message: string,
         extraError?: any
         stack?: string;
