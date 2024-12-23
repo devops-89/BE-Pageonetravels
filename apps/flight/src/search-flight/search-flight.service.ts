@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { SearchRepositoryService, SettingRepositoryService } from '../../../../libs/database/src';
 import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
 // import axios from 'axios';
@@ -10,10 +10,13 @@ import { GenerateTokenService } from './generateToken.service';
 import {  HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
 // import { FLIGHTDATA } from '../../../../libs/config/config.interface';
 import { JOURNEY_TYPE } from '../../../../libs/constants/flightConstant'
+import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
+
 @Injectable()
 export class SearchFlightService {
     // private tbo_credentials : FLIGHTDATA 
     constructor(
+        @Inject(CACHE_MANAGER) private cacheManager: CacheStore,
         private readonly settingRepo: SettingRepositoryService,
         private readonly tboConfigService: TBO_CredentialsService,
         private readonly searchrepositoryService: SearchRepositoryService,
@@ -90,6 +93,7 @@ export class SearchFlightService {
                 adult = 0,
                 child = 0,
                 infant = 0,
+                ip_address
             } = body;
     
             if (adult < 1) {
@@ -138,10 +142,10 @@ export class SearchFlightService {
             const apiJourneyType = journeyTypeMap[journey_type] || 1;
     
           
-            const { token, TBO_data } = await this.generateTokenService.getToken();
+            const { token, TBO_data } = await this.generateTokenService.getToken(ip_address);
+
             const { FLIGHT_SEARCH: base_url, FLIGHT_ENDUSERIP: base_ip } = TBO_data;
     
-            // Call searchFlightAPI with the validated data
             const response = await this.httptboapiservice.searchFlightAPI(token, base_url, base_ip, {
                 ...body,
                 journey_type: apiJourneyType,
@@ -149,8 +153,12 @@ export class SearchFlightService {
     
             return { message: "Flight list fetched successfully", data: response };
         } catch (error) {
-            console.error("Error fetching flight list:", error);
-            throw error.message
-        }
+            throw new HttpException({
+                status: HttpStatus.FORBIDDEN,
+                error: 'This is a custom message',
+              }, HttpStatus.FORBIDDEN, {
+                cause: error
+              });
+            }
     }
 }

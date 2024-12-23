@@ -29,13 +29,13 @@ export interface CabinClass {
     FIRST_CLASS : 6,
 }
 
-export interface JourneyType {
-    ONE_WAY:1,
-    RETURN : 2,
-    MULTI_STOP: 3,
-    ADVANCE_SEARCH: 4,
-    SPECIAL_RETURN:5
-}
+// export interface JourneyType {
+//     ONE_WAY:1,
+//     RETURN : 2,
+//     MULTI_STOP: 3,
+//     ADVANCE_SEARCH: 4,
+//     SPECIAL_RETURN:5
+// }
 
 export interface Multicity  {
   origin: string;         
@@ -45,10 +45,3 @@ export interface Multicity  {
   preferred_time: string;             // The time in HHMM format
 };
 
-export interface TimeFilter {
-  "AnyTime" : '00:00:00';
-  "Morning" : '08:00:00'; 
-  "AfterNoon" : '14:00:00';
-  "Evening" : '19:00:00';
-  "Night" : '01:00:00';
-}
