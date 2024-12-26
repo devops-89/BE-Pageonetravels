@@ -1,12 +1,13 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
-import { TokenValidationGuard } from '../../../../../libs/middlewares/authMiddleware.guard';
 import { ResponseHandlerService } from '../../../../../libs/response-handler/response-handler.service';
 import { LogoutService } from './logout.service';
+import { TokenValidationGuard } from '../../../../../libs/middlewares/authMiddleware.guard';
 
 @Controller('logout')
 export class LogoutController {
 
     constructor(private readonly ResponseHandler: ResponseHandlerService, private readonly LogoutService:LogoutService) {}
+
 
     @Get('/currentSession')
     @UseGuards(TokenValidationGuard)

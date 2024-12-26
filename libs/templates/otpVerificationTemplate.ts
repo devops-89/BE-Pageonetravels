@@ -1,6 +1,6 @@
 import { LOGO } from '../constants/commonConstants'; // Adjust path as needed
 
-export const otpVerificationTemplate = function (otp: string, name?:string) {
+export const otpVerificationTemplate = function (otp: string, full_name?:string) {
     const html = `
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -24,7 +24,7 @@ export const otpVerificationTemplate = function (otp: string, name?:string) {
                     <td style="padding: 40px 0px 0px;">
                       <div style="text-align: center;">
                         <div style="padding-bottom: 20px;"><img
-                            src="" alt="Bharat Hast Kaushal" style="width: 100px;">
+                            src="" alt="Page1Travels" style="width: 100px;">
                         </div>
                       </div>
                       <div style="padding: 20px; background-color: rgb(255, 255, 255);">
@@ -33,7 +33,7 @@ export const otpVerificationTemplate = function (otp: string, name?:string) {
                           <p style="padding-bottom: 16px">Please use the verification code below to complete the email verification process.</p>
                           <p style="padding-bottom: 16px"><strong style="font-size: 130%">${otp}</strong></p>
                           <p style="padding-bottom: 16px">If you didn't request this, you can ignore this email.</p>
-                          <p style="padding-bottom: 16px">Thanks,<br>Bharat Hast Kaushal</p>
+                          <p style="padding-bottom: 16px">Thanks,<br>Page1Travels</p>
                         </div>
                       </div>
                       <div style="padding-top: 20px; color: rgb(153, 153, 153); text-align: center;">

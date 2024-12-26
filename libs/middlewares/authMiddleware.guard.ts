@@ -12,6 +12,7 @@ export class TokenValidationGuard implements CanActivate {
     const response = context.switchToHttp().getResponse();
 
     return new Promise<boolean>((resolve, reject) => {
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.tokenValidationMiddleware.use(request, response, (err: any) => {
         if (err) 

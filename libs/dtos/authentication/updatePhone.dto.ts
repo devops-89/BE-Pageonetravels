@@ -3,11 +3,11 @@ import { IsNumber, IsOptional, IsString } from "class-validator";
 export class AdminVerifyPhoneDto
     {
         @IsNumber()
-        userId: number
+        user_id: number
 
         @IsString()
         @IsOptional()
-        phone_no:string
+        phone_number:string
         
         @IsString()
         @IsOptional()

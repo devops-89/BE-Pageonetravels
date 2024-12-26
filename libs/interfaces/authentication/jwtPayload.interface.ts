@@ -3,7 +3,7 @@ import { ERROR_CODES, ErrorMessages, TOKEN_TYPE } from "../../constants/commonCo
 
 export interface JWTPayload
 {
-    reference_id: string,  //userId
+    reference_id: string,
     guest_id: string,
     refresh_token: string,
     user_role: string,
@@ -22,7 +22,7 @@ export interface VerifyJWTTokenResult
 
 export interface AddUserPayload
 {
-    reference_id: number,  //userId
+    reference_id: number,  //user_id
     member_request_id: string,
     token_type: TOKEN_TYPE
 }

@@ -3,7 +3,7 @@ export declare namespace UpdatePhoneI
 {
     interface AddPhone 
     {
-        phone_no: string,
+        phone_number: string,
         reference_id: string
     }
 

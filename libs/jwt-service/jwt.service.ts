@@ -27,7 +27,7 @@ export class JwtService {
 
       jwt.sign(payload, Buffer.from(JWTSecretKey, 'base64'), { expiresIn: expiryTimeInSecs, algorithm: 'HS512' }, function (err: any, token: string | PromiseLike<string>) {
         if (err || !token) {
-          reject({ statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: 'Error while creating JWT token', extraError: err });
+          reject({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: 'Error while creating JWT token', extraError: err });
           return;
         } else {
           resolve(token);
@@ -43,7 +43,7 @@ export class JwtService {
 
       jwt.sign(payload, Buffer.from(JWTSecretKey, 'base64'), { algorithm: 'HS512' }, function (err: any, token: string | PromiseLike<string>) {
         if (err || !token) {
-          reject({ statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: 'Error while creating JWT token', extraError: err });
+          reject({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: 'Error while creating JWT token', extraError: err });
           return;
         } else {
           resolve(token);

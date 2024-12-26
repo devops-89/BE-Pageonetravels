@@ -1,9 +1,10 @@
 /* eslint-disable no-async-promise-executor */
 import { Injectable } from '@nestjs/common';
-import { JWTPayload } from '../../../../../libs/interfaces/authentication/jwtPayload.interface';
-import { ApiResponse } from '../../../../../libs/interfaces/commonTypes/apiResponse.interface';
 import { LoginSessionService } from '../../../../../libs/database/src';
 import { LOGOUT_MSG } from '../../../../../libs/constants/autenticationConstants/messageConstants';
+import { JWTPayload } from '../../../../../libs/interfaces/authentication/jwtPayload.interface';
+import { ApiResponse } from '../../../../../libs/interfaces/commonTypes/apiResponse.interface';
+
 
 @Injectable()
 export class LogoutService {
@@ -45,5 +46,5 @@ logoutAllSession(userPayload: JWTPayload): Promise<ApiResponse.ApiOK>
         }
     })
 }
-
 }
+

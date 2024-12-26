@@ -22,11 +22,11 @@ export class DefaultUserService {
         return;
       }
 
-      const passwordHash = await generatePasswordHash(defaultUser.password);
+      const password_hash = await generatePasswordHash(defaultUser.password);
 
       const userObj: UserI.InsertDefaultUser = 
       {
-        password: passwordHash,
+        password: password_hash,
         email: defaultUser.email.toLowerCase().trim(),
         user_type: USER_TYPE.ADMIN,
         full_name: defaultUser.full_name,

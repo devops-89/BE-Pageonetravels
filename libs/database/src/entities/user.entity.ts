@@ -66,13 +66,13 @@ export class User {
   otp_verifications: OtpVerification[]
 
   @OneToMany(() => Address, address => address.user, { cascade: true, nullable: true })
-  @JoinColumn({ name: 'addressId' })
+  @JoinColumn({ name: 'address_id' })
   addresses: Address[]
 
   @OneToMany(() => LoginSession, session => session.user)
   login_sessions: LoginSession[];
 
   @Column({ type: 'timestamp', default: () => 'now()' })
-  createdAt: Date
+  created_at: Date
 
 }

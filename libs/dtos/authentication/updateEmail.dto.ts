@@ -3,7 +3,7 @@ import { IsEmail, IsNumber, IsOptional } from "class-validator";
 export class AdminVerifyEmailDto 
 {
     @IsNumber()
-    userId: number
+    user_id: number
 
     @IsEmail()
     @IsOptional()

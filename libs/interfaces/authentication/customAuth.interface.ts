@@ -5,13 +5,13 @@ export declare namespace CustomAuthI
     interface LoginSessionSchema
     {
         id: number,
-        userId: number,
+        user_id: number,
         refresh_token: string,
         loginBy: LOGIN_BY,
-        loginIdentity: string,
+        login_identity: string,
         loginStatus: SESSION_STATUS,
         refreshTokenExpiry: number,
-        createdAt: Date,
+        created_at: Date,
         updatedAt: Date
     }
 
@@ -19,20 +19,20 @@ export declare namespace CustomAuthI
 
     interface insertLoginSession
     {
-        userId: number,
+        user_id: number,
         refresh_token: string,
         loginStatus: SESSION_STATUS,
         refreshTokenExpiry: number,
         loginBy: LOGIN_BY,
-        loginIdentity: string,
+        login_identity: string,
     }
 
     interface GetLoginToken {
-        userId: number;
+        user_id: number;
         loginBy: LOGIN_BY;
-        loginIdentity: string;
-        roleName?: string;
-        group?: USER_TYPE;
+        login_identity: string;
+        // role_name?: string;
+        user_type?: USER_TYPE;
     }
 
 
