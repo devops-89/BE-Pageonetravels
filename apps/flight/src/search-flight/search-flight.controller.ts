@@ -35,6 +35,18 @@ export class SearchFlightController {
         }
     }
 
+    @Get('/all-airport')
+    async searchAllAirport(
+        @Req() req : Request, @Res() res : Response){
+        try {
+            const result = await this.searchflightsearvice.searchAllAirport();
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch(error){
+            console.error("Failed in the search airport", error)
+            return this.responseHandler.sendErrorResponse(res,error)
+        }
+    }
+
 
     @Post('/search-flight')
     async searchFlight(@Req() req: Request, @Body(new ValidationPipe()) body: SearchFlightDto,  @Res() res: Response){

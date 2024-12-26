@@ -36,7 +36,7 @@ export class GenerateTokenService {
             return this.tbo_token;
            
         } catch (error) {
-            console.log(error);
+            console.log("Error in the generate token", error);
             throw error
         }
     }
@@ -74,7 +74,6 @@ export class GenerateTokenService {
     async getCache(ip_address: string) {
         const ip_key = `tboToken:${ip_address}`
         const value = await this.cacheManager.get(`${ip_key}`); // ttl in seconds
-        console.log("Inside Get Cache", value);
-        return value;
+        return value
     }
 }

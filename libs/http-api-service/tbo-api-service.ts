@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import axios from "axios";
-import { SearchFlightDto } from "libs/dtos/flight/flights.dto";
-import { IFlightSearch } from "../interfaces/flight/search.interface";
+import { SearchFlightDto } from "../../libs/dtos/flight/flights.dto";
+import { IFlightSearch, ISearchFlight } from "../interfaces/flight/search.interface";
 import { JOURNEY_TYPE } from "../../libs/constants/flightConstant";
 
 @Injectable()
@@ -23,9 +23,10 @@ export class HTTPSTboAPIService {
         token: any, 
         base_url: string, 
         base_ip: string, 
-        body: SearchFlightDto
+        body: ISearchFlight
     ) {
         try {
+          
             const {
                 min_price,
                 max_price,
@@ -43,11 +44,11 @@ export class HTTPSTboAPIService {
                 one_stop_flight,
                 cabin_class
             } = body;
-    
+           
 
             const segments = this.generateSegments({ journey_type, origin,  destination, departure_date, return_date, multicity, cabin_class,preferred_time});
     
-
+           
             const payload: IFlightSearch = {
                 EndUserIp: base_ip,
                 TokenId: token,
@@ -61,13 +62,11 @@ export class HTTPSTboAPIService {
                 Segments: segments,
                 Sources: null,
             };
-            
-            // Call API
+          
+           
             const response = await this.httpAPICall(base_url, payload);
 
-            if(min_price && max_price){
-                //filter the price here
-            }
+          
             return response;
     
         } catch (error) {
@@ -87,7 +86,37 @@ export class HTTPSTboAPIService {
 
 
     private generateSegments({ journey_type, origin, destination, departure_date, return_date, multicity, cabin_class, preferred_time }) {
-        if (journey_type === JOURNEY_TYPE.ROUNDTRIP) {
+        try {
+            if (journey_type === JOURNEY_TYPE.ROUNDTRIP) {
+                return [
+                    {
+                        Origin: origin,
+                        Destination: destination,
+                        FlightCabinClass: cabin_class,
+                        PreferredDepartureTime: `${departure_date}T${preferred_time}`,
+                        PreferredArrivalTime: `${departure_date}T${preferred_time}`,
+                    },
+                    {
+                        Origin: destination,
+                        Destination: origin,
+                        FlightCabinClass: cabin_class,
+                        PreferredDepartureTime: `${return_date}T${preferred_time}`,
+                        PreferredArrivalTime: `${return_date}T${preferred_time}`,
+                    },
+                ];
+            }
+        
+            if (journey_type === JOURNEY_TYPE.MULTICITY) {
+                return multicity.map((segment) => ({
+                    Origin: segment.origin,
+                    Destination: segment.destination,
+                    FlightCabinClass: cabin_class,
+                    PreferredDepartureTime: `${segment.departure_date}T${preferred_time}`,
+                    PreferredArrivalTime: `${segment.departure_date}T${preferred_time}`,
+                }));
+            }
+    
+            // Default to one-way journey
             return [
                 {
                     Origin: origin,
@@ -96,36 +125,12 @@ export class HTTPSTboAPIService {
                     PreferredDepartureTime: `${departure_date}T${preferred_time}`,
                     PreferredArrivalTime: `${departure_date}T${preferred_time}`,
                 },
-                {
-                    Origin: destination,
-                    Destination: origin,
-                    FlightCabinClass: cabin_class,
-                    PreferredDepartureTime: `${return_date}T${preferred_time}`,
-                    PreferredArrivalTime: `${return_date}T${preferred_time}`,
-                },
             ];
+        }catch(error){
+            console.log("Error in the generate segments fucntion", error);
+            throw error
         }
-    
-        if (journey_type === JOURNEY_TYPE.MULTICITY) {
-            return multicity.map((segment) => ({
-                Origin: segment.origin,
-                Destination: segment.destination,
-                FlightCabinClass: cabin_class,
-                PreferredDepartureTime: `${segment.departure_date}T${preferred_time}`,
-                PreferredArrivalTime: `${segment.departure_date}T${preferred_time}`,
-            }));
-        }
-
-        // Default to one-way journey
-        return [
-            {
-                Origin: origin,
-                Destination: destination,
-                FlightCabinClass: cabin_class,
-                PreferredDepartureTime: `${departure_date}T${preferred_time}`,
-                PreferredArrivalTime: `${departure_date}T${preferred_time}`,
-            },
-        ];
+       
     }
     
 }

@@ -1,3 +1,5 @@
+import { TimeFilter, JOURNEY_TYPE } from '../../../libs/constants/flightConstant';
+
 export interface IFlightSearch {
   EndUserIp: string;
   TokenId: any;
@@ -17,6 +19,8 @@ export interface IFlightSearch {
   }[];
   Sources?: string[] | null;      // Optional
 }
+
+
 
   
  
@@ -41,7 +45,44 @@ export interface Multicity  {
   origin: string;         
   destination: string;
   cabin_class:string;     
-  departure_date: string;   // The departure date in YYYY-MM-DD format
-  preferred_time: string;             // The time in HHMM format
+  departure_date: string;   
+  preferred_time: any;           
 };
 
+export type AirportType = {
+  id: string;         
+  created_at: Date;   
+  iata_code: string;    
+  airport_name: string; 
+  city_name: string;   
+  city_code: string;   
+  country_code: string;
+};
+
+
+export interface MulticityItem {
+  origin: string;
+  destination: string;
+  cabin_class: string;
+  departure_date: string;
+  preferred_time?: string; // Optional, as it is commented in the original code
+}
+
+export interface ISearchFlight {
+  min_price?: string;
+  max_price?: string;
+  ip_address: string;
+  origin: string;
+  destination: string;
+  departure_date: string;
+  preferred_time: string;
+  return_date?: string;
+  multicity?: any;
+  journey_type: number;
+  adult: number;
+  child?: number;
+  infant?: number;
+  cabin_class: string;
+  direct_flight?: boolean;
+  one_stop_flight?: boolean;
+}
