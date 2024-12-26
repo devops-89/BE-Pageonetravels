@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AddHeaderDto } from '../../../../../libs/dtos/admin/header.dto';
-import { JWTPayload } from 'libs/interfaces/authentication/jwtPayload.interface';
-import { UserRepositoryService } from 'libs/database/src';
+import { JWTPayload } from '../../../../../libs/interfaces/authentication/jwtPayload.interface';
+import { UserRepositoryService } from '../../../../../libs/database/src';
 import { S3FileService} from '../../../../../libs/S3-Service/s3File.service';
 // import { ApiResponse } from 'libs/interfaces/commonTypes/apiResponse.interface';
 
@@ -14,8 +14,8 @@ export class HeaderService {
 
     async addHeader(payload:JWTPayload,headerDto:AddHeaderDto,file){
         try{
-            const {reference_id}= payload; 
-            const existingUser=this.userRepositoryService.getuserbyuserId(reference_id)
+           // const {reference_id}= payload; 
+           // const existingUser=this.userRepositoryService.getuserbyuserId(reference_id)
             
             console.log(headerDto);
             console.log(file);

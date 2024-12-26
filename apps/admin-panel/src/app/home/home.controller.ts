@@ -11,10 +11,10 @@ import {JWTPayload} from '../../../../../libs/interfaces/authentication/jwtPaylo
 import { SocialService } from './social.service';
 import { TestimonialService } from './testimonial.service';
 import { AddHeaderDto } from '../../../../../libs/dtos/admin/header.dto';
-import {TokenValidationGuard,CheckIfAdminGuard} from '../../../../../libs/middlewares/authMiddleware.guard';
+import {TokenValidationGuard} from '../../../../../libs/middlewares/authMiddleware.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { imageFileFilter } from '../../../../../libs/utils/fileUpload';
-import { ResponseHandlerService } from 'libs/response-handler/response-handler.service';
+import { ResponseHandlerService } from '../../../../../libs/response-handler/response-handler.service';
 
 @Controller('home')
 export class HomeController {
@@ -35,7 +35,7 @@ private readonly testimonialService : TestimonialService,
 //Header API
 
 @Post('header_logo')
-@UseGuards(TokenValidationGuard,CheckI)
+@UseGuards(TokenValidationGuard)
 @UseInterceptors(FileInterceptor('avatar',{fileFilter:imageFileFilter}))
 async addHeader(@Body() body:AddHeaderDto, @UploadedFile() file , @Req() req: Request, @Res() res:Response ){
     try{
