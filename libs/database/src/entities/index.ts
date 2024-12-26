@@ -3,5 +3,15 @@ export * from './otpVerification.entity';
 export * from './user.entity';
 export * from './address.entity'; 
 export * from './commission.entity';
-export * from './settings.entity'
-export * from './airport.entity'
+export * from './settings.entity';
+export * from './airport.entity';
+export * from './banner.entity';
+export * from './headers.entity';
+export * from './service.entity';
+export * from './festival.entity';
+export * from './offer.entity';
+export * from './about.entity';
+export * from './faq.entity';
+export * from './testimonial.entity';
+export * from './social.entity';
+export * from './footer.entity';

@@ -13,7 +13,7 @@ import {
     SearchRepositoryService
  
 } from './';
-import { User, OtpVerification, LoginSession, Address, Setting,Commission, Airport} from './';
+import { User, OtpVerification, LoginSession, Address, Setting,Commission, Airport,Faq,Banner,About,Festival,Offer, Social, Testimonial,Footer,Headers,Service } from './';
 
 @Module({})
 export class DBModule {
@@ -33,8 +33,8 @@ export class DBModule {
                 Address,
                 Commission,
                 Setting,
-                Airport
-                
+                Airport,
+                Faq,Banner,About,Festival,Offer, Social, Testimonial,Footer,Headers,Service
             ],
             synchronize: true,
             logging: false,
@@ -77,7 +77,8 @@ export class DBModule {
                     Address,
                     Commission,
                     Setting,
-                    Airport
+                    Airport,
+                    Faq,Banner,About,Festival,Offer, Social, Testimonial,Footer,Headers,Service
                 ]),
             ],
             controllers: [],
@@ -99,7 +100,6 @@ export class DBModule {
                 CommissionRepositoryService,
                 SettingRepositoryService,
                 SearchRepositoryService
-
             ],
         };
     }
