@@ -7,7 +7,7 @@ import { Cache } from 'cache-manager';
 
 @Injectable()
 export class GenerateTokenService {
-    private tbo_credentials: FLIGHTDATA
+    private tbo_credentials: FLIGHTDATA | undefined=undefined;
     private tbo_token: string
     constructor(
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
@@ -20,7 +20,7 @@ export class GenerateTokenService {
         try {
 
             this.tbo_credentials = await this.tboConfigService.getTBOCredentials();
-
+            console.log(">>>>>>>>>>>>>>>>>", this.tbo_credentials);
             const base_url = this.tbo_credentials.FLIGHT_AUTHENTICATION;
 
             const payload = {
@@ -41,17 +41,22 @@ export class GenerateTokenService {
         }
     }
 
+    getTBOCredentials(){
+        
+    }
+    
+
     async getToken(ip_address: string) {
         try {
            
             let token = await this.getCache(ip_address);
-
             if (!token) {
                 await this.generateTBOToken(ip_address);
+
                 token = await this.getCache(ip_address);
             }
     
-           
+           console.log("........", this.tbo_credentials);
             const payload = {
                 TBO_data: this.tbo_credentials,
                 token: token as string,
@@ -66,7 +71,7 @@ export class GenerateTokenService {
     }
     
 
-    async setCache(ip_address: string, token: string) {
+    async setCache(ip_address: string, token: string,) {
         const ip_key = `tboToken:${ip_address}`
         await this.cacheManager.set(ip_key, `${token}`,  82800); // ttl in seconds
     }

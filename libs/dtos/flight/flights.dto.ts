@@ -1,6 +1,6 @@
 import { IsArray, IsBoolean, IsDateString, IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, Length, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { JOURNEY_TYPE } from '../../../libs/constants/flightConstant';
+import { JOURNEY_TYPE, JOURNEYTYPEMAPPING } from '../../../libs/constants/flightConstant';
 import { TimeFilter } from '../../../libs/constants/flightConstant';
 
 export class SearchFlightDto {
@@ -51,7 +51,7 @@ export class SearchFlightDto {
     //   @IsEnum(JOURNEY_TYPE, {
     //     message: `journey_type must be one of: ${Object.values(JOURNEY_TYPE).join(', ')}`,
     //   })
-    journey_type: JOURNEY_TYPE;
+    journey_type: JOURNEYTYPEMAPPING;
 
     @IsNumber()
     @Type(() => Number)
@@ -100,7 +100,7 @@ class MulticityItem {
     @IsOptional()
     departure_date: string;
 
-    @IsString()
-    @IsOptional() 
-    preferred_time: string; 
+    // @IsString()
+    // @IsOptional() 
+    // preferred_time: string; 
 }

@@ -45,9 +45,13 @@ export class HTTPSTboAPIService {
                 cabin_class
             } = body;
            
+            console.log("?>>>", journey_type);
 
-            const segments = this.generateSegments({ journey_type, origin,  destination, departure_date, return_date, multicity, cabin_class,preferred_time});
-    
+            const segments = await this.generateSegments({ journey_type, origin,  destination, departure_date, return_date, multicity, cabin_class,preferred_time});
+            
+            console.log(">>>>>>>>>>>>>>>>",
+                segments
+            )
            
             const payload: IFlightSearch = {
                 EndUserIp: base_ip,
@@ -63,7 +67,7 @@ export class HTTPSTboAPIService {
                 Sources: null,
             };
           
-           
+           console.log(">>>>>>>>>", JSON.stringify(payload));
             const response = await this.httpAPICall(base_url, payload);
 
           
@@ -85,8 +89,9 @@ export class HTTPSTboAPIService {
     // }
 
 
-    private generateSegments({ journey_type, origin, destination, departure_date, return_date, multicity, cabin_class, preferred_time }) {
+    async generateSegments({ journey_type, origin, destination, departure_date, return_date, multicity, cabin_class, preferred_time }) {
         try {
+           
             if (journey_type === JOURNEY_TYPE.ROUNDTRIP) {
                 return [
                     {
@@ -110,7 +115,7 @@ export class HTTPSTboAPIService {
                 return multicity.map((segment) => ({
                     Origin: segment.origin,
                     Destination: segment.destination,
-                    FlightCabinClass: cabin_class,
+                    FlightCabinClass: segment.cabin_class,
                     PreferredDepartureTime: `${segment.departure_date}T${preferred_time}`,
                     PreferredArrivalTime: `${segment.departure_date}T${preferred_time}`,
                 }));
