@@ -86,3 +86,10 @@ export interface ISearchFlight {
   direct_flight?: boolean;
   one_stop_flight?: boolean;
 }
+
+export interface IFareRule {
+  "EndUserIp":string,
+  "TokenId": string,
+  "TraceId": string,
+  "ResultIndex": string
+}

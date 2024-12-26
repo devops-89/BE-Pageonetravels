@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import axios from "axios";
-import { SearchFlightDto } from "../../libs/dtos/flight/flights.dto";
-import { IFlightSearch, ISearchFlight } from "../interfaces/flight/search.interface";
+import { SearchFlightDto } from "../dtos/flight/search-flights.dto";
+import { IFareRule, IFlightSearch, ISearchFlight } from "../interfaces/flight/search.interface";
 import { JOURNEY_TYPE } from "../../libs/constants/flightConstant";
 
 @Injectable()
@@ -138,4 +138,14 @@ export class HTTPSTboAPIService {
        
     }
     
+    
+    async fareRule(baseurl:string, payload:IFareRule){
+        try {
+          let result = await this.httpAPICall(baseurl, payload);
+          return result;
+        } catch(error){
+          console.log(error);
+          throw error
+      }
+    }
 }

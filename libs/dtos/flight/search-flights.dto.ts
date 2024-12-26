@@ -1,7 +1,7 @@
 import { IsArray, IsBoolean, IsDateString, IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, Length, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { JOURNEY_TYPE, JOURNEYTYPEMAPPING } from '../../../libs/constants/flightConstant';
-import { TimeFilter } from '../../../libs/constants/flightConstant';
+import { JOURNEY_TYPE, JOURNEYTYPEMAPPING } from '../../constants/flightConstant';
+import { TimeFilter } from '../../constants/flightConstant';
 
 export class SearchFlightDto {
     @IsString()

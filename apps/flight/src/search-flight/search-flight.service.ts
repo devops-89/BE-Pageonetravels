@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { SearchRepositoryService, SettingRepositoryService } from '../../../../libs/database/src';
-import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
+import { SearchRepositoryService } from '../../../../libs/database/src';
 import { ApiResponse } from '../../../../libs/interfaces/commonTypes/apiResponse.interface';
-import { SearchFlightDto } from '../../../../libs/dtos/flight/flights.dto';
+import { SearchFlightDto } from '../../../../libs/dtos/flight/search-flights.dto';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 import { GenerateTokenService } from './generateToken.service';
 import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
@@ -13,8 +12,6 @@ import { FlightValidator } from './search-utility';
 @Injectable()
 export class SearchFlightService {
   constructor(
-    private readonly settingRepo: SettingRepositoryService,
-    private readonly tboConfigService: TBO_CredentialsService,
     private readonly searchrepositoryService: SearchRepositoryService,
     private readonly generateTokenService: GenerateTokenService,
     private readonly httptboapiservice: HTTPSTboAPIService

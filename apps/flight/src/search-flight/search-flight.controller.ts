@@ -1,7 +1,7 @@
 import { Controller, Req, Body, ValidationPipe, Res, Get, Post} from '@nestjs/common';
 import { SearchFlightService } from './search-flight.service';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
-import { SearchFlightDto } from '../../../../libs/dtos/flight/flights.dto';
+import { SearchFlightDto } from '../../../../libs/dtos/flight/search-flights.dto';
 
 @Controller('/flight')
 export class SearchFlightController { 

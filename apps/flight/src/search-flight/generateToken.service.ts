@@ -7,7 +7,7 @@ import { Cache } from 'cache-manager';
 
 @Injectable()
 export class GenerateTokenService {
-    private tbo_credentials: FLIGHTDATA | undefined=undefined;
+    // private tbo_credentials: FLIGHTDATA | undefined=undefined;
     private tbo_token: string
     constructor(
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
@@ -18,15 +18,13 @@ export class GenerateTokenService {
 
     async generateTBOToken(ip_address:string) {
         try {
-
-            this.tbo_credentials = await this.tboConfigService.getTBOCredentials();
-            console.log(">>>>>>>>>>>>>>>>>", this.tbo_credentials);
-            const base_url = this.tbo_credentials.FLIGHT_AUTHENTICATION;
+            const tbo_credentials = await this.getTBOCredentials();
+            const base_url = tbo_credentials.FLIGHT_AUTHENTICATION;
 
             const payload = {
-                ClientId: this.tbo_credentials.FLIGHT_CLIENT_ID,
-                UserName: this.tbo_credentials.FLIGHT_USERNAME,
-                Password: this.tbo_credentials.FLIGHT_PASSWORD,
+                ClientId: tbo_credentials.FLIGHT_CLIENT_ID,
+                UserName: tbo_credentials.FLIGHT_USERNAME,
+                Password: tbo_credentials.FLIGHT_PASSWORD,
                 // EndUserIp: this.tbo_credentials.FLIGHT_ENDUSERIP,
                 EndUserIp: ip_address,
             }
@@ -41,8 +39,14 @@ export class GenerateTokenService {
         }
     }
 
-    getTBOCredentials(){
-        
+    async getTBOCredentials(){
+        try {
+            const tbo_credentials = await this.tboConfigService.getTBOCredentials();
+            return tbo_credentials as FLIGHTDATA
+        }catch(error){
+            console.log("Error in the generate token", error);
+            throw error
+        }
     }
     
 
@@ -50,15 +54,15 @@ export class GenerateTokenService {
         try {
            
             let token = await this.getCache(ip_address);
+            const tbo_credentials = await this.getTBOCredentials();
             if (!token) {
                 await this.generateTBOToken(ip_address);
 
                 token = await this.getCache(ip_address);
             }
-    
-           console.log("........", this.tbo_credentials);
+            
             const payload = {
-                TBO_data: this.tbo_credentials,
+                TBO_data: tbo_credentials,
                 token: token as string,
             };
     
@@ -66,7 +70,7 @@ export class GenerateTokenService {
     
         } catch (error) {
             console.error("Failed in getToken API:", error);
-            throw error; // Re-throw the error for higher-level handling
+            throw error;
         }
     }
     
