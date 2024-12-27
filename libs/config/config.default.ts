@@ -18,9 +18,10 @@ export const DEFAULT_CONFIG: ConfigData = {
     JWT_EXPIRY_TIME: 0,
     AUTH_KEY: '',
     servicePorts: {
-        authentication: 8085,
-        product: 8087,
-        userManagement: 8086
+        adminpanel: 3005,
+        flight: 3001,
+        userManagement: 3002,
+        authentication: 3000
     },
     S3_bucket: { access_key_id: '', bucket_name: '', region: '', secret_access_key: '' },
     SMTP: { HOST: '', PASSWORD: '', PORT: 587, SENDER: '', SERVICE: 'gmail', SMTP_TLS: '', USERNAME: '' },
@@ -36,5 +37,21 @@ export const DEFAULT_CONFIG: ConfigData = {
     },
     FIREBASE_SERVICE_ACCOUNT: '',
     PaypalCredentials: { PAYPAL_MODE: '', PAYPAL_CLIENT_ID: '', PAYPAL_CLIENT_SECRET: ''},
-    RAZORPAY_CREDENTIAL: { RAZORPAY_KEY: '', RAZORPAY_KEY_SECRET: ''}
+    RAZORPAY_CREDENTIAL: { RAZORPAY_KEY: '', RAZORPAY_KEY_SECRET: ''},
+    TBO_CREDENTIALS: {
+        FLIGHT_AUTHENTICATION : '',
+        FLIGHT_SEARCH : '',
+        FLIGHT_FARERULE : '',
+        FLIGHT_FAREQUOTE : '',
+        FLIGHT_BOOKING : '',
+        FLIGHT_TICKET : '',
+        FLIGHT_BOOKING_DETAILS : '',
+        FLIGHT_CALENDER_DETAILS : '',
+      
+      
+        FLIGHT_CLIENT_ID :  '',
+        FLIGHT_USERNAME :  '',
+        FLIGHT_PASSWORD : '',
+        FLIGHT_ENDUSERIP : '',
+    }
 };

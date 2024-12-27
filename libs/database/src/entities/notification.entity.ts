@@ -4,8 +4,8 @@ import { User } from "./user.entity";
 
 @Entity('address')
 export class Notifications {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Column({ type: 'timestamp', default: () => 'now()' })
   createdAt: Date
@@ -24,7 +24,7 @@ export class Notifications {
   houseNo: string
 
   @Column()
-  postalCode: string
+  postal_code: string
 
   @Column()
   city: string

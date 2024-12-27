@@ -1,11 +1,11 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-export const TokenType = createParamDecorator((tokenType: string, ctx: ExecutionContext) => {
+export const TokenType = createParamDecorator((token_type: string, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
-    // Extract tokenType from the request, you might need to adjust this logic based on how tokenType is provided in your request
-    // const tokenType = request.headers.tokenType; // assuming tokenType is in the request headers
-    console.log("tokenType", tokenType)
-    request.tokenType = tokenType; // set tokenType on the request object
-    return tokenType;
+    // Extract token_type from the request, you might need to adjust this logic based on how token_type is provided in your request
+    // const token_type = request.headers.token_type; // assuming token_type is in the request headers
+    console.log("token_type", token_type)
+    request.token_type = token_type; // set token_type on the request object
+    return token_type;
   },
 );

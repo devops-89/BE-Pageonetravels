@@ -4,7 +4,7 @@ import { OtpVerification } from "./otpVerification.entity";
 import { Address } from "./address.entity";
 import { LoginSession } from "./loginSession.entity";
 import { IsDefined } from "class-validator";
-import { USER_TYPE } from "../../../constants/autenticationConstants/userContants";
+import { USER_ACCOUNT_STATUS, USER_TYPE, USER_VERIFY_STATUS } from "../../../constants/autenticationConstants/userContants";
 
 @Entity('user')
 export class User {
@@ -30,7 +30,7 @@ export class User {
 
   @Column({ nullable: true })
   @IsDefined()
-  country_code: string
+  reference_id: string
 
   @Column({ nullable: true })
   @IsDefined()
@@ -43,6 +43,19 @@ export class User {
   @Column({ default: false })
   is_email_verified: boolean
 
+  @Column({
+    type:'enum',
+    enum:USER_ACCOUNT_STATUS, 
+  })
+  status: USER_ACCOUNT_STATUS;
+
+  @Column({
+    type:'enum',
+    enum: USER_VERIFY_STATUS,
+  })
+  verify_status: USER_VERIFY_STATUS;
+
+  
   @Column({
     type: 'enum',
     enum: USER_TYPE,

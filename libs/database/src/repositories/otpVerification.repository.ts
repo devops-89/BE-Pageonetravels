@@ -15,59 +15,61 @@ export class OtpVerificationService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  // async addOtpVerificationRequest(input: OtpVerificationI.VerifyOtpRequest): Promise<number> {
-  //   try {
-  //     const { otp, expiryTime, otpType, emailOrPhone, sendOn, countryCode, user: userId } = input;
+  async removeVerificationOtpDataByReferenceId(reference_id: string): Promise<any> {
+    const doc = await this.otpVerificationRepository.delete({ id: reference_id });
+    return doc;
+  }
 
-  //     const user = await this.userRepository.findOne({ where: { id: String(userId) } });
+  async getVerificationOtpDataByReferenceId(reference_id: string) {
+    const doc = await this.otpVerificationRepository.findOne({ where: { id: reference_id }, loadRelationIds: true });
+    return doc as any || null;
+  }
 
-  //     const updateValue: any = {
-  //       otp,
-  //       expiryTime,
-  //       emailOrPhone,
-  //       otpType,
-  //       user,
-  //       sendOn,
-  //     };
+  async addOtpVerificationRequest(input: OtpVerificationI.VerifyOtpRequest): Promise<number> {
+    try {
+      const { otp, expiryTime, otpType, emailOrPhone, sendOn, reference_id, user: userId } = input;
 
-  //     if (countryCode) {
-  //       updateValue.countryCode = countryCode;
-  //     }
+      const user = await this.userRepository.findOne({ where: { id: String(userId) } });
 
-  //     let insertedId: number | undefined;
-  //     const oldOtp = await this.otpVerificationRepository.findOne({ where: { otpType, user: { id: userId } }, loadRelationIds: true });
+      const updateValue: any = {
+        otp,
+        expiryTime,
+        emailOrPhone,
+        otpType,
+        user,
+        sendOn,
+      };
 
-  //     if (oldOtp) {
-  //       insertedId = oldOtp.id;
-  //       await this.otpVerificationRepository.update({ otpType, user: { id: userId } }, updateValue);
-  //     } else {
-  //       const insertResult = await this.otpVerificationRepository.insert(updateValue);
+      if (reference_id) {
+        updateValue.reference_id = reference_id;
+      }
 
-  //       const otpres = JSON.parse(JSON.stringify(insertResult));
-  //       if (otpres.identifiers && otpres.identifiers.length > 0 && otpres.identifiers[0].id) 
-  //       {
-  //           insertedId = otpres.identifiers[0].id
-  //       }
-  //     }
+      let insertedId: string | undefined;
+      const oldOtp = await this.otpVerificationRepository.findOne({ where: { otpType, user: { id: userId } }, loadRelationIds: true });
 
-  //     return insertedId ?? 0;
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
+      if (oldOtp) {
+        insertedId = oldOtp.id;
+        await this.otpVerificationRepository.update({ otpType, user: { id: userId } }, updateValue);
+      } else {
+        const insertResult = await this.otpVerificationRepository.insert(updateValue);
 
-  // async getVerificationOtpDataByReferenceId(referenceId: number): Promise<OtpVerificationI.OtpVerificationSchema  | null> {
-  //   const doc = await this.otpVerificationRepository.findOne({ where: { id: referenceId }, loadRelationIds: true });
+        const otpres = JSON.parse(JSON.stringify(insertResult));
+        if (otpres.identifiers && otpres.identifiers.length > 0 && otpres.identifiers[0].id) 
+        {
+            insertedId = otpres.identifiers[0].id
+        }
+      }
+
+      return insertedId as any;
+    } catch (error) {
+      throw error;
+    }
+  }
+ 
+
+  // async getOtpRequestByIdAndType(reference_id: number, otpType: OTP_TYPE): Promise<OtpVerificationI.OtpVerificationSchema  | null> {
+  //   const doc = await this.otpVerificationRepository.findOne({ where: { id: reference_id, otpType }, loadRelationIds: true });
   //   return doc as any || null;
   // }
 
-  // async getOtpRequestByIdAndType(referenceId: number, otpType: OTP_TYPE): Promise<OtpVerificationI.OtpVerificationSchema  | null> {
-  //   const doc = await this.otpVerificationRepository.findOne({ where: { id: referenceId, otpType }, loadRelationIds: true });
-  //   return doc as any || null;
-  // }
-
-  // async removeVerificationOtpDataByReferenceId(referenceId: number): Promise<any> {
-  //   const doc = await this.otpVerificationRepository.delete({ id: referenceId });
-  //   return doc;
-  // }
 }

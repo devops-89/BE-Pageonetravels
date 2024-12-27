@@ -8,9 +8,12 @@ import {
     OtpVerificationService,
     UserRepositoryService,
     AddressRepositoryService,
+    CommissionRepositoryService,
+    SettingRepositoryService,
+    SearchRepositoryService
  
 } from './';
-import { User, OtpVerification, LoginSession, Address} from './';
+import { User, OtpVerification, LoginSession, Address, Setting,Commission, Airport} from './';
 
 @Module({})
 export class DBModule {
@@ -28,6 +31,9 @@ export class DBModule {
                 OtpVerification,
                 LoginSession,
                 Address,
+                Commission,
+                Setting,
+                Airport
                 
             ],
             synchronize: true,
@@ -37,7 +43,9 @@ export class DBModule {
     }
 
     private static getConnectionOptionsPostgres(dbData: ConfigDatabase): TypeOrmModuleOptions {
-        const { database, entities, host, logging, password, port, synchronize, type, username } = dbData;
+        const { database, entities, host, logging, password, port, synchronize, type, username, url } = dbData;
+        // return {url, type:'postgres'}
+        
         return {
             database,
             entities,
@@ -67,7 +75,9 @@ export class DBModule {
                     OtpVerification,
                     LoginSession,
                     Address,
-                   
+                    Commission,
+                    Setting,
+                    Airport
                 ]),
             ],
             controllers: [],
@@ -76,6 +86,9 @@ export class DBModule {
                 OtpVerificationService,
                 LoginSessionService,
                 AddressRepositoryService,
+                CommissionRepositoryService,
+                SettingRepositoryService,
+                SearchRepositoryService
                
             ],
             exports: [
@@ -83,6 +96,9 @@ export class DBModule {
                 OtpVerificationService,
                 LoginSessionService,
                 AddressRepositoryService,
+                CommissionRepositoryService,
+                SettingRepositoryService,
+                SearchRepositoryService
 
             ],
         };
