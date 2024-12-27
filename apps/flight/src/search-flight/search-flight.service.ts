@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SearchRepositoryService } from '../../../../libs/database/src';
 import { ApiResponse } from '../../../../libs/interfaces/commonTypes/apiResponse.interface';
 import { SearchFlightDto } from '../../../../libs/dtos/flight/search-flights.dto';
@@ -8,6 +8,8 @@ import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-se
 import { JOURNEYTYPEMAPPING, TimeFilter } from '../../../../libs/constants/flightConstant'
 import { AirportType } from '../../../../libs/interfaces/flight/search.interface';
 import { FlightValidator } from './search-utility';
+import { TBOResponse, FlightDetails, FlightSegment } from '../../../../libs/interfaces/flight/search.interface';
+
 
 @Injectable()
 export class SearchFlightService {
@@ -42,7 +44,7 @@ export class SearchFlightService {
       const filtered_airport_list = airport_list.filter((airport) => {
         return regex.test(airport.iata_code) || regex.test(airport.airport_name);
       });
-  
+
 
       return { message: "Airport List fetched", data: filtered_airport_list };
     } catch (error) {
@@ -153,12 +155,104 @@ export class SearchFlightService {
         preferred_time: preferredTimeValue,
       });
 
-      return { message: "Flight list fetched successfully", data: response };
+      const trans = this.fetchSegmentsDataAsPerJourneyType(response, assigned_journey_type)
+   
+      // const transform_flight_list = this.extractFlightData(response);
+
+      return { message: "Flight list fetched successfully", data: trans };
+
     } catch (error) {
       console.log("Error in the search flight function", error);
       throw error;
     }
   }
 
+
+  private fetchSegmentsDataAsPerJourneyType(response, journey_type) {
+    try {
+      
+      const result = response.Response.Results[0];
+      // console.log(journey_type);
+      if (journey_type === 1) {
+        // Domestic or International
+        // console.log("result", isArray(result));
+        // const flightList =  result[0].Segments[0];
+        const flightList =  this.segmentsFromResultArray(result);
+        
   
-}
+        return flightList
+      }
+
+      if (journey_type === 2) {
+        if (result.length == 1) {
+          //internationation flight
+          const incoming_flight_list = result[0].Segments[0];
+          const outgoing_flight_list = result[0].Segments[1];
+          return { incoming_flight_list, outgoing_flight_list };
+        } else {
+          const incoming_flight_list = result[0].Segments[0];
+          const outgoing_flight_list = result[1].Segments[0];
+
+          return { incoming_flight_list, outgoing_flight_list };
+        }
+      }
+
+      if (journey_type === 3) {
+        // Domestic or International
+        return result[0].Segments;
+      }
+      // return result;
+
+    } catch (error) {
+      console.log("Error in segment type ", error);
+      throw ('Invalid travel type or data structure');
+    }
+
+  }
+
+  private extractFlightData(response: TBOResponse): FlightDetails[] {
+    try {
+      return response.Response.Results.flatMap((result) =>
+        result.map((flight) => {
+          const segmentDetails: FlightSegment[] = flight.Segments.flatMap((segmentGroup) =>
+            segmentGroup.map((segment) => ({
+              Departure: `${segment.Origin.Airport.CityName} (${segment.Origin.Airport.AirportCode})`,
+              Arrival: `${segment.Destination.Airport.CityName} (${segment.Destination.Airport.AirportCode})`,
+              DepartureTime: segment.Origin.DepTime,
+              ArrivalTime: segment.Destination.ArrTime,
+              FlightName: segment.Airline.AirlineName,
+              FlightNumber: segment.Airline.FlightNumber,
+              AirlineCode: segment.Airline.AirlineCode,
+              FlightImage: segment.Craft || null,
+              Duration: segment.Duration,
+              NoOfSeatAvailable: segment.NoOfSeatAvailable ?? 0,
+            })),
+          );
+
+          return {
+            TraceID: flight.TraceId,
+            ResultIndex: flight.ResultIndex,
+            TotalJourneyDuration: segmentDetails.reduce((acc, seg) => acc + seg.Duration, 0),
+            IsRefundable: flight.IsRefundable ? 'Yes' : 'No',
+            IsLCC: flight.IsLCC ? 'Yes' : 'No',
+            SeatsAvailable: segmentDetails[0]?.NoOfSeatAvailable || 0,
+            FlightPrice: flight.Fare.PublishedFare,
+            SegmentDetails: segmentDetails,
+          };
+        }),
+      );
+    } catch (error) {
+      console.error('Error extracting flight data:', error);
+      throw new HttpException('Failed to process flight data', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private segmentsFromResultArray(result){
+    let flight_listing = [];
+    flight_listing = result.map((element)=>{
+      // console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<<"< JSON.stringify(element));
+      return flight_listing.push(element);
+    })
+    return flight_listing
+  }
+}  
