@@ -45,7 +45,15 @@ export class HTTPSTboAPIService {
             } = body;
     
 
-            const segments = this.generateSegments({ journey_type, origin,  destination, departure_date, return_date, multicity, cabin_class,preferred_time});
+            const segments = this.generateSegments({
+                  journey_type, 
+                  origin,  
+                  destination,
+                  departure_date, 
+                  return_date, 
+                  multicity, 
+                  cabin_class,
+                  preferred_time});
     
 
             const payload: IFlightSearch = {
@@ -86,22 +94,51 @@ export class HTTPSTboAPIService {
     // }
 
 
-    private generateSegments({ journey_type, origin, destination, departure_date, return_date, multicity, cabin_class, preferred_time }) {
+    private formatTime(preferred_time: string): string {
+        const timeFilterMapping: { [key: string]: string } = {
+            "AnyTime": "00:00:00",
+            "Morning": "08:00:00",
+            "AfterNoon": "14:00:00",
+            "Evening": "19:00:00",
+            "Night": "01:00:00",
+        };
+    
+    
+        if (timeFilterMapping[preferred_time]) {
+            return timeFilterMapping[preferred_time];
+        }
+
+        if (preferred_time && preferred_time.length === 4 && !isNaN(Number(preferred_time))) {
+            const hours = preferred_time.slice(0, 2);
+            const minutes = preferred_time.slice(2, 4);
+            return `${hours}:${minutes}:00`;
+        }
+    
+        
+        console.log("Invalid preferred time:", preferred_time);
+        return "00:00:00";
+    }
+    
+    private generateSegments({
+        journey_type, origin, destination, departure_date, return_date, multicity, cabin_class, preferred_time
+    }) {
+        const formattedDepartureTime = this.formatTime(preferred_time);  // Format the preferred time
+    
         if (journey_type === JOURNEY_TYPE.ROUNDTRIP) {
             return [
                 {
                     Origin: origin,
                     Destination: destination,
                     FlightCabinClass: cabin_class,
-                    PreferredDepartureTime: `${departure_date}T${preferred_time}`,
-                    PreferredArrivalTime: `${departure_date}T${preferred_time}`,
+                    PreferredDepartureTime: `${departure_date}T${formattedDepartureTime}`,  // Correct format
+                    PreferredArrivalTime: `${departure_date}T${formattedDepartureTime}`,  // Correct format
                 },
                 {
                     Origin: destination,
                     Destination: origin,
                     FlightCabinClass: cabin_class,
-                    PreferredDepartureTime: `${return_date}T${preferred_time}`,
-                    PreferredArrivalTime: `${return_date}T${preferred_time}`,
+                    PreferredDepartureTime: `${return_date}T${formattedDepartureTime}`,  // Correct format
+                    PreferredArrivalTime: `${return_date}T${formattedDepartureTime}`,  // Correct format
                 },
             ];
         }
@@ -111,19 +148,19 @@ export class HTTPSTboAPIService {
                 Origin: segment.origin,
                 Destination: segment.destination,
                 FlightCabinClass: cabin_class,
-                PreferredDepartureTime: `${segment.departure_date}T${preferred_time}`,
-                PreferredArrivalTime: `${segment.departure_date}T${preferred_time}`,
+                PreferredDepartureTime: `${segment.departure_date}T${this.formatTime(segment.preferred_time)}`, // Format each segment's preferred time
+                PreferredArrivalTime: `${segment.departure_date}T${this.formatTime(segment.preferred_time)}`, // Format arrival time too
             }));
         }
-
+    
         // Default to one-way journey
         return [
             {
                 Origin: origin,
                 Destination: destination,
                 FlightCabinClass: cabin_class,
-                PreferredDepartureTime: `${departure_date}T${preferred_time}`,
-                PreferredArrivalTime: `${departure_date}T${preferred_time}`,
+                PreferredDepartureTime: `${departure_date}T${formattedDepartureTime}`,  // Correct format
+                PreferredArrivalTime: `${departure_date}T${formattedDepartureTime}`,  // Correct format
             },
         ];
     }

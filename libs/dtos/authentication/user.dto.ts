@@ -187,13 +187,13 @@ export class ChangePasswordDto {
   @IsNotEmpty({ message: 'New password is required' })
   new_password: string;
 
-  @IsString()
-  @IsNotEmpty()
-  readonly otp: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // readonly otp: string;
 
-  @IsString()
-  @IsNotEmpty()
-  reference_id: number;
+  // @IsString()
+  // @IsNotEmpty()
+  // reference_id: string;
   
   
   @IsString()

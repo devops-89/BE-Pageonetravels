@@ -3,7 +3,7 @@ import { ResponseHandlerService } from '../../../../../libs/response-handler/res
 import { Request, Response } from 'express';
 import { UpdatePersonalDetailDto, UserFilterDto } from '../../../../../libs/dtos/authentication/user.dto';
 import { PaginationDto } from '../../../../../libs/dtos/authentication/user.dto';
-import {InsertAddressDto } from '../../../../../libs/dtos/authentication/address.dto';
+import { InsertAddressDto } from '../../../../../libs/dtos/authentication/address.dto';
 import { UserService } from './user.service';
 import { TokenValidationGuard } from '../../../../../libs/middlewares/authMiddleware.guard';
 import { JWTPayload } from '../../../../../libs/interfaces/authentication/jwtPayload.interface';
@@ -25,7 +25,7 @@ export class UserController {
     try {
 
       const pagination = { page: query.page || 1, limit: query.limit || 10 };
-      const filters = {  user_type:query.user_type, search: query.search, status: query.status, };
+      const filters = { user_type: query.user_type, search: query.search, status: query.status, };
       const result = await this.userService.getUsersByGroup(filters, pagination);
       return this.responseHandler.sendSuccessResponse(res, result)
 
@@ -61,7 +61,7 @@ export class UserController {
   @Post('/update_profile')
   @UseGuards(TokenValidationGuard)
   @UseInterceptors(FileInterceptor('avatar', { fileFilter: imageFileFilter }))
-  async updateUserProfile(@Req() req,@Body() body: UpdatePersonalDetailDto, @UploadedFile() file, @Res() res) {
+  async updateUserProfile(@Req() req, @Body() body: UpdatePersonalDetailDto, @UploadedFile() file, @Res() res) {
     try {
       const payload: JWTPayload = req['userPayload'];
       const result = await this.userService.updateUserProfile(payload, body, file);
@@ -69,14 +69,14 @@ export class UserController {
     } catch (error) {
       return this.responseHandler.sendErrorResponse(res, error);
     }
-  } 
+  }
 
   @Post('/insert_or_update_address')
   @UseGuards(TokenValidationGuard)
-  async insertOrUpdateUser(@Req() req : Request, @Res() res : Response, @Body() body : InsertAddressDto) {
+  async insertOrUpdateUser(@Req() req: Request, @Res() res: Response, @Body() body: InsertAddressDto) {
     try {
       const payload = req['userPayload'];
-      const result = await this.userService.insertOrUpdateUserAddress(payload,body);
+      const result = await this.userService.insertOrUpdateUserAddress(payload, body);
       return this.responseHandler.sendSuccessResponse(res, result);
     } catch (error) {
       return this.responseHandler.sendErrorResponse(res, error);

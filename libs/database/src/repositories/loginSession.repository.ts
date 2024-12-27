@@ -59,7 +59,7 @@ export class LoginSessionService {
 
     async logoutAllSessionDb(user_id: string): Promise<void> {
         try {
-            await this.sessionRepository.update({ user: { id: user_id } }, { loginStatus: SESSION_STATUS.LOGGED_OUT });
+            //await this.sessionRepository.update({ user: { id: user_id } }, { loginStatus: SESSION_STATUS.LOGGED_OUT });
             await this.sessionRepository.delete({ user: { id: user_id } });
         } catch (error) {
             throw error;
@@ -68,7 +68,7 @@ export class LoginSessionService {
 
     async logoutAllEmailSessionDb(user_id: string, email: string): Promise<void> {
         try {
-            await this.sessionRepository.update({ user: { id: user_id }, loginBy: LOGIN_BY.EMAIL, login_identity: email }, { loginStatus: SESSION_STATUS.LOGGED_OUT });
+            //await this.sessionRepository.update({ user: { id: user_id }, loginBy: LOGIN_BY.EMAIL, login_identity: email }, { loginStatus: SESSION_STATUS.LOGGED_OUT });
             await this.sessionRepository.delete( { user: { id: user_id }, loginBy: LOGIN_BY.EMAIL, login_identity: email });
 
         } 

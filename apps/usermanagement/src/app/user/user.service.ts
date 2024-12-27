@@ -68,7 +68,7 @@ export class UserService {
     }
   }
 
-  
+
   async insertOrUpdateUserAddress(payload: JWTPayload, address) {
     try {
 
@@ -105,16 +105,17 @@ export class UserService {
     }
   }
 
-  async updateUserStatus(user_id:string, status: USER_ACCOUNT_STATUS): Promise<ApiResponse.ApiOK> {
+  async updateUserStatus(user_id: string, status: USER_ACCOUNT_STATUS): Promise<ApiResponse.ApiOK> {
     try {
       if (!status) {
-        return { message: "Status can't be null", status_code: ERROR_CODES.BAD_REQUEST };
+        return { message: "Status can't be null", statusCode: ERROR_CODES.BAD_REQUEST };
       }
 
       const user = await this.userRepositoryService.getUserByUserId(user_id)
+      
 
       if (!user) {
-        return { message: "User not found", status_code: ERROR_CODES.NOT_FOUND };
+        return { message: "User not found", statusCode: ERROR_CODES.NOT_FOUND };
       }
 
       // Call the method to update the user account status
@@ -137,42 +138,42 @@ export class UserService {
       }
     } catch (error) {
       console.log('Error updating last login:', error);
-      throw { message: "Error In Updating Last login Details Of User", statusCode: ERROR_CODES.NOT_FOUND };
+      throw { message: "Error In Updating Last login Details Of User", status_code: ERROR_CODES.NOT_FOUND };
     }
   }
 
-async getLoggedInUserDetails(payload: JWTPayload): Promise<ApiResponse.ApiOK> {
-  try {
-    const { reference_id } = payload
-    const user = await this.userRepositoryService.getUserByUserId(reference_id);
+  async getLoggedInUserDetails(payload: JWTPayload): Promise<ApiResponse.ApiOK> {
+    try {
+      const { reference_id } = payload
+      const user = await this.userRepositoryService.getUserByUserId(reference_id);
 
-    if (!user) {
-      throw { message: "User not found", statusCode: ERROR_CODES.NOT_FOUND };
-    }
-
-    // Return required Data, including the new fields
-    const { full_name,email, phone_number, last_login, id, addresses, avatar, country_code, is_email_verified, is_phone_verified,  user_type, status, created_at } = user;
-    return {
-      message: "User details fetched successfully",
-      data: {
-        full_name,
-        email,
-        phone_number,
-        last_login,
-        id,
-        avatar,
-        country_code,
-        is_email_verified,
-        is_phone_verified,
-        user_type,
-        status,
-        addresses, // Include addresses
-        created_at
+      if (!user) {
+        throw { message: "User not found", status_code: ERROR_CODES.NOT_FOUND };
       }
-    };
-  } catch (error) {
-    console.log('Error in Get Logged-In User Details:', error);
-    throw error;
+
+      // Return required Data, including the new fields
+      const { full_name, email, phone_number, last_login, id, addresses, avatar, country_code, is_email_verified, is_phone_verified, user_type, status, created_at } = user;
+      return {
+        message: "User details fetched successfully",
+        data: {
+          full_name,
+          email,
+          phone_number,
+          last_login,
+          id,
+          avatar,
+          country_code,
+          is_email_verified,
+          is_phone_verified,
+          user_type,
+          status,
+          addresses, // Include addresses
+          created_at
+        }
+      };
+    } catch (error) {
+      console.log('Error in Get Logged-In User Details:', error);
+      throw error;
+    }
   }
-}
 }

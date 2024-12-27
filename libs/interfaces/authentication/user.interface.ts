@@ -2,7 +2,6 @@ import { DEVICE_TYPE } from "libs/constants/commonConstants";
 import { DEFAULT_USER_ROLES, USER_ACCOUNT_STATUS, USER_LOGIN_SOURCE, USER_TYPE, USER_VERIFY_STATUS } from "../../constants/autenticationConstants/userContants";
 import { IPagination } from "../commonTypes/custom.interface";
 // import { MultiFileType } from "../commonTypes/fastifyTypes";
-// import { IPagination } from "../commonTypes/custom.interface";
 
 export declare namespace UserI {
     interface AddressSchema {
@@ -60,12 +59,13 @@ export declare namespace UserI {
     {
         full_name?: string,
         password?: string,
-        email: string,
+        email?: string,
         is_email_verified?: boolean,
         country_code?: string,
         phone_number?: string,
+        status?: USER_ACCOUNT_STATUS,
         id?: string,
-        // role_name?: string,
+        user_id?: string,
         user_type?: USER_TYPE,
         verify_status?:USER_VERIFY_STATUS,
         avatar?:string
@@ -101,7 +101,7 @@ export declare namespace UserI {
 
     interface UpdateUserStatus
     {
-        user_id:string,
+        id:string,
         status: USER_ACCOUNT_STATUS,
         verify_status: USER_VERIFY_STATUS,
         is_phone_verified?: boolean,
@@ -233,8 +233,8 @@ export declare namespace UserI {
     interface ChangePassword {
         old_password: string,
         new_password: string,
-        otp: string;
-        reference_id:number
+        // otp: string;
+        // reference_id:string
     }
 
     interface UpdateUserAccountStatus
