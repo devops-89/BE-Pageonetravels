@@ -234,6 +234,17 @@ export class RegisterDto {
   @IsEnum(USER_TYPE)
   @IsOptional()
   user_type: USER_TYPE;
+
+  
+  @IsOptional()
+  @IsString()
+  country_code: string;
+
+  @IsOptional()
+  @IsString()
+  phone_number: string;
+
+
 }
 
 export class CustomLoginDto {

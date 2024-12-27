@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import axios from "axios";
-import { SearchFlightDto } from "libs/dtos/flight/flights.dto";
-import { IFlightSearch } from "../interfaces/flight/search.interface";
+import { SearchFlightDto } from "../dtos/flight/search-flights.dto";
+import { IFareRule, IFlightSearch, ISearchFlight } from "../interfaces/flight/search.interface";
 import { JOURNEY_TYPE } from "../../libs/constants/flightConstant";
 
 @Injectable()
@@ -23,9 +23,10 @@ export class HTTPSTboAPIService {
         token: any, 
         base_url: string, 
         base_ip: string, 
-        body: SearchFlightDto
+        body: ISearchFlight
     ) {
         try {
+          
             const {
                 min_price,
                 max_price,
@@ -43,19 +44,15 @@ export class HTTPSTboAPIService {
                 one_stop_flight,
                 cabin_class
             } = body;
-    
+           
+            console.log("?>>>", journey_type);
 
-            const segments = this.generateSegments({
-                  journey_type, 
-                  origin,  
-                  destination,
-                  departure_date, 
-                  return_date, 
-                  multicity, 
-                  cabin_class,
-                  preferred_time});
-    
-
+            const segments = await this.generateSegments({ journey_type, origin,  destination, departure_date, return_date, multicity, cabin_class,preferred_time});
+            
+            console.log(">>>>>>>>>>>>>>>>",
+                segments
+            )
+           
             const payload: IFlightSearch = {
                 EndUserIp: base_ip,
                 TokenId: token,
@@ -69,13 +66,11 @@ export class HTTPSTboAPIService {
                 Segments: segments,
                 Sources: null,
             };
-            
-            // Call API
+          
+           console.log(">>>>>>>>>", JSON.stringify(payload));
             const response = await this.httpAPICall(base_url, payload);
 
-            if(min_price && max_price){
-                //filter the price here
-            }
+          
             return response;
     
         } catch (error) {
@@ -83,86 +78,65 @@ export class HTTPSTboAPIService {
             throw (error.message || "Failed to fetch flight data in search flight api service");
         }
     }
-    
-    // async BoookingFlightAPI(){
-    //     try {
-
-    //     }catch(error){
-    //         console.error("Error in the search flight api call service", error);
-    //         throw error.message;
-    //     }
-    // }
 
 
-    private formatTime(preferred_time: string): string {
-        const timeFilterMapping: { [key: string]: string } = {
-            "AnyTime": "00:00:00",
-            "Morning": "08:00:00",
-            "AfterNoon": "14:00:00",
-            "Evening": "19:00:00",
-            "Night": "01:00:00",
-        };
-    
-    
-        if (timeFilterMapping[preferred_time]) {
-            return timeFilterMapping[preferred_time];
-        }
-
-        if (preferred_time && preferred_time.length === 4 && !isNaN(Number(preferred_time))) {
-            const hours = preferred_time.slice(0, 2);
-            const minutes = preferred_time.slice(2, 4);
-            return `${hours}:${minutes}:00`;
-        }
-    
+    async generateSegments({ journey_type, origin, destination, departure_date, return_date, multicity, cabin_class, preferred_time }) {
+        try {
+           
+            if (journey_type === JOURNEY_TYPE.ROUNDTRIP) {
+                return [
+                    {
+                        Origin: origin,
+                        Destination: destination,
+                        FlightCabinClass: cabin_class,
+                        PreferredDepartureTime: `${departure_date}T${preferred_time}`,
+                        PreferredArrivalTime: `${departure_date}T${preferred_time}`,
+                    },
+                    {
+                        Origin: destination,
+                        Destination: origin,
+                        FlightCabinClass: cabin_class,
+                        PreferredDepartureTime: `${return_date}T${preferred_time}`,
+                        PreferredArrivalTime: `${return_date}T${preferred_time}`,
+                    },
+                ];
+            }
         
-        console.log("Invalid preferred time:", preferred_time);
-        return "00:00:00";
-    }
+            if (journey_type === JOURNEY_TYPE.MULTICITY) {
+                return multicity.map((segment) => ({
+                    Origin: segment.origin,
+                    Destination: segment.destination,
+                    FlightCabinClass: segment.cabin_class,
+                    PreferredDepartureTime: `${segment.departure_date}T${preferred_time}`,
+                    PreferredArrivalTime: `${segment.departure_date}T${preferred_time}`,
+                }));
+            }
     
-    private generateSegments({
-        journey_type, origin, destination, departure_date, return_date, multicity, cabin_class, preferred_time
-    }) {
-        const formattedDepartureTime = this.formatTime(preferred_time);  // Format the preferred time
-    
-        if (journey_type === JOURNEY_TYPE.ROUNDTRIP) {
+            // Default to one-way journey
             return [
                 {
                     Origin: origin,
                     Destination: destination,
                     FlightCabinClass: cabin_class,
-                    PreferredDepartureTime: `${departure_date}T${formattedDepartureTime}`,  // Correct format
-                    PreferredArrivalTime: `${departure_date}T${formattedDepartureTime}`,  // Correct format
-                },
-                {
-                    Origin: destination,
-                    Destination: origin,
-                    FlightCabinClass: cabin_class,
-                    PreferredDepartureTime: `${return_date}T${formattedDepartureTime}`,  // Correct format
-                    PreferredArrivalTime: `${return_date}T${formattedDepartureTime}`,  // Correct format
+                    PreferredDepartureTime: `${departure_date}T${preferred_time}`,
+                    PreferredArrivalTime: `${departure_date}T${preferred_time}`,
                 },
             ];
+        }catch(error){
+            console.log("Error in the generate segments fucntion", error);
+            throw error
         }
-    
-        if (journey_type === JOURNEY_TYPE.MULTICITY) {
-            return multicity.map((segment) => ({
-                Origin: segment.origin,
-                Destination: segment.destination,
-                FlightCabinClass: cabin_class,
-                PreferredDepartureTime: `${segment.departure_date}T${this.formatTime(segment.preferred_time)}`, // Format each segment's preferred time
-                PreferredArrivalTime: `${segment.departure_date}T${this.formatTime(segment.preferred_time)}`, // Format arrival time too
-            }));
-        }
-    
-        // Default to one-way journey
-        return [
-            {
-                Origin: origin,
-                Destination: destination,
-                FlightCabinClass: cabin_class,
-                PreferredDepartureTime: `${departure_date}T${formattedDepartureTime}`,  // Correct format
-                PreferredArrivalTime: `${departure_date}T${formattedDepartureTime}`,  // Correct format
-            },
-        ];
+       
     }
     
+    
+    async fareRule(baseurl:string, payload:IFareRule){
+        try {
+          let result = await this.httpAPICall(baseurl, payload);
+          return result;
+        } catch(error){
+          console.log(error);
+          throw error
+      }
+    }
 }

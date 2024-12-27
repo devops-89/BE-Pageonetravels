@@ -1,7 +1,7 @@
-import { IsArray, IsBoolean, IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Length } from 'class-validator';
+import { IsArray, IsBoolean, IsDateString, IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, Length, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { JOURNEY_TYPE } from '../../../libs/constants/flightConstant';
-import { TimeFilter } from '../../../libs/constants/flightConstant';
+import { JOURNEY_TYPE, JOURNEYTYPEMAPPING } from '../../constants/flightConstant';
+import { TimeFilter } from '../../constants/flightConstant';
 
 export class SearchFlightDto {
     @IsString()
@@ -17,25 +17,20 @@ export class SearchFlightDto {
     ip_address: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     origin: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     destination: string;
 
     @IsDateString()
-    @IsNotEmpty()
+    @IsOptional()
     departure_date: string; 
 
     @IsString()
-    @IsNotEmpty({
-        message: 'preferred_time is required and cannot be empty',
-      })
-      @IsEnum(TimeFilter, {
-        message: `preferred_time must be one of: ${Object.values(TimeFilter).join(', ')}`,
-      })
-    preferred_time: TimeFilter; 
+    @IsOptional()
+    preferred_time: string; 
 
 
     @IsDateString()
@@ -43,18 +38,20 @@ export class SearchFlightDto {
     return_date: string; 
 
     @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => MulticityItem)
     @IsOptional()
-    @IsArray({ each: true })
     multicity: MulticityItem[];
 
     @IsString()
-    @IsNotEmpty({
-        message: 'journey_type is required and cannot be empty',
-      })
-      @IsEnum(JOURNEY_TYPE, {
-        message: `journey_type must be one of: ${Object.values(JOURNEY_TYPE).join(', ')}`,
-      })
-    journey_type: JOURNEY_TYPE;
+    @IsOptional()
+    // @IsNotEmpty({
+    //     message: 'journey_type is required and cannot be empty',
+    //   })
+    //   @IsEnum(JOURNEY_TYPE, {
+    //     message: `journey_type must be one of: ${Object.values(JOURNEY_TYPE).join(', ')}`,
+    //   })
+    journey_type: JOURNEYTYPEMAPPING;
 
     @IsNumber()
     @Type(() => Number)
@@ -71,10 +68,10 @@ export class SearchFlightDto {
     @IsOptional()
     infant: number;
 
-    @IsNumber()
-    @Type(() => Number)
-    @IsNotEmpty()
-    cabin_class: number;
+    @IsString()
+    // @Type(() => Number)
+    @IsOptional()
+    cabin_class: string;
 
     @IsBoolean()
     @IsOptional()
@@ -96,14 +93,14 @@ class MulticityItem {
     destination: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     cabin_class: string;
 
     @IsDateString()
-    @IsNotEmpty()
+    @IsOptional()
     departure_date: string;
 
-    @IsString()
-    @IsNotEmpty()
-    preferred_time: string;
+    // @IsString()
+    // @IsOptional() 
+    // preferred_time: string; 
 }

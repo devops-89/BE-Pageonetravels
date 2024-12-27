@@ -1,7 +1,7 @@
 import { Controller, Req, Body, ValidationPipe, Res, Get, Post} from '@nestjs/common';
 import { SearchFlightService } from './search-flight.service';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
-import { SearchFlightDto } from '../../../../libs/dtos/flight/flights.dto';
+import { SearchFlightDto } from '../../../../libs/dtos/flight/search-flights.dto';
 
 @Controller('/flight')
 export class SearchFlightController { 
@@ -28,6 +28,18 @@ export class SearchFlightController {
         try {
             const {search_query} = req['params'];
             const result = await this.searchflightsearvice.searchAirport(search_query);
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch(error){
+            console.error("Failed in the search airport", error)
+            return this.responseHandler.sendErrorResponse(res,error)
+        }
+    }
+
+    @Get('/all-airport')
+    async searchAllAirport(
+        @Req() req : Request, @Res() res : Response){
+        try {
+            const result = await this.searchflightsearvice.searchAllAirport();
             return this.responseHandler.sendSuccessResponse(res, result);
         } catch(error){
             console.error("Failed in the search airport", error)
