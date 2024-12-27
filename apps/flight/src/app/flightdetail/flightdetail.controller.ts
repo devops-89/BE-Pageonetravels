@@ -22,7 +22,7 @@ export class FlightdetailController {
         }
     }
 
-    @Post('/farerule')
+    @Post('/flightdetail')
     async FlightDetail(@Req() req: Request, @Res() res: Response,
     @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })) body: FlightDetailRequestDto,) {
         try {

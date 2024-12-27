@@ -78,15 +78,6 @@ export class HTTPSTboAPIService {
             throw (error.message || "Failed to fetch flight data in search flight api service");
         }
     }
-    
-    // async BoookingFlightAPI(){
-    //     try {
-
-    //     }catch(error){
-    //         console.error("Error in the search flight api call service", error);
-    //         throw error.message;
-    //     }
-    // }
 
 
     async generateSegments({ journey_type, origin, destination, departure_date, return_date, multicity, cabin_class, preferred_time }) {

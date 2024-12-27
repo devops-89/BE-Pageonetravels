@@ -33,14 +33,6 @@ export interface CabinClass {
     FIRST_CLASS : 6,
 }
 
-// export interface JourneyType {
-//     ONE_WAY:1,
-//     RETURN : 2,
-//     MULTI_STOP: 3,
-//     ADVANCE_SEARCH: 4,
-//     SPECIAL_RETURN:5
-// }
-
 export interface Multicity  {
   origin: string;         
   destination: string;

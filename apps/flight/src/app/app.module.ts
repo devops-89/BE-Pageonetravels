@@ -17,7 +17,7 @@ import * as redisStore from 'cache-manager-redis-store';
                     // Use `create` to initialize the store
                     host: 'localhost',
                     port: 6379,
-                    ttl: 600, // Default time-to-live in seconds
+                    ttl: 600,
                     max: 100000,
                 }),
             }),
