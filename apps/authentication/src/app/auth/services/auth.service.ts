@@ -67,7 +67,7 @@ export class AuthService {
 
             if (otpReq.otp_type === OTP_TYPE.REGISTER_OTP) {
                 const userStatus: UserI.UpdateUserStatus = {
-                    user_id: otpReq.user,
+                    id: otpReq.user,
                     status: USER_ACCOUNT_STATUS.ACTIVE,
                     verify_status: USER_VERIFY_STATUS.VERIFIED
                 };
@@ -75,7 +75,7 @@ export class AuthService {
 
                 if (otpReq.send_on === OTP_SEND_ON.EMAIL) {
                     userStatus.is_email_verified = true;
-
+console.log(">>>>>>>>",userStatus)
 
                     if (!user.passwordExist) {
                         const password = getRandomString(8, true, false);
@@ -89,7 +89,8 @@ export class AuthService {
                 } else {
                     userStatus.is_phone_verified = true;
                 }
-
+        
+                await this.UserModel.addOrUpdateUser(userStatus);
             }
 
             await this.OtpVerificationModel.removeVerificationOtpDataByReferenceId(reference_id);
@@ -109,7 +110,7 @@ export class AuthService {
                 access_token: jwt_token,
                 refresh_token,
                 user_type: user.user_type ? user.user_type : null,
-                name: user.full_name,
+                full_name: user.full_name,
                 email: user.email,
                 reference_id: user.id
             };
@@ -167,6 +168,7 @@ export class AuthService {
                     {
                         phone_number,
                         country_code,
+                        status: USER_ACCOUNT_STATUS.INACTIVE,
                         verify_status: USER_VERIFY_STATUS.UNVERIFIED,
                         loginSource: USER_LOGIN_SOURCE.LOCAL,
                         id: (user && user.verify_status == USER_VERIFY_STATUS.UNVERIFIED) ? user.id: undefined,
@@ -291,7 +293,7 @@ export class AuthService {
         }
     }
 
-    async registerWithEmailPassword(input: RegisterDto): Promise<ApiResponse.ApiOK> {
+    async  registerWithEmailPassword(input: RegisterDto): Promise<ApiResponse.ApiOK> {
         try {
             input.email = input.email.toLowerCase();
             const { email, password, full_name, user_type } = input;
@@ -305,8 +307,8 @@ export class AuthService {
             }
 
             const checkIfExist = await this.UserModel.checkUserEmailExist(email);
-            if (checkIfExist) {
-                throw { message: COMMON_MSG.EMAIL_ALREADY_EXIST, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+            if (checkIfExist)   {
+                throw ({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: COMMON_MSG.EMAIL_ALREADY_EXIST });
             }
 
             const password_hash = await generatePasswordHash(password);
@@ -331,14 +333,21 @@ export class AuthService {
             const otpObj: OtpVerificationI.VerifyOtpRequest = {
                 otp: OTP,
                 otp_type: OTP_TYPE.REGISTER_OTP,
+                
                 user: userData.id,
                 send_on: OTP_SEND_ON.EMAIL,
+                resendData: {
+                    blockedTill: -1,
+                    isBlocked: false,
+                    retryLeft: OTP_REQUEST_LIMITS.RESEND_OTP,
+                    totalRetry: OTP_REQUEST_LIMITS.RESEND_OTP
+                },
                 email_or_phone: email,
                 expiry_time: currentTime + 900000 // 15 min
             };
 
             const otpId = await this.OtpVerificationModel.addOtpVerificationRequest(otpObj);
-
+            console.log(">>>>>>>>>>", full_name, OTP)
             const emailTemplate = otpVerificationTemplate(full_name, OTP);
             await this.EmailService.sendEmail(email, 'Email Verification', emailTemplate.html);
 

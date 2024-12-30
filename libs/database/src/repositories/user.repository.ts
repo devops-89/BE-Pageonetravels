@@ -118,9 +118,9 @@ export class UserRepositoryService {
         }
     }
 
-    async addOrUpdateUser(input: UserI.AddOrUpdateUser, includeLastLogin: boolean = true): Promise<string | null> { 
+    async addOrUpdateUser(input: UserI.AddOrUpdateUser, includeLastLogin?:boolean): Promise<string | null> { 
         try {
-            const { phone_number, avatar, id, user_type, email, password, full_name, is_email_verified} = input;
+            const { phone_number, avatar, id, user_type, email, password, full_name, is_email_verified, verify_status} = input;
     
 
             const insertVal = { 
@@ -131,6 +131,7 @@ export class UserRepositoryService {
                 password, 
                 full_name, 
                 is_email_verified,
+                verify_status,
                 status:'ACTIVE'
             };
     
@@ -186,6 +187,7 @@ export class UserRepositoryService {
     async getUserByEmail(email: string): Promise<(User) | null> {
         try {
             const user = await this.userRepository.findOne({ where: { email, verify_status: USER_VERIFY_STATUS.VERIFIED, is_email_verified: true }, loadRelationIds: true });
+            console.log()
             return (user as any) || null;
         } catch (error) {
             console.log('Cannot Find User By Email', error);

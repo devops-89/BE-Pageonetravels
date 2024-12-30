@@ -187,13 +187,13 @@ export class ChangePasswordDto {
   @IsNotEmpty({ message: 'New password is required' })
   new_password: string;
 
-  @IsString()
-  @IsNotEmpty()
-  readonly otp: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // readonly otp: string;
 
-  @IsString()
-  @IsNotEmpty()
-  reference_id: number;
+  // @IsString()
+  // @IsNotEmpty()
+  // reference_id: string;
   
   
   @IsString()
@@ -234,6 +234,17 @@ export class RegisterDto {
   @IsEnum(USER_TYPE)
   @IsOptional()
   user_type: USER_TYPE;
+
+  
+  @IsOptional()
+  @IsString()
+  country_code: string;
+
+  @IsOptional()
+  @IsString()
+  phone_number: string;
+
+
 }
 
 export class CustomLoginDto {

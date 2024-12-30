@@ -1,6 +1,6 @@
 import { LOGO } from '../constants/commonConstants'; // Adjust path as needed
 
-export const otpVerificationTemplate = function (otp: string, full_name?:string) {
+export const otpVerificationTemplate = function (name: string, otp?:string) {
     const html = `
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml">

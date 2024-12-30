@@ -4,7 +4,7 @@ import { DefaultUserService } from './services/defaultUserService';
 import { AuthService } from './services/auth.service';
 // import { UserI } from '../../../../../libs/interfaces/authentication/user.interface';
 import { ResponseHandlerService } from '../../../../../libs/response-handler/response-handler.service';
-import { ChangePasswordDto, LoginDto, LoginOrRegisterDto, VerifyDto } from '../../../../../libs/dtos/authentication/user.dto';
+import { ChangePasswordDto, LoginDto, LoginOrRegisterDto, RegisterDto, VerifyDto } from '../../../../../libs/dtos/authentication/user.dto';
 import { TokenValidationGuard } from '../../../../../libs/middlewares/authMiddleware.guard';
 import { ResetPasswordDto, ForgotPasswordDto } from '../../../../../libs/dtos/authentication/forgotPassword.dto'
 
@@ -60,15 +60,15 @@ export class AuthController {
     // }
 
 
-    // @Post('/register')
-    // async register(@Res() res: Response, @Req() req: Request, @Body() body: RegisterDto) {
-    //     try {
-    //         const result = await this.authService.registerWithEmailPassword(body);
-    //         this.ResponseHandler.sendSuccessResponse(res, result);
-    //     } catch (error) {
-    //         this.ResponseHandler.sendErrorResponse(res, error);
-    //     }
-    // }
+    @Post('/register')
+    async register(@Res() res: Response, @Req() req: Request, @Body() body: RegisterDto) {
+        try {
+            const result = await this.authService.registerWithEmailPassword(body);
+            this.ResponseHandler.sendSuccessResponse(res, result);
+        } catch (error) {
+            this.ResponseHandler.sendErrorResponse(res, error);
+        }
+    }
 
 
     @Post('/change_password')

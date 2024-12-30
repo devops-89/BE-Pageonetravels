@@ -9,42 +9,40 @@ import { ApiResponse } from '../../../../../libs/interfaces/commonTypes/apiRespo
 @Injectable()
 export class LogoutService {
 
-    constructor(private readonly LoginSessionModel: LoginSessionService){}
+    constructor(private readonly LoginSessionModel: LoginSessionService) { }
 
-logoutCurrentSession(userPayload: JWTPayload): Promise<ApiResponse.ApiOK>
-{
-    return new Promise(async(resolve, reject)=>{
-        try {
+    logoutCurrentSession(userPayload: JWTPayload): Promise<ApiResponse.ApiOK> {
+        return new Promise(async (resolve, reject) => {
+            try {
 
-            const { session_id } = userPayload;
-            await this.LoginSessionModel.logoutCurrentSession(session_id);
+                const { session_id } = userPayload;
+                await this.LoginSessionModel.logoutCurrentSession(session_id);
 
-            resolve({ message: LOGOUT_MSG.LOGOUT_CURRENT, data: null });
-            return;
-            
-        } catch (error) {
-            reject(error);
-            return;
-        }
-    })
-}
+                resolve({ message: LOGOUT_MSG.LOGOUT_CURRENT, data: null });
+                return;
 
-logoutAllSession(userPayload: JWTPayload): Promise<ApiResponse.ApiOK>
-{
-    return new Promise(async(resolve, reject)=>{
-        try {
+            } catch (error) {
+                reject(error);
+                return;
+            }
+        })
+    }
 
-            const { reference_id } = userPayload;
-            await this.LoginSessionModel.logoutAllSessionDb(reference_id);
+    logoutAllSession(userPayload: JWTPayload): Promise<ApiResponse.ApiOK> {
+        return new Promise(async (resolve, reject) => {
+            try {
 
-            resolve({ message: LOGOUT_MSG.LOGOUT_ALL, data: null });
-            return;
-            
-        } catch (error) {
-            reject(error);
-            return;
-        }
-    })
-}
+                const { reference_id } = userPayload;
+                await this.LoginSessionModel.logoutAllSessionDb(reference_id);
+
+                resolve({ message: LOGOUT_MSG.LOGOUT_ALL, data: null });
+                return;
+
+            } catch (error) {
+                reject(error);
+                return;
+            }
+        })
+    }
 }
 

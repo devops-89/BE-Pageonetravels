@@ -6,7 +6,7 @@ export declare namespace ForgotPasswardI
     }
 
     interface ForgotPasswordVerifyByOtp {
-        reference_id: number,
+        reference_id: string,
         otp: string,
         password: string
     }
