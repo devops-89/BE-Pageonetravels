@@ -171,9 +171,9 @@ export class UserRepositoryService {
     
     async addOrUpdateByEmail(input: UserI.InsertUserByEmail): Promise<User | null> {
         try {
-            const { email, verify_status, password, status, full_name,user_type } = input;
+            const { email, verify_status, password, status, full_name,user_type, country_code,phone_number } = input;
 
-            const updateFields = { email, verify_status, password, status,  full_name, user_type };
+            const updateFields = { email, verify_status, password, status,  full_name, user_type, country_code, phone_number };
             const insertVal = this.mapObject(updateFields);
 
             await this.userRepository.save(this.userRepository.create(insertVal));

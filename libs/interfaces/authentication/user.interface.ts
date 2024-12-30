@@ -44,6 +44,8 @@ export declare namespace UserI {
         verify_status: USER_VERIFY_STATUS,
         status?:USER_ACCOUNT_STATUS,
         loginSource: USER_LOGIN_SOURCE.LOCAL,
+        country_code?: string,
+        phone_number?: string,
     }
 
 

@@ -296,7 +296,7 @@ console.log(">>>>>>>>",userStatus)
     async  registerWithEmailPassword(input: RegisterDto): Promise<ApiResponse.ApiOK> {
         try {
             input.email = input.email.toLowerCase();
-            const { email, password, full_name, user_type } = input;
+            const { email, password, full_name, user_type, phone_number, country_code } = input;
 
             if (!user_type) {
                 input.user_type = USER_TYPE.USER;
@@ -320,7 +320,9 @@ console.log(">>>>>>>>",userStatus)
                 verify_status: USER_VERIFY_STATUS.UNVERIFIED,
                 loginSource: USER_LOGIN_SOURCE.LOCAL,
                 full_name,
-                user_type
+                user_type,
+                phone_number,
+                country_code,
             };
 
             const userData = await this.UserModel.addOrUpdateByEmail(user);
@@ -453,7 +455,8 @@ console.log(">>>>>>>>",userStatus)
                 user_type: user.user_type,
                 name: user.full_name,
                 email: user.email,
-                reference_id: user.id
+                reference_id: user.id,
+                // phone_number:user.phone_number
             };
     
             return { 
