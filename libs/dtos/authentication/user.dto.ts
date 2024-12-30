@@ -244,7 +244,6 @@ export class RegisterDto {
   @IsString()
   phone_number: string;
 
-
 }
 
 export class CustomLoginDto {

@@ -37,6 +37,10 @@ export class User {
   @Index()
   phone_number: string
 
+  @Column({nullable: true})
+  @IsDefined()
+  country_code: string
+
   @Column({ default: false })
   is_phone_verified: boolean
 
