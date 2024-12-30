@@ -11,8 +11,8 @@ export class Headers {
     @Column({ nullable: false })
     header_logo: string; 
 
-    @Column("simple-array", { nullable: false })
-    header_links: string[]; 
+    @Column( { nullable: false })
+    header_links: string; 
 
     @CreateDateColumn()
     created_at: Date; 

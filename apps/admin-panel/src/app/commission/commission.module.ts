@@ -4,7 +4,7 @@ import { CommissionController } from './commission.controller';
 import { CommissionService } from './commission.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '../../../../../libs/config/config.module';
-import {  CommissionRepositoryService, DBModule } from 'libs/database/src';
+import {  CommissionRepositoryService, DBModule } from '../../../../../libs/database/src';
 import { ResponseHandlerModule } from '../../../../../libs/response-handler/response-handler.module';
 
 @Module({

@@ -1,16 +1,34 @@
-import { IsString, IsNotEmpty, IsNumber, IsBoolean, IsOptional,IsUUID } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsBoolean, IsOptional,IsUUID, IsMimeType, IsMultibyte } from 'class-validator';
 
 export class AddHeaderDto{
-    @IsString()
-    @IsNotEmpty()
-    favicon: String
+    // @IsMimeType()
+    // @IsNotEmpty()
+    // favicon: String
+
+    // @IsMultibyte()
+    // @IsNotEmpty()
+    // header_logo: String
 
     @IsString()
     @IsNotEmpty()
-    header_logo: String
+    header_links: string 
+
+}
+
+export class UpdateHeaderDto{
 
     @IsString()
     @IsNotEmpty()
-    header_links: String 
+    header_id: string
 
+    @IsString()
+    @IsNotEmpty()
+    favicon?: string;
+
+    @IsString()
+    @IsNotEmpty()
+    header_logo?: string;
+
+    @IsString()
+    header_links: string
 }

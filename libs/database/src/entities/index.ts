@@ -7,7 +7,7 @@ export * from './settings.entity';
 export * from './airport.entity';
 export * from './banner.entity';
 export * from './headers.entity';
-export * from './service.entity';
+export * from './tabService.entity';
 export * from './festival.entity';
 export * from './offer.entity';
 export * from './about.entity';

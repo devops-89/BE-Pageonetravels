@@ -10,10 +10,11 @@ import {
     AddressRepositoryService,
     CommissionRepositoryService,
     SettingRepositoryService,
-    SearchRepositoryService
+    SearchRepositoryService,
+    HeaderRepositoryService
  
 } from './';
-import { User, OtpVerification, LoginSession, Address, Setting,Commission, Airport,Faq,Banner,About,Festival,Offer, Social, Testimonial,Footer,Headers,Service } from './';
+import { User, OtpVerification, LoginSession, Address, Setting,Commission, Airport,Faq,Banner,About,Festival,Offer, Social, Testimonial,Footer,Headers,TabService } from './';
 
 @Module({})
 export class DBModule {
@@ -34,7 +35,7 @@ export class DBModule {
                 Commission,
                 Setting,
                 Airport,
-                Faq,Banner,About,Festival,Offer, Social, Testimonial,Footer,Headers,Service
+                Faq,Banner,About,Festival,Offer, Social, Testimonial,Footer,Headers,TabService
             ],
             synchronize: true,
             logging: false,
@@ -78,7 +79,7 @@ export class DBModule {
                     Commission,
                     Setting,
                     Airport,
-                    Faq,Banner,About,Festival,Offer, Social, Testimonial,Footer,Headers,Service
+                    Faq,Banner,About,Festival,Offer, Social, Testimonial,Footer,Headers,TabService
                 ]),
             ],
             controllers: [],
@@ -89,7 +90,8 @@ export class DBModule {
                 AddressRepositoryService,
                 CommissionRepositoryService,
                 SettingRepositoryService,
-                SearchRepositoryService
+                SearchRepositoryService,
+                HeaderRepositoryService
                
             ],
             exports: [
@@ -99,7 +101,8 @@ export class DBModule {
                 AddressRepositoryService,
                 CommissionRepositoryService,
                 SettingRepositoryService,
-                SearchRepositoryService
+                SearchRepositoryService,
+                HeaderRepositoryService
             ],
         };
     }
