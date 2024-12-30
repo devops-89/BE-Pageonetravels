@@ -11,10 +11,10 @@ export class LoginSession {
   id: string;
 
   @Column({ type: 'timestamp', default: () => 'now()' })
-  createdAt: Date
+  created_at: Date
 
   @ManyToOne(() => User, u => u.id)
-  @JoinColumn({ name: "userId" })
+  @JoinColumn({ name: "user_id" })
   user: User
 
   @Column({
@@ -24,7 +24,7 @@ export class LoginSession {
   loginBy: LOGIN_BY
 
   @Column()
-  loginIdentity: string
+  login_identity: string
   
   @Column({ nullable : true })
   fcmToken: string
@@ -34,7 +34,7 @@ export class LoginSession {
     type : 'enum',
     enum:DEVICE_TYPE
   })
-  deviceType: DEVICE_TYPE 
+  device_type: DEVICE_TYPE 
 
   @Column()
   refresh_token: string

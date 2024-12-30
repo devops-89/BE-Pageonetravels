@@ -17,19 +17,19 @@ export class LoginSessionService {
 
     async insertLoginSession(input: LoginSessionI.insertLoginSession): Promise<LoginSessionI.LoginSessionSchema> {
         try {
-            const { loginStatus, refresh_token, refreshTokenExpiry, userId, loginIdentity, loginBy ,fcmToken, deviceType} = input;
+            const { loginStatus, refresh_token, refreshTokenExpiry, user_id, login_identity, loginBy ,fcmToken, device_type} = input;
 
-            const user = await this.userRepository.findOne({ where: { id: userId } });
+            const user = await this.userRepository.findOne({ where: { id: user_id } });
 
             const newSession = this.sessionRepository.create({
                 loginStatus,
                 refresh_token,
                 refreshTokenExpiry,
                 user,
-                loginIdentity,
+                login_identity,
                 loginBy,
                 fcmToken,
-                deviceType
+                device_type
             });
 
             const res = await this.sessionRepository.save(newSession);
@@ -57,19 +57,19 @@ export class LoginSessionService {
         }
     }
 
-    async logoutAllSessionDb(userId: string): Promise<void> {
+    async logoutAllSessionDb(user_id: string): Promise<void> {
         try {
-            // await this.sessionRepository.update({ user: { id: userId } }, { loginStatus: SESSION_STATUS.LOGGED_OUT });
-            await this.sessionRepository.delete({ user: { id: userId } });
+            //await this.sessionRepository.update({ user: { id: user_id } }, { loginStatus: SESSION_STATUS.LOGGED_OUT });
+            await this.sessionRepository.delete({ user: { id: user_id } });
         } catch (error) {
             throw error;
         }
     }
 
-    async logoutAllEmailSessionDb(userId: string, email: string): Promise<void> {
+    async logoutAllEmailSessionDb(user_id: string, email: string): Promise<void> {
         try {
-            // await this.sessionRepository.update({ user: { id: userId }, loginBy: LOGIN_BY.EMAIL, loginIdentity: email }, { loginStatus: SESSION_STATUS.LOGGED_OUT });
-            await this.sessionRepository.delete( { user: { id: userId }, loginBy: LOGIN_BY.EMAIL, loginIdentity: email });
+            //await this.sessionRepository.update({ user: { id: user_id }, loginBy: LOGIN_BY.EMAIL, login_identity: email }, { loginStatus: SESSION_STATUS.LOGGED_OUT });
+            await this.sessionRepository.delete( { user: { id: user_id }, loginBy: LOGIN_BY.EMAIL, login_identity: email });
 
         } 
         catch (error) {
@@ -77,9 +77,9 @@ export class LoginSessionService {
         }
     }
 
-    async logoutAllPhoneSessionDb(userId: string, phone_no: string): Promise<void> {
+    async logoutAllPhoneSessionDb(user_id: string, phone_number: string): Promise<void> {
         try {
-            await this.sessionRepository.update({ user: { id: userId }, loginBy: LOGIN_BY.PHONE, loginIdentity: phone_no }, { loginStatus: SESSION_STATUS.LOGGED_OUT });
+            await this.sessionRepository.update({ user: { id: user_id }, loginBy: LOGIN_BY.PHONE, login_identity: phone_number }, { loginStatus: SESSION_STATUS.LOGGED_OUT });
         } catch (error) {
             throw error;
         }
@@ -107,17 +107,17 @@ export class LoginSessionService {
         return success;
     }
 
-    async blockAllSessionDb(userId: string): Promise<void> {
+    async blockAllSessionDb(user_id: string): Promise<void> {
         try {
-            await this.sessionRepository.update({ user: { id: userId } }, { loginStatus: SESSION_STATUS.BLOCKED });
+            await this.sessionRepository.update({ user: { id: user_id } }, { loginStatus: SESSION_STATUS.BLOCKED });
         } catch (error) {
             throw error;
         }
     }
 
-    async getAllSessionByUserId(userId: string): Promise<LoginSession[]> {
+    async getAllSessionByUserId(user_id: string): Promise<LoginSession[]> {
         try {
-            const session = await this.sessionRepository.find({ where: { user: { id: userId}, loginStatus: SESSION_STATUS.LOGGED_IN } });
+            const session = await this.sessionRepository.find({ where: { user: { id: user_id}, loginStatus: SESSION_STATUS.LOGGED_IN } });
             return session;
         } 
         catch (error) {

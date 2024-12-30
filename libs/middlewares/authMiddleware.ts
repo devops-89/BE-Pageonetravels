@@ -22,13 +22,14 @@ export class TokenValidationMiddleware implements NestMiddleware
 
   async use(req: Request, res: Response, next: NextFunction) {
     const errorResponse: ApiResponse.ApiErrorType = {
-        statusCode: ERROR_CODES.JWT_TOKEN_INVALID, message: ErrorMessages.JWT_TOKEN_INVALID, extraError: '', name: ''
+        status_code: ERROR_CODES.JWT_TOKEN_INVALID, message: ErrorMessages.JWT_TOKEN_INVALID, extraError: '', name: ''
       };
   
       try 
       {
-        const accessToken = req.headers['accesstoken'] as string || null;
-        const { verified, payload, error_code, error_message } = await this.jwtService.verifyJWTToken(accessToken);
+        console.log(JSON.stringify(req.headers));
+        const access_token = req.headers['accesstoken'] as string || null;
+        const { verified, payload, error_code, error_message } = await this.jwtService.verifyJWTToken(access_token);
         if (verified && payload) 
         {
 
@@ -45,12 +46,12 @@ export class TokenValidationMiddleware implements NestMiddleware
               next();
           } else if (loginSession && loginSession.loginStatus == SESSION_STATUS.BLOCKED) 
           {
-              errorResponse.statusCode = ERROR_CODES.BLOCKED_USER;
+              errorResponse.status_code = ERROR_CODES.BLOCKED_USER;
               errorResponse.message = COMMON_MSG.BLOCKED_USER;
               this.ResponseHandler.sendErrorResponse(res, errorResponse);
           } else 
           {
-              errorResponse.statusCode = ERROR_CODES.NOT_AUTHORIZED;
+              errorResponse.status_code = ERROR_CODES.NOT_AUTHORIZED;
               errorResponse.message = ErrorMessages.NOT_AUTHORIZED;
               this.ResponseHandler.sendErrorResponse(res, errorResponse);
           }
@@ -58,7 +59,7 @@ export class TokenValidationMiddleware implements NestMiddleware
         }
         else 
         {
-          errorResponse.statusCode = error_code;
+          errorResponse.status_code = error_code;
           errorResponse.message = error_message as string;
           this.ResponseHandler.sendErrorResponse(res, errorResponse)
         }
@@ -78,18 +79,18 @@ export class TokenValidationAndGuestMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     const errorResponse: ApiResponse.ApiErrorType = {
-        statusCode: ERROR_CODES.JWT_TOKEN_INVALID, message: ErrorMessages.JWT_TOKEN_INVALID, extraError: '', name: ''
+        status_code: ERROR_CODES.JWT_TOKEN_INVALID, message: ErrorMessages.JWT_TOKEN_INVALID, extraError: '', name: ''
       };
   
       try 
       {
-        const accessToken = req.headers['accesstoken'] as string || null;
-        if (accessToken == "null" || !accessToken) {
+        const access_token = req.headers['accesstoken'] as string || null;
+        if (access_token == "null" || !access_token) {
             next();
         }
         else
         {
-        const { verified, payload, error_code, error_message } = await this.jwtService.verifyJWTToken(accessToken);
+        const { verified, payload, error_code, error_message } = await this.jwtService.verifyJWTToken(access_token);
         if (verified && payload) 
         {
 
@@ -108,25 +109,25 @@ export class TokenValidationAndGuestMiddleware implements NestMiddleware {
               } 
               else if (loginSession && loginSession.loginStatus == SESSION_STATUS.BLOCKED) 
               {
-                  errorResponse.statusCode = ERROR_CODES.BLOCKED_USER;
+                  errorResponse.status_code = ERROR_CODES.BLOCKED_USER;
                   errorResponse.message = COMMON_MSG.BLOCKED_USER;
                   this.ResponseHandler.sendErrorResponse(res, errorResponse);
               } else 
               {
-                  errorResponse.statusCode = ERROR_CODES.NOT_AUTHORIZED;
+                  errorResponse.status_code = ERROR_CODES.NOT_AUTHORIZED;
                   errorResponse.message = ErrorMessages.NOT_AUTHORIZED;
                   this.ResponseHandler.sendErrorResponse(res, errorResponse);
               }
           } 
           else {
-              errorResponse.statusCode = ERROR_CODES.NOT_AUTHORIZED;
+              errorResponse.status_code = ERROR_CODES.NOT_AUTHORIZED;
               errorResponse.message = ErrorMessages.NOT_AUTHORIZED;
               this.ResponseHandler.sendErrorResponse(res, errorResponse);
           }
         }
         else 
         {
-          errorResponse.statusCode = error_code;
+          errorResponse.status_code = error_code;
           errorResponse.message = error_message as string;
           this.ResponseHandler.sendErrorResponse(res, errorResponse)
         }
@@ -148,18 +149,18 @@ export class OptionalTokenValidationAndGuestMiddleware implements NestMiddleware
 
   async use(req: Request, res: Response, next: NextFunction) {
     const errorResponse: ApiResponse.ApiErrorType = {
-        statusCode: ERROR_CODES.JWT_TOKEN_INVALID, message: ErrorMessages.JWT_TOKEN_INVALID, extraError: '', name: ''
+        status_code: ERROR_CODES.JWT_TOKEN_INVALID, message: ErrorMessages.JWT_TOKEN_INVALID, extraError: '', name: ''
       };
   
       try 
       {
-        const accessToken = (req.headers['accesstoken'] as string) || null;
-        if (!accessToken) {
+        const access_token = (req.headers['accesstoken'] as string) || null;
+        if (!access_token) {
             next();
         }
         else 
         {
-            const { verified, payload, error_code, error_message } = await this.jwtService.verifyJWTToken(accessToken);
+            const { verified, payload, error_code, error_message } = await this.jwtService.verifyJWTToken(access_token);
             if (verified && payload) {
                 if (payload.token_type && payload.token_type == TOKEN_TYPE.GUEST_LOGIN) {
                     req['userPayload'] = payload;
@@ -183,7 +184,7 @@ export class KeyValidationMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
 
     const errorResponse: ApiResponse.ApiErrorType = {
-            statusCode: ERROR_CODES.ACCESS_DENIED, message: ErrorMessages.NOT_AUTHORIZED, name: ""
+            status_code: ERROR_CODES.ACCESS_DENIED, message: ErrorMessages.NOT_AUTHORIZED, name: ""
           };
 
           if ( this.configService.get().AUTH_KEY != req.headers.authKey) {
@@ -200,7 +201,7 @@ export class checkIfAdmin implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
 
     const errorResponse: ApiResponse.ApiErrorType = {
-            statusCode: ERROR_CODES.ACCESS_DENIED, message: ErrorMessages.NOT_AUTHORIZED, name: ""
+            status_code: ERROR_CODES.ACCESS_DENIED, message: ErrorMessages.NOT_AUTHORIZED, name: ""
           };
         
           const payload: JWTPayload = req['userPayload'];
@@ -219,7 +220,7 @@ export class checkIfAdminUser implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
 
     const errorResponse: ApiResponse.ApiErrorType = {
-            statusCode: ERROR_CODES.ACCESS_DENIED, message: ErrorMessages.NOT_AUTHORIZED, name: ""
+            status_code: ERROR_CODES.ACCESS_DENIED, message: ErrorMessages.NOT_AUTHORIZED, name: ""
           };
         console.log("payload",req['userPayload'])
           const payload: JWTPayload = req['userPayload'];

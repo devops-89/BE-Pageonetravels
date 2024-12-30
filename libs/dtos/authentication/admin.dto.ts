@@ -50,7 +50,7 @@ export class AddMemberDto {
     user_type: string;
 
     @IsString()
-    phone_no: string;
+    phone_number: string;
   
     @IsString()
     reference_id: string;

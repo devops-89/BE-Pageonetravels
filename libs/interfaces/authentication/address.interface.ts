@@ -4,14 +4,14 @@ export declare namespace AddressI
     interface AddAdress
     {
         street: string,
-        houseNo: string,
+        house_number: string,
         city: string,
         state: string,
         country: string,
         postal_code: string,
-        isDefault?:boolean,
-        userId?: string,
-        addressType: string
+        is_default?:boolean,
+        user_id?: string,
+        address_type: string
     }
 
     interface UpdateAdress extends Partial<AddAdress>

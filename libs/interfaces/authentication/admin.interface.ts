@@ -26,7 +26,7 @@ export declare namespace AdminI {
         new_password: string,
         designation: string,
         user_type: USER_TYPE,
-        phone_no: string,
+        phone_number: string,
         reference_id: string
     }
 
@@ -37,12 +37,12 @@ export declare namespace AdminI {
     }
 
     interface BlockUser {
-        userId: string,
+        user_id: string,
         status: USER_ACCOUNT_STATUS
     }
 
     interface getCounts {
-        userId: string,
+        user_id: string,
         status: USER_ACCOUNT_STATUS
     }
 

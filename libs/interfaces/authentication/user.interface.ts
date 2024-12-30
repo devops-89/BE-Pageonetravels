@@ -2,12 +2,11 @@ import { DEVICE_TYPE } from "libs/constants/commonConstants";
 import { DEFAULT_USER_ROLES, USER_ACCOUNT_STATUS, USER_LOGIN_SOURCE, USER_TYPE, USER_VERIFY_STATUS } from "../../constants/autenticationConstants/userContants";
 import { IPagination } from "../commonTypes/custom.interface";
 // import { MultiFileType } from "../commonTypes/fastifyTypes";
-// import { IPagination } from "../commonTypes/custom.interface";
 
 export declare namespace UserI {
     interface AddressSchema {
         street: string;
-        houseNo: string;
+        house_number: string;
         postal_code: string;
         city: string;
         country: string;
@@ -27,7 +26,8 @@ export declare namespace UserI {
         user_type: USER_TYPE,
         is_phone_verified: boolean,
         is_email_verified: boolean,
-        createdAt: Date,
+        created_at: Date,
+        last_login?: Date,
         addresses?: AddressSchema[];
     }
 
@@ -41,6 +41,9 @@ export declare namespace UserI {
         password?: string,
         user_type?: USER_TYPE,
         id?:string,
+        verify_status: USER_VERIFY_STATUS,
+        status?:USER_ACCOUNT_STATUS,
+        loginSource: USER_LOGIN_SOURCE.LOCAL,
     }
 
 
@@ -56,14 +59,17 @@ export declare namespace UserI {
     {
         full_name?: string,
         password?: string,
-        email: string,
+        email?: string,
         is_email_verified?: boolean,
         country_code?: string,
         phone_number?: string,
+        status?: USER_ACCOUNT_STATUS,
         id?: string,
-        roleName?: string,
+        user_id?: string,
         user_type?: USER_TYPE,
+        verify_status?:USER_VERIFY_STATUS,
         avatar?:string
+        loginSource?:USER_LOGIN_SOURCE,
     }
 
     interface InsertDefaultUser 
@@ -77,18 +83,28 @@ export declare namespace UserI {
         is_email_verified:boolean
     }
 
+
+    
+    interface PermissionObj {
+        // role_name?: string;
+        user_type?: string;
+        //permission?: number;
+    }
+
+
     interface UpdateRoleAndPermission
     {
-        roleName: string, 
-        userId:string
+        //role_name: string, 
+        user_id:string
+
     }
 
     interface UpdateUserStatus
     {
-        user_id:string,
+        id:string,
         status: USER_ACCOUNT_STATUS,
         verify_status: USER_VERIFY_STATUS,
-        isPhoneNoVerified?: boolean,
+        is_phone_verified?: boolean,
         is_email_verified?: boolean,
         password?: string
 
@@ -99,7 +115,7 @@ export declare namespace UserI {
         email: string,
         password: string,
         // user_role: string,
-        name: string,
+        full_name: string,
         user_type: USER_TYPE
     }
 
@@ -123,7 +139,7 @@ export declare namespace UserI {
   
     interface LoginWithEmailOrPhone {
         // email: string,
-        // phone_no: string,
+        // phone_number: string,
         country_code:string,
         identity: string
         user_role:string,
@@ -131,7 +147,7 @@ export declare namespace UserI {
     }
 
     interface UpdateProfile {
-        userId: string,
+        user_id: string,
         full_name: string,
         email: string,
         phone_number: string,
@@ -141,7 +157,7 @@ export declare namespace UserI {
     }
     export interface UpdatePersonalDetailRequest
     {
-        name: string,
+        full_name: string,
         phone_number: string,
         country_code: string,
         email: string
@@ -149,7 +165,7 @@ export declare namespace UserI {
 
     interface UpdateEmailById
     {
-        userId: number,
+        user_id: number,
         email: string,
         is_email_verified: boolean
     }
@@ -157,16 +173,16 @@ export declare namespace UserI {
     interface UpdatePhoneById
     {
         phone_number: string,
-        userId: number,
-        isPhoneNoVerified: boolean,
+        user_id: number,
+        is_phone_verified: boolean,
         country_code: string
     }
 
     interface AddUser
     {
-        name: string,
+        full_name: string,
         email: string,
-        // phone_no: string,
+        // phone_number: string,
         user_role: DEFAULT_USER_ROLES,
         roleId: string,
     }
@@ -175,19 +191,19 @@ export declare namespace UserI {
     {
         user_name: string,
         password: string,
-        phone_no: string,
+        phone_number: string,
         country_code: string
         // avatar
     }
 
     export interface UpdateUserProfile
     {
-        userId: string,
+        user_id: string,
         full_name: string,
         user_role: string,
         user_name: string,
         email?: string,
-        phone_no?: string,
+        phone_number?: string,
         password?: string,
     }
 
@@ -198,32 +214,32 @@ export declare namespace UserI {
 
     interface UpdatePasswordByUserId
     {
-        userId: number,
+        user_id: number,
         password: string
 
     }
 
     interface UpdateParentByUserId
     {
-        userId: number,
+        user_id: number,
         parentId: string
     }
 
     interface RenewAccessToken {
-        accessToken: string,
+        access_token: string,
         refresh_token: string
     }
 
     interface ChangePassword {
         old_password: string,
         new_password: string,
-        otp: string;
-        reference_id:number
+        // otp: string;
+        // reference_id:string
     }
 
     interface UpdateUserAccountStatus
     {
-        userId: string,
+        user_id: string,
         status: USER_ACCOUNT_STATUS
     }
     interface GetUsersByFilter extends IPagination
@@ -232,8 +248,8 @@ export declare namespace UserI {
         status?: USER_ACCOUNT_STATUS,
         parentId?: number,
         search?: string,
-        isPhoneNoVerified?: boolean, 
+        is_phone_verified?: boolean, 
         is_email_verified?: boolean 
-
+        
     }
 }

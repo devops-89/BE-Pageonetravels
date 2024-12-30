@@ -6,7 +6,7 @@ export declare namespace OtpVerificationI
     interface DefaultField
     {
         id: string
-        createdAt:Date,
+        created_at:Date,
     }
 
     interface OtpResendData {
@@ -19,11 +19,11 @@ export declare namespace OtpVerificationI
     interface OtpVerification {
         otp: string,
         user: string,
-        otpType: OTP_TYPE,
-        sendOn: OTP_SEND_ON,
-        expiryTime: number,
-        emailOrPhone: string,
-        reference_id?: string
+        otp_type: OTP_TYPE,
+        send_on: OTP_SEND_ON,
+        expiry_time: number,
+        email_or_phone: string,
+        country_code?: string
     }
 
     interface OtpVerificationSchema extends OtpVerification, DefaultField

@@ -10,9 +10,9 @@ export class ResetPasswordDto {
   @MinLength(6, { message: 'OTP must be at least 6 characters long' })
   otp: string;
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty({ message: 'Reference ID is required' })
-  reference_id: number;
+  reference_id: string;
 
   @IsString()
   @IsNotEmpty({ message: 'Password is required' })
