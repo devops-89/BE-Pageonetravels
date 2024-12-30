@@ -72,21 +72,25 @@ async getHeader(@Res() res:Response){
     }
 }
 
-@Post('updateHeader')
-@UseGuards(TokenValidationGuard)
-@UseInterceptors(
-  FileFieldsInterceptor(
-    [
-      { name: 'header_logo', maxCount: 1 },
-      { name: 'favicon', maxCount: 1 },
-    ],
-    { fileFilter: imageFileFilter }
-  )
-)
+// @Post('updateHeader')
+// @UseGuards(TokenValidationGuard)
+// @UseInterceptors(
+//   FileFieldsInterceptor(
+//     [
+//       { name: 'header_logo', maxCount: 1 },
+//       { name: 'favicon', maxCount: 1 },
+//     ],
+//     { fileFilter: imageFileFilter }
+//   )
+// )
+// async updateHeader(@Body() body:UpdateHeaderDto,@UploadedFiles() files , @Req() req: Request, @Res() res:Response ){
+//    try{
+//       const payload: JWTPayload=req['userPayload'];
+//       const result = await this.headerService.updateHeader();
+//    }catch(error){
 
-async updateHeader( ){
-   
-}
+//    }
+// }
 
 
 
