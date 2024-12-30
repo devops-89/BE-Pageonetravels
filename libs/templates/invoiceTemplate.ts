@@ -85,9 +85,9 @@ export const invoiceEmailTemplate = function (invoiceData: any) {
             <p><strong>Billing Address:</strong><br>${billingAddress}</p>
             <p><strong>Shipping Address:</strong><br>${shippingAddress}</p>
             <p>If you have any questions, please feel free to contact us.</p>
-            <p>Thank you,<br>Bharat Hast Kaushal</p>
+            <p>Thank you,<br>Page One Travels</p>
         </div>
-        <div class="footer">© 2024 Bharat Hast Kaushal. All rights reserved.</div>
+        <div class="footer">© 2024 Page One Travels. All rights reserved.</div>
     </body>
     </html>`;
     const text = `
@@ -110,6 +110,6 @@ export const invoiceEmailTemplate = function (invoiceData: any) {
     ${shippingAddress}
     If you have any questions, please feel free to contact us.
     Thank you,
-    Bharat Hast Kaushal`;
+    Page One Travels`;
     return { html, text };
 };

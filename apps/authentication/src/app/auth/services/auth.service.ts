@@ -311,6 +311,15 @@ console.log(">>>>>>>>",userStatus)
                 throw ({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: COMMON_MSG.EMAIL_ALREADY_EXIST });
             }
 
+            if (phone_number) {
+                const isPhoneExist = await this.UserModel.checkPhoneNumberExist(phone_number);
+                if (isPhoneExist) {
+                    throw {
+                        status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER,
+                        message: COMMON_MSG.PHONE_ALREADY_EXIST,
+                    };
+                }
+            }
             const password_hash = await generatePasswordHash(password);
 
             const user: UserI.InsertUserByEmail = {

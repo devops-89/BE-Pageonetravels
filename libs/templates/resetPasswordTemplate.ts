@@ -70,7 +70,7 @@ export const resetPassword = function (otp: string, firstName: string) {
 
 <body
   style="margin: 0; padding: 0; width: 100%; word-break: break-word; -webkit-font-smoothing: antialiased; background-color: #eceff1;">
-  <div style="display: none;">A request to reset password was received from your Bharat Hast Kaushal Account</div>
+  <div style="display: none;">A request to reset password was received from your Page One Travels Account</div>
   <div role="article" aria-roledescription="email" aria-label="Reset your Password" lang="en">
     <table style="font-family: Montserrat, -apple-system, 'Segoe UI', sans-serif; width: 100%;" width="100%"
       cellpadding="0" cellspacing="0" role="presentation">
@@ -80,7 +80,7 @@ export const resetPassword = function (otp: string, firstName: string) {
             <tr>
               <td class="sm-py-32 sm-px-24" style="padding: 48px; text-align: center;">
                 <a href="#">
-                  <img src="${LOGO}" alt="Bharat Hast Kaushal" style="width: 100px;">
+                  <img src="${LOGO}" alt="Page One Travels" style="width: 100px;">
                 </a>
               </td>
             </tr>
@@ -91,16 +91,16 @@ export const resetPassword = function (otp: string, firstName: string) {
                     <td style="background-color: #ffffff; border-radius: 4px; font-size: 14px; line-height: 24px; padding: 48px; text-align: left; color: #626262;">
                       <p style="font-weight: 600; font-size: 18px; margin: 10px 0;">Hey ${firstName},</p>
                       <p style="margin: 0 0 24px;">
-                        This is the password reset OTP you requested from Bharat Hast Kaushal. Use it to reset your Bharat Hast Kaushal account password.
+                        This is the password reset OTP you requested from Page One Travels. Use it to reset your Page One Travels account password.
                       </p>
                       <p style="font-weight: 600; text-align: center; font-size: 24px; margin: 20px 0;">${otp}</p>
                       <p style="margin: 20px 0 2px;">
                         If you did not request this password reset, please contact us immediately.<br>
-                        Bharat Hast Kaushal Support
+                        Page One Travels Support
                       </p>
                       <p style="margin: 0 0 16px;">
                         Have additional questions or need direct assistance? <br>
-                        Contact our team at <a href="mailto:bharathastkaushal@yopmail.com" class="hover-underline" style="color: #7367f0;">info@'bharathastkaushal.com'</a>.
+                        Contact our team at <a href="mailto:pageonetravels@yopmail.com" class="hover-underline" style="color: #7367f0;">info@'pageonetravels.com'</a>.
                       </p>
                     </td>
                   </tr>
@@ -117,7 +117,7 @@ export const resetPassword = function (otp: string, firstName: string) {
 
     // Plain text content for the email
     const text = `
-        Reset Password: You recently requested to reset your password for your Bharat Hast Kaushal account. Copy and paste it to reset your password:
+        Reset Password: You recently requested to reset your password for your Page One Travels account. Copy and paste it to reset your password:
         ${otp}
 
 If you did not request a password reset, please ignore this email or reply to let us know. This password reset is only valid for the next 2 hours.`;

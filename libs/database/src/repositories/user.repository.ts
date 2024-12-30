@@ -104,6 +104,19 @@ export class UserRepositoryService {
     }
 
 
+    async checkPhoneNumberExist(phone_number: string): Promise<boolean> {
+        try {
+            const doc = await this.userRepository.count({
+                where: { phone_number: phone_number.trim(), is_phone_verified: true },
+            });
+            return doc > 0;
+        } catch (error) {
+            console.log('Phone Number Not Found', error);
+            throw error;
+        }
+    }
+    
+
     async insertDefaultUser(input: UserI.InsertDefaultUser): Promise<User> {
         try {
             const { email, status, password, user_type, full_name, is_email_verified } = input;

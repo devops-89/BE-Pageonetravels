@@ -8,7 +8,7 @@ export function loginPasswordTemplate(password: string, email: string): { html: 
             <p>Email: ${email}</p>
             <p>Password: ${password}</p>
             <p>Please change your password upon your first login.</p>
-            <p>Best regards,<br>Bharat Hast Kaushal</p>
+            <p>Best regards,<br>Page One Travels</p>
           </body>
         </html>
       `

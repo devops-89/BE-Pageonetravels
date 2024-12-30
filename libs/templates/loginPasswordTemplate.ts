@@ -40,7 +40,7 @@ export const loginPasswordTemplate = function (password: string, email: string) 
                               style="font-size: 130%">${password}</strong></span></p>
                           <p style="padding-bottom: 16px"><em>Please change the password when you login for the first time or update your
                               profile.</em></p>
-                          <p style="padding-bottom: 16px">Thanks,<br>Bharat Hast Kaushal Team</p>
+                          <p style="padding-bottom: 16px">Thanks,<br>Page One Travels Team</p>
                         </div>
                       </div>
                       <div style="padding-top: 20px; color: rgb(153, 153, 153); text-align: center;">
