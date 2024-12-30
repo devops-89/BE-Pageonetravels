@@ -1,7 +1,8 @@
 import { Controller, Req, Body, ValidationPipe, Res, Get, Post } from '@nestjs/common';
 import { SearchFlightService } from './search-flight.service';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
-import { SearchFlightDto } from '../../../../libs/dtos/flight/flights.dto';
+import { SearchFlightDto } from '../../../../libs/dtos/flight/search-flights.dto';
+
 @Controller('/flight')
 export class SearchFlightController {
     constructor(private readonly searchflightsearvice: SearchFlightService,
@@ -17,7 +18,9 @@ export class SearchFlightController {
     //         return this.responseHandler.sendErrorResponse(res,error);
     //     }
     // }
-    @Get('/searchairport/:search_query')
+
+
+    @Get('/search-airport/:search_query')
     async searchAirport(
         // @Param('search_query ') searchQuery :string,
         @Req() req: Request, @Res() res: Response) {
@@ -30,9 +33,23 @@ export class SearchFlightController {
             return this.responseHandler.sendErrorResponse(res, error)
         }
     }
-    @Post('/search-flight')
-    async searchFlight(@Req() req: Request, @Body(new ValidationPipe()) body: SearchFlightDto, @Res() res: Response) {
+
+    @Get('/all-airport')
+    async searchAllAirport(
+        @Req() req : Request, @Res() res : Response){
         try {
+            const result = await this.searchflightsearvice.searchAllAirport();
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch(error){
+            console.error("Failed in the search airport", error)
+            return this.responseHandler.sendErrorResponse(res,error)
+        }
+    }
+
+
+    @Post('/search-flight')
+    async searchFlight(@Req() req: Request, @Body(new ValidationPipe()) body: SearchFlightDto,  @Res() res: Response){
+        try{
             const result = await this.searchflightsearvice.searchFlight(body);
             return this.responseHandler.sendSuccessResponse(res, result);
         } catch (error) {

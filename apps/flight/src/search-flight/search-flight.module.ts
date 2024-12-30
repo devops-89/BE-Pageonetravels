@@ -8,12 +8,15 @@ import { Airport, SearchRepositoryService, Setting, SettingRepositoryService } f
 import { ResponseHandlerModule } from '../../../../libs/response-handler/response-handler.module';
 import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.module';
 import { GenerateTokenService } from './generateToken.service';
+import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
+import { HTTPSTboAPIService } from "../../../../libs/http-api-service/tbo-api-service";
+
 @Module({
     imports:[
         DBModule.forRoot(),
         ConfigModule,
         ResponseHandlerModule,
-        TBOConfigModule,
+        TBOConfigModule.register(),    
         TypeOrmModule.forFeature([
             Setting,
             Airport,
@@ -22,6 +25,6 @@ import { GenerateTokenService } from './generateToken.service';
         ]),
     ],
     controllers: [SearchFlightController],
-    providers: [SearchFlightService, GenerateTokenService],
+    providers: [SearchFlightService, GenerateTokenService, TBO_CredentialsService, HTTPSTboAPIService],
 })
 export class SearchFlightModule {}
