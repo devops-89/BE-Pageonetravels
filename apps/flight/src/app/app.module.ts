@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 import { SearchFlightModule } from '../search-flight/search-flight.module';
 // import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { FlightdetailModule } from './flightdetail/flightdetail.module';
+// import { FlightdetailModule } from './flightdetail/flightdetail.module';
 import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
@@ -23,7 +23,7 @@ import * as redisStore from 'cache-manager-redis-store';
             }),
         }),
         SearchFlightModule,
-        FlightdetailModule,
+        // FlightdetailModule,
     ],
     controllers: [AppController],
     providers: [AppService],

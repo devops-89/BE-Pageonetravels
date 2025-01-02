@@ -1,7 +1,9 @@
-import { Controller, Req, Body, ValidationPipe, Res, Get, Post} from '@nestjs/common';
+import { Controller, Req, Body, ValidationPipe, Res, Get, Post, UploadedFile, UseInterceptors} from '@nestjs/common';
 import { SearchFlightService } from './search-flight.service';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { SearchFlightDto } from '../../../../libs/dtos/flight/search-flights.dto';
+import { imageFileFilter } from '../../../../libs/utils/fileUpload';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('/flight')
 export class SearchFlightController { 
@@ -9,16 +11,18 @@ export class SearchFlightController {
         private readonly responseHandler: ResponseHandlerService,
     ){}
 
-    // @Get('/data') 
-    // async generateToken(@Req() req : Request, @Res() res: Response){
-    //     try {
-    //         const result = await this.searchflightsearvice.generateToken();
-    //         return this.responseHandler.sendSuccessResponse(res,result)
-    //     }catch(error){
-    //         console.log("error in the generate token", error);
-    //         return this.responseHandler.sendErrorResponse(res,error);
-    //     }
-    // }
+    @Post('/upload-airport')
+    @UseInterceptors(FileInterceptor('airportexcel', { fileFilter: imageFileFilter }))
+    async uploadAirport(@Req() req: Request, @Res() res: Response, @UploadedFile() file) {
+        try {
+            // Pass the uploaded file to the service for processing
+            const result = await this.searchflightsearvice.uploadAirport(file);
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch (error) {
+            console.log("Error in generate token:", error);
+            return this.responseHandler.sendErrorResponse(res, error);
+        }
+    }
 
 
     @Get('/search-airport/:search_query')

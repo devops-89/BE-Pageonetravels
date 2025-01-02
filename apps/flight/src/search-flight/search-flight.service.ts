@@ -9,7 +9,8 @@ import { JOURNEYTYPEMAPPING, TimeFilter } from '../../../../libs/constants/fligh
 import { AirportType } from '../../../../libs/interfaces/flight/search.interface';
 import { FlightValidator } from './search-utility';
 import { TBOResponse, FlightDetails, FlightSegment } from '../../../../libs/interfaces/flight/search.interface';
-
+import path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class SearchFlightService {
@@ -155,8 +156,8 @@ export class SearchFlightService {
         preferred_time: preferredTimeValue,
       });
 
-      const trans = this.fetchSegmentsDataAsPerJourneyType(response, assigned_journey_type)
-   
+      const trans = await this.fetchSegmentsDataAsPerJourneyType(response, assigned_journey_type)
+
       // const transform_flight_list = this.extractFlightData(response);
 
       return { message: "Flight list fetched successfully", data: trans };
@@ -168,47 +169,70 @@ export class SearchFlightService {
   }
 
 
-  private fetchSegmentsDataAsPerJourneyType(response, journey_type) {
+  async  fetchSegmentsDataAsPerJourneyType(response, journey_type:number) {
     try {
+      const flightList = {};
+      const result = response.Response?.Results?.[0];
+      const origin = response.Response?.Origin;
+      const destination = response.Response?.Destination;
+      const trace_id = response.Response?.TraceId;
+      console.log("object", origin, destination, trace_id);
+      if (!result) {
+        console.error("Invalid response structure or empty Results.");
+        throw `("result is empty")`;
+      }
+     
       
-      const result = response.Response.Results[0];
-      // console.log(journey_type);
       if (journey_type === 1) {
-        // Domestic or International
-        // console.log("result", isArray(result));
-        // const flightList =  result[0].Segments[0];
-        const flightList =  this.segmentsFromResultArray(result);
-        
+        console.log("I am", journey_type)
+
+        // result.map((element)=>{
+        //   element.Segments
+        // })
+        // Domestic or International single segment
+        // flightList['departure_flights'] = await this.segmentsFromResultArray(result);
+        // console.log(">>", JSON.stringify(flightList[0]));
+        // return flightList
+        const segments = await this.segmentsFromResultArray(result);
+        console.log("Segments for journeyType 1:", segments);
+        return segments; // Ensure you're returning the result here
+      }
   
-        return flightList
-      }
-
       if (journey_type === 2) {
-        if (result.length == 1) {
-          //internationation flight
-          const incoming_flight_list = result[0].Segments[0];
-          const outgoing_flight_list = result[0].Segments[1];
-          return { incoming_flight_list, outgoing_flight_list };
+        if (result.length === 1) {
+  
+          const segment1 = await this.segmentsFromResultArray(result);
+          const segment2 = await this.segmentsFromResultArray(result[0]?.Segments?.[1]);
+
+          flightList['departure_flights'] = segment1;
+
+          flightList['arrival_flights'] = segment2;
+
         } else {
-          const incoming_flight_list = result[0].Segments[0];
-          const outgoing_flight_list = result[1].Segments[0];
 
-          return { incoming_flight_list, outgoing_flight_list };
+          const segment1 = await this.segmentsFromResultArray(result[0]?.Segments?.[0])
+          const segment2 = await this.segmentsFromResultArray(result[1]?.Segments?.[0])
+  
+          flightList['departure_flights'] = segment1;
+          flightList['arrival_flights'] = segment2
         }
+        return flightList;
       }
-
+  
       if (journey_type === 3) {
-        // Domestic or International
-        return result[0].Segments;
+        // Domestic or International multiple segments
+        const segment = await this.segmentsFromResultArray(result[0]?.Segments);
+        return segment;
       }
-      // return result;
-
+  
+      // If journey_type is invalid
+      throw new Error("Invalid journey type provided");
     } catch (error) {
-      console.log("Error in segment type ", error);
-      throw ('Invalid travel type or data structure');
+      console.error("Error in fetchSegmentsDataAsPerJourneyType:", error.message);
+      throw new Error("Invalid travel type or data structure");
     }
-
   }
+  
 
   private extractFlightData(response: TBOResponse): FlightDetails[] {
     try {
@@ -247,12 +271,44 @@ export class SearchFlightService {
     }
   }
 
-  private segmentsFromResultArray(result){
-    let flight_listing = [];
-    flight_listing = result.map((element)=>{
-      // console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<<"< JSON.stringify(element));
-      return flight_listing.push(element);
-    })
-    return flight_listing
+  async segmentsFromResultArray(result) {
+    if (!Array.isArray(result)) {
+      throw new Error("Invalid input: 'result' must be an array.");
+    }
+  
+    const flight_listing = result.flatMap(element =>
+      Array.isArray(element.Segments)
+        ? element.Segments.map(segment => segment) // Process segments
+        : []
+    );
+  
+    return flight_listing;
+  }
+
+  async uploadAirport(file) {
+    try {
+      if (!file) {
+        throw { message: "No file uploaded. Please upload an Excel file.", statusCode: ERROR_CODES.BAD_REQUEST };
+      }
+       // Define the folder path
+       const uploadDir = path.join(__dirname, 'uploads');
+
+       // Check if the folder exists, if not create it
+       if (!fs.existsSync(uploadDir)) {
+           fs.mkdirSync(uploadDir, { recursive: true });  // This creates the directory if it doesn't exist
+           console.log("Created uploads directory");
+       }
+
+       const uploadPath = path.join(uploadDir, file.originalname);
+       fs.writeFileSync(uploadPath, file.buffer);  // Save the file
+
+       console.log("File saved to:", uploadPath);
+       await this.searchrepositoryService.uploadExcelData(uploadPath);
+      return { message: "Uploaded airport successfully", data: null };
+    } catch (error) {
+      console.log("error in the upload file", error.message);
+      throw error;
+    }
+
   }
 }  
