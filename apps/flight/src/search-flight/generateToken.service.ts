@@ -7,7 +7,7 @@ import { Cache } from 'cache-manager';
 
 @Injectable()
 export class GenerateTokenService {
-    // private tbo_credentials: FLIGHTDATA | undefined=undefined;
+
     private tbo_token: string
     constructor(
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
@@ -30,7 +30,7 @@ export class GenerateTokenService {
             }
 
             const result = await axios.post(base_url, payload)
-            await this.setCache(ip_address,result.data.TokenId);
+            await this.setCache(`tboToken:${ip_address}`,result.data.TokenId);
             return this.tbo_token;
            
         } catch (error) {
@@ -43,7 +43,7 @@ export class GenerateTokenService {
         try {
             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
             return tbo_credentials as FLIGHTDATA
-        }catch(error){
+        } catch(error){
             console.log("Error in the generate token", error);
             throw error
         }
@@ -53,12 +53,12 @@ export class GenerateTokenService {
     async getToken(ip_address: string) {
         try {
            
-            let token = await this.getCache(ip_address);
+            let token = await this.getCache(`tboToken:${ip_address}`);
             const tbo_credentials = await this.getTBOCredentials();
             if (!token) {
                 await this.generateTBOToken(ip_address);
 
-                token = await this.getCache(ip_address);
+                token = await this.getCache(`tboToken:${ip_address}`);
             }
             
             const payload = {
@@ -75,14 +75,19 @@ export class GenerateTokenService {
     }
     
 
-    async setCache(ip_address: string, token: string,) {
-        const ip_key = `tboToken:${ip_address}`
-        await this.cacheManager.set(ip_key, `${token}`,  82800); // ttl in seconds
+    async setCache(key: string, token: string,) {
+    
+        await this.cacheManager.set(key, `${token}`,  82800); // ttl in seconds
     }
 
-    async getCache(ip_address: string) {
-        const ip_key = `tboToken:${ip_address}`
-        const value = await this.cacheManager.get(`${ip_key}`); // ttl in seconds
+    async getCache(key: string) {
+     
+        const value = await this.cacheManager.get(`${key}`); // ttl in seconds
         return value
+    }
+
+    async deleteCache(key: string) {
+        const value = await this.cacheManager.del(key);
+        return value; 
     }
 }

@@ -14,7 +14,7 @@ export class HTTPSTboAPIService {
             const result = await axios.post(baseURL, payload);
             return result.data;
         }catch(error){
-            console.log("Error in AXIOS api call", error);
+            console.log("Error in AXIOS api call", error.message);
             throw error.message;
         }
     }
@@ -45,14 +45,9 @@ export class HTTPSTboAPIService {
                 cabin_class
             } = body;
            
-            console.log("?>>>", journey_type);
 
             const segments = await this.generateSegments({ journey_type, origin,  destination, departure_date, return_date, multicity, cabin_class,preferred_time});
-            
-            console.log(">>>>>>>>>>>>>>>>",
-                segments
-            )
-           
+        
             const payload: IFlightSearch = {
                 EndUserIp: base_ip,
                 TokenId: token,
@@ -67,7 +62,7 @@ export class HTTPSTboAPIService {
                 Sources: null,
             };
           
-           console.log(">>>>>>>>>", JSON.stringify(payload));
+          
             const response = await this.httpAPICall(base_url, payload);
 
           

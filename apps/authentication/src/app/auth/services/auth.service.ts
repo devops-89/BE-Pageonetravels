@@ -349,7 +349,7 @@ console.log(">>>>>>>>",userStatus)
             };
 
             const otpId = await this.OtpVerificationModel.addOtpVerificationRequest(otpObj);
-            console.log(">>>>>>>>>>", full_name, OTP)
+
             const emailTemplate = otpVerificationTemplate(full_name, OTP);
             await this.EmailService.sendEmail(email, 'Email Verification', emailTemplate.html);
 
