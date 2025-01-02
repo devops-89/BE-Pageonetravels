@@ -68,29 +68,65 @@ export class UserService {
     }
   }
 
+  // async insertOrUpdateUserAddress(payload: JWTPayload, address) {
+  //   try {
+
+  //     const { reference_id } = payload;
+  //     const { address_id } = address;
+  //     // let { street, houseNo, country, city, state, postalCode, addressType } = address
+  //     // const userDetails = await this.userRepositoryService.getUserByUserId(referenceId);
+
+  //     if (address_id) {
+  //       const updateAdd = await this.addressRepository.updateAddress(address);
+  //       // const updateAdd = await this.userRepositoryService.updateUserAddress(address_id, referenceId)
+  //       return { message: "Address updated", data: updateAdd }
+
+  //     } else {
+  //       const newAdd = await this.addressRepository.insertAddress(address);
+  //       const savedAdd = await this.userRepositoryService.updateUserAddress(newAdd.id, reference_id)
+  //       return { message: "Address updated", data: savedAdd }
+  //     }
+
+  //   } catch (error) {
+  //     console.log('Error in update user address', error);
+  //     throw error;
+  //   }
+  // }
 
   async insertOrUpdateUserAddress(payload: JWTPayload, address) {
     try {
+        const { reference_id } = payload; // Assuming `reference_id` maps to the user ID
+        const { address_id, ...addressFields } = address;
 
-      const { reference_id } = payload;
-      const { address_id } = address;
-      // let { street, houseNo, country, city, state, postalCode, addressType } = address
-      // const userDetails = await this.userRepositoryService.getUserByUserId(referenceId);
+        if (address_id) {
+            const existingAddress = await this.addressRepository.getAddressesById(address_id);
 
-      if (address_id) {
-        const updateAdd = await this.addressRepository.updateAddress(address);
-        // const updateAdd = await this.userRepositoryService.updateUserAddress(address_id, referenceId)
-        return { message: "Address updated", data: updateAdd }
+            if (!existingAddress) {
+                throw new Error("Address not found for the given ID");
+            }
 
-      } else {
-        const newAdd = await this.addressRepository.insertAddress(address);
-        const savedAdd = await this.userRepositoryService.updateUserAddress(newAdd.id, reference_id)
-        return { message: "Address updated", data: savedAdd }
-      }
+            const updatedAddress = {
+                ...existingAddress,
+                ...addressFields,
+                id: address_id,
+                user_id: reference_id,
+            };
 
+            await this.addressRepository.updateAddress(updatedAddress);
+            return { message: 'Address updated successfully' };
+        } else {
+            
+            const newAddress = await this.addressRepository.insertAddress({
+                ...addressFields,
+                user_id: reference_id,
+            });
+            
+
+            return { message: 'Address inserted successfully', data: newAddress };
+        }
     } catch (error) {
-      console.log('Error in update user address', error);
-      throw error;
+        console.error('Error inserting/updating address:', error);
+        throw error;
     }
   }
 

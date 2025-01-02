@@ -371,11 +371,12 @@ console.log(">>>>>>>>",userStatus)
 
     async loginWithEmailOrPhonePassword(input: LoginDto,device_type: string): Promise<ApiResponse.ApiOK> {
         try {
+            input.identity = input.identity.toLowerCase()
             const { identity, password, country_code } = input;
     
             if (validateEmail(identity)) {
-                const email = identity.toLowerCase();
-                const user = await this.UserModel.getUserByEmail(email);
+                
+                const user = await this.UserModel.getUserByEmail(identity);
                 if (!user) {
                 throw {
                         message: LOGIN_MSG.INVALID_EMAIL_PASSWORD,

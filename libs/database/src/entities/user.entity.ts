@@ -69,9 +69,13 @@ export class User {
   @OneToMany(() => OtpVerification, (o) => o.user)
   otp_verifications: OtpVerification[]
 
-  @OneToMany(() => Address, address => address.user, { cascade: true, nullable: true })
-  @JoinColumn({ name: 'address_id' })
-  addresses: Address[]
+  // @OneToMany(() => Address, address => address.user, { cascade: true, nullable: true })
+  // @JoinColumn({ name: 'address_id' })
+  // addresses: Address[]
+
+  @OneToMany(() => Address, (address) => address.user)
+  addresses: Address[];
+  
 
   @OneToMany(() => LoginSession, session => session.user)
   login_sessions: LoginSession[];

@@ -35,11 +35,11 @@ export class Notifications {
   @Column()
   state: string
 
-  @Column({
-    type: 'enum',
-    enum: ["OFFICE", "HOME", "OTHER"],
-    default: "HOME"
-  })
-  address_type: string
+  // @Column({
+  //   type: 'enum',
+  //   enum: ["OFFICE", "HOME", "OTHER"],
+  //   default: "HOME"
+  // })
+  // address_type: string
 
 }

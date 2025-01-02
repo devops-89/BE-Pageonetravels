@@ -313,6 +313,23 @@ export class UserRepositoryService {
         }
     }
 
+    // async updateUserAddress(address_id: string, user_id: string) {
+    //     try {
+    //         // Prepare the fields for the update
+    //         const fields = address_id ? { address: { id: address_id } } : {};
+    
+    //         // Update the user record with the new address reference
+    //         const savedAdd = await this.userRepository.update({ id: user_id }, fields);
+    
+    //         // Return the updated record or status
+    //         return savedAdd;
+    //     } catch (error) {
+    //         console.error("Error in updating user address:", error);
+    //         throw error;
+    //     }
+    // }
+    
+
     async getUsersWithFilters(filter: UserFilterDto, pagination: PaginationDto): Promise<IPaginationObject> {
         try {   
             const { user_type, search, status } = filter;

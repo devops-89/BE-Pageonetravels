@@ -34,8 +34,8 @@ export class InsertAddressDto {
     @IsOptional()
     address_id:string
 
-    @IsString()
-    address_type: string
+    // @IsString()
+    // address_type: string
   }
 
 
@@ -80,9 +80,9 @@ export class InsertAddressDto {
     @IsOptional()
     isdefault:boolean
 
-    @IsString()
-    @IsOptional()
-    address_type: string
+    // @IsString()
+    // @IsOptional()
+    // address_type: string
   }
 
   export class GetAddressByIdDto {
