@@ -9,7 +9,7 @@ export class Airport {
   @Column({ type: 'timestamp', default: () => 'now()' })
   created_at: Date
 
-  @Column({ })
+  @Column({ unique: true })
   iata_code: string
 
   @Column({})

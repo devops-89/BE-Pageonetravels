@@ -3,7 +3,7 @@ import { extname } from "path";
 type fileCallback =  (arg0: Error, arg1: boolean) => void
 
 export const imageFileFilter = (req: Request, file: { originalname: string; }, callback: fileCallback) => {
-    if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp|xlsx)$/)) {
         return callback(new Error('Only image files are allowed!'), false);
     }
     callback(null, true);
