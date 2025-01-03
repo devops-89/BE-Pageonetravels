@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { ERROR_CODES, ErrorMessages } from '../constants/commonConstants';
 // import { serverConfig } from '../../../serverConfig/environment.config';
-import { JWTPayload, VerifyJWTTokenResult } from '../interfaces/authentication/jwtPayload.interface';
+import { JWTPayload, JWTPayloadForGuest, VerifyJWTTokenResult } from '../interfaces/authentication/jwtPayload.interface';
 import { ConfigService } from '../config/config.service';
 
 @Injectable()
@@ -22,6 +22,22 @@ export class JwtService {
   }
 
   public generateJWTToken(payload: Partial<JWTPayload>): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const { expiryTimeInSecs, JWTSecretKey } = this.getJWTTokenInfo();
+
+      jwt.sign(payload, Buffer.from(JWTSecretKey, 'base64'), { expiresIn: expiryTimeInSecs, algorithm: 'HS512' }, function (err: any, token: string | PromiseLike<string>) {
+        if (err || !token) {
+          reject({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: 'Error while creating JWT token', extraError: err });
+          return;
+        } else {
+          resolve(token);
+          return;
+        }
+      });
+    });
+  }
+
+  public generateGuestJWTToken(payload: Partial<JWTPayloadForGuest>): Promise<string> {
     return new Promise((resolve, reject) => {
       const { expiryTimeInSecs, JWTSecretKey } = this.getJWTTokenInfo();
 

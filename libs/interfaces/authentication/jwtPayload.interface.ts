@@ -11,6 +11,11 @@ export interface JWTPayload
     user_type: USER_TYPE,
     token_type: TOKEN_TYPE
 }
+export interface JWTPayloadForGuest
+{
+    guest_id: string,
+    token_type: TOKEN_TYPE
+}
 
 export interface VerifyJWTTokenResult
 {
