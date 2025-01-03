@@ -1,4 +1,4 @@
-import { Controller, Req, Body, ValidationPipe, Res, Get, Post, UploadedFile, UseInterceptors} from '@nestjs/common';
+import { Controller, Req, Body, ValidationPipe, Res, Get, Post, UploadedFile, UseInterceptors, Query} from '@nestjs/common';
 import { SearchFlightService } from './search-flight.service';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { SearchFlightDto } from '../../../../libs/dtos/flight/search-flights.dto';
@@ -28,10 +28,10 @@ export class SearchFlightController {
     @Get('/search-airport/:search_query')
     async searchAirport(
         // @Param('search_query ') searchQuery :string, 
-        @Req() req : Request, @Res() res : Response){
+        @Req() req : Request, @Res() res : Response, @Query('page') page :number, @Query('pageSize') pageSize:number){
         try {
             const {search_query} = req['params'];
-            const result = await this.searchflightsearvice.searchAirport(search_query);
+            const result = await this.searchflightsearvice.searchAirport(page, pageSize, search_query);
             return this.responseHandler.sendSuccessResponse(res, result);
         } catch(error){
             console.error("Failed in the search airport", error)
