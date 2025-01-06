@@ -18,7 +18,7 @@ export class SearchFlightService {
     private readonly searchrepositoryService: SearchRepositoryService,
     private readonly generateTokenService: GenerateTokenService,
     private readonly httptboapiservice: HTTPSTboAPIService
-  ) {
+    ) {
   }
 
 
@@ -282,12 +282,13 @@ export class SearchFlightService {
 
       const departure = flight.Segments && flight.Segments.length > 0 ? flight.Segments[0] : [];
       const arrival = flight.Segments && flight.Segments.length > 1 ? flight.Segments[1] : [];
-
+      const airline_logo = await this.getAirlineLogo(flight.AirlineCode);
       const flightJson = {
         ResultIndex: flight.ResultIndex,
         TotalFare: flight.Fare.PublishedFare,
         Currency: flight.Fare.Currency,
-        Airline:"",
+        AirlineCode:flight.AirlineCode,
+        AirlineLogo: airline_logo,
         departure,
         arrival
       }
@@ -330,4 +331,22 @@ export class SearchFlightService {
   }
 
 }
+
+
+
+async getAirlineLogo(airlineCode: string) {
+  try {
+    const filePath = path.join('./../assets/AirlineLogo', `${airlineCode}.png`); // Assuming PNG format
+
+    if (fs.existsSync(filePath)) {
+      return filePath; // Return the file path if it exists
+    } else {
+      throw (`Logo for airline code "${airlineCode}" not found.`);
+    }
+  } catch (error) {
+    console.error(error.message);
+    return null; // Return null if the file doesn't exist or there's an error
+  }
+}
+
 }  
