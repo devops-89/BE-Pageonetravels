@@ -1,7 +1,7 @@
 import { Controller, Post, Req, Res, ValidationPipe, Body } from '@nestjs/common';
 import { FlightDetailService } from './flightdetail.service';
-import { ResponseHandlerService } from '../../../../../libs/response-handler/response-handler.service';
-import { FlightDetailRequestDto } from '../../../../../libs/dtos/flight/flight-detail.dto';
+import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
+import { FlightDetailRequestDto } from '../../../../libs/dtos/flight/flight-detail.dto';
 
 
 @Controller('flightdetail')
