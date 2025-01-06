@@ -30,7 +30,7 @@ export class GenerateTokenService {
             }
 
             const result = await axios.post(base_url, payload)
-            await this.setCache(`tboToken:${ip_address}`,result.data.TokenId);
+            await this.setCache(`tboToken:${ip_address}`,result.data.TokenId, 82800);
             return this.tbo_token;
            
         } catch (error) {
@@ -75,9 +75,9 @@ export class GenerateTokenService {
     }
     
 
-    async setCache(key: string, token: string,) {
+    async setCache(key: string, token: string, ttl: number) {
     
-        await this.cacheManager.set(key, `${token}`,  82800); // ttl in seconds
+        await this.cacheManager.set(key, `${token}`,  ttl); // ttl in seconds
     }
 
     async getCache(key: string) {

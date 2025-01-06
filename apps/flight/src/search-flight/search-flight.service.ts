@@ -65,7 +65,7 @@ export class SearchFlightService {
 
       await this.generateTokenService.deleteCache('airportList');
 
-      await this.generateTokenService.setCache('airportList', JSON.stringify(airport_list));
+      await this.generateTokenService.setCache('airportList', JSON.stringify(airport_list), 86400);
 
       return { message: "Airport List fetched", data: airport_list }
     } catch (error) {
@@ -155,15 +155,15 @@ export class SearchFlightService {
 
       const { FLIGHT_SEARCH: base_url, FLIGHT_ENDUSERIP: base_ip } = TBO_data;
 
-      const response = await this.httptboapiservice.searchFlightAPI(token, base_url, base_ip, {
+      const responsefromTBO = await this.httptboapiservice.searchFlightAPI(token, base_url, base_ip, {
         ...body,
         journey_type: assigned_journey_type,
         preferred_time: preferredTimeValue,
       });
 
-      const trans = await this.fetchSegmentsDataAsPerJourneyType(response, assigned_journey_type)
+      const trans = await this.fetchSegmentsDataAsPerJourneyType(responsefromTBO, assigned_journey_type)
 
-      // const transform_flight_list = this.extractFlightData(response);
+      await this.generateTokenService.setCache(`${origin}${destination}`, JSON.stringify(trans), 3600); // 1 minute
 
       return { message: "Flight list fetched successfully", data: trans };
 
@@ -179,6 +179,7 @@ export class SearchFlightService {
 
       const flightList = {};
       const result = response.Response?.Results?.[0];
+      const roundtrip_dometic_result = response.Response?.Results?.[1];
       const origin = response.Response?.Origin;
       const destination = response.Response?.Destination;
       const trace_id = response.Response?.TraceId;
@@ -188,29 +189,28 @@ export class SearchFlightService {
         throw `("result is empty")`;
       }
 
-
+      //Oneway 
       if (journey_type === 1) {
-        const segments = await this.segmentsFromResultArray(result);
-       
-        return { flight_list: segments, origin, destination, trace_id }; // Ensure you're returning the result here
-      }
-     
 
+        const segments = await this.handleFlightListingSegments(result);
+
+        return { flight_list: segments, origin, destination, trace_id };
+      }
+
+      //RoundTrip
       if (journey_type === 2) {
+
         if (response.Response?.Results?.length === 1) {
           //international flights 
-     
-          const { arrival_flight, departure_flight } = await this.getDepartureAndArrivalFlights(response.Response?.Results?.[0]);
-         
-          flightList['departure_flights'] = departure_flight;
 
-          flightList['arrival_flights'] = arrival_flight;
+          const { flightData } = await this.handleFlightListingSegments(result);
 
+          flightList['departure_flights'] = flightData
         } else {
           //domestic flights
 
-          const segment1 = await this.segmentsFromResultArray(result)
-          const segment2 = await this.segmentsFromResultArray(response.Response?.Results?.[1])
+          const segment1 = await this.handleFlightListingSegments(result)
+          const segment2 = await this.handleFlightListingSegments(roundtrip_dometic_result)
 
           flightList['departure_flights'] = segment1;
           flightList['arrival_flights'] = segment2
@@ -219,10 +219,11 @@ export class SearchFlightService {
         return { flight_list: flightList, origin, destination, trace_id };
       }
 
+      // Multicity
       if (journey_type === 3) {
-        // Domestic or International multiple segments
-        console.log("I am inside journey tyoe", journey_type);
-        const segment = await this.getDepartureAndArrivalFlightsForMulticity(result);
+
+        const segment = await this.handleFlightListingSegmentsForMulticity(result);
+
         return { flight_list: segment, origin, destination, trace_id };
       }
 
@@ -234,42 +235,34 @@ export class SearchFlightService {
   }
 
 
-  async segmentsFromResultArray(result) {
 
-    const flight_listing = result.flatMap(element =>
-      Array.isArray(element.Segments)
-        ? element.Segments.map(segment => segment) // Process segments
-        : []
-    );
-
-    return flight_listing;
-  }
-  
-  async getDepartureAndArrivalFlightsForMulticity(result) {
+  async handleFlightListingSegmentsForMulticity(searchflight) {
     try {
-    
-      const journeys = [];
-  
-      result?.forEach(item => {
-        item.Segments.forEach((segment, index) => {
-          // Dynamically create journey labels based on segment index
-          const journeyLabel = `journey${index + 1}`;
-  
-          // Create the segment object with the corresponding journey label
-          const flight = {
-            ...segment,
-            journey: journeyLabel,
-          };
-  
-          // Push the segment into the journeys array
-          journeys.push(flight);
-        });
-      });
-  
-      console.log("Journeys:", journeys);
-  
-      return { journeys };
-      
+
+      const flightData = []
+
+      for (const flight of searchflight) {
+
+        const flight_segment = [];
+
+        for (const segment of searchflight.Segments) {
+
+
+          flight_segment.push(segment);
+        }
+
+
+        const flightJson = {
+          ResultIndex: flight.ResultIndex,
+          flight_segment
+
+        }
+
+        flightData.push(flightJson)
+      }
+
+      return { flightData };
+
     } catch (error) {
       console.log("Error in getDepartureAndArrivalFlights", error);
       throw error;
@@ -277,29 +270,27 @@ export class SearchFlightService {
   }
   
 
-  async getDepartureAndArrivalFlights(result) {
+  async handleFlightListingSegments(searchflight) {
     try {
-      console.log("getDepartureAndArrivalFlights", Array.isArray(result));
-      // Separate departure and arrival flights
-      const departure_flight = result?.flatMap(item =>
-        item.Segments[0].map(segment => ({
-          ...segment,
-          flightType: 'departure'
-        }))
-      );
 
-      const arrival_flight = result?.flatMap(item =>
-        item.Segments[1].map(segment => ({
-          ...segment,
-          flightType: 'arrival' 
-        }))
-      );
+      const flightData = []
 
-      console.log("Departure Flights:", departure_flight[0]);
-      console.log("Arrival Flights:", arrival_flight[0]);
+      for (const flight of searchflight) {
 
+        const departure = flight.Segments && flight.Segments.length > 0 ? flight.Segments[0] : [];
+        const arrival = flight.Segments && flight.Segments.length > 1 ? flight.Segments[1] : [];
 
-      return { departure_flight, arrival_flight };
+        const flightJson = {
+          ResultIndex: flight.ResultIndex,
+          departure,
+          arrival
+
+        }
+
+        flightData.push(flightJson)
+      }
+
+      return { flightData };
 
     } catch (error) {
       console.log("Error in getDepartureAndArrivalFlights", error);
