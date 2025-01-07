@@ -1,14 +1,14 @@
-import { IsString, IsInt, Min, Max, IsOptional } from 'class-validator';
+import { IsString, IsInt, Min, Max, IsOptional, IsNumber } from 'class-validator';
 
-export class SearchHotelDto {
+export class HotelSearchDto {
   @IsString()
   location: string;
 
   @IsString()
-  check_in: string;
+  check_in_date: string;
 
   @IsString()
-  check_out: string;
+  check_out_date: string;
 
   @IsInt()
   @Min(1)
@@ -21,8 +21,26 @@ export class SearchHotelDto {
 
   @IsOptional()
   @IsString()
-  city?: string;
+  city: string;
 
   @IsString()
   ip_address: string;
+
+  @IsOptional()
+  @IsNumber()
+  adult_count:number;
+
+  @IsOptional()
+  @IsNumber()
+  child_count:number;
+
+
 }
+
+// export class BlockRoomDto {
+//   tokenId: string;
+//   traceId: string;
+//   roomIndices: number[]; // Room indices as per "Fixed" or "Open" combination
+//   isVoucherBooking: boolean; // True or false
+//   paxDetails: PaxDetails[];
+// }

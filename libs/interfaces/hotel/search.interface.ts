@@ -22,16 +22,32 @@ export interface HotelType {
     };
   }
   
+
+  export interface IHotelSearchPayload {
+    EndUserIp: string;
+    TokenId: string;
+    CheckInDate: string;
+    CheckOutDate: string;
+    City: string;
+    NoOfRooms: number;
+    AdultCount: number;
+    ChildCount?: number;
+    PreferredHotelBrand?: string;
+    Rating?: number;
+    PreferredAmenities?: string[];
+  }
+
   export interface IHotelSearch {
     city: string;
-    checkInDate: string; 
-    checkOutDate: string; 
-    adultCount: number; 
-    childCount: number;  
-    roomTypes?: string[]; 
-    preferredHotelBrand?: string; 
-    rating?: number; 
-    preferredAmenities?: string; 
+    check_in_date: string;
+    check_out_date: string;
+    adult_count: number;
+    child_count?: number;
+    roomTypes?: string[];
+    preferredHotelBrand?: string;
+    rating?: number;
+    ip_address:string;
+    preferredAmenities?: string[];
   }
   
   export interface HotelDetails {
@@ -45,15 +61,24 @@ export interface HotelType {
     availableRooms: number;
     roomType: string;
     totalPrice: number;
-    checkInDate: string;
-    checkOutDate: string;
+    check_in_date: string;
+    check_out_date: string;
   }
   
   export interface HotelSearchResponse {
+    Response: any;
     message: string;
     data: HotelDetails[];
     statusCode: number;
   }
+
+  export interface IFareRule {
+    "EndUserIp":string,
+    "TokenId": string,
+    "TraceId": string,
+    "ResultIndex": string
+  }
+  
   
 
   // export interface IHotelSearch {

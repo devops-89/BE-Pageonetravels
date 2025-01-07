@@ -6,3 +6,4 @@ export * from './commission.entity';
 export * from './settings.entity'
 export * from './airport.entity'
 export * from './guestUser.enity'
+export * from './hotel.entity'

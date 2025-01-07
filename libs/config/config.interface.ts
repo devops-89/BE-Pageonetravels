@@ -29,8 +29,10 @@ export interface ConfigAuthorizationData {
 export interface ServicesPort {
   authentication: number;
   flight: number;
-  userManagement: number
-  adminpanel: number
+  userManagement: number;
+  adminpanel: number;
+  hotel: number
+
 }
 
 export interface SMTP  {
@@ -98,8 +100,8 @@ export interface ConfigData {
   SERVER_BASE_PATH: string
   TWILIO_SECRETE: TWILIO_SECRETE
   FIREBASE_SERVICE_ACCOUNT:string,
-  PaypalCredentials :PaypalPaymentGatewayCred
-  RAZORPAY_CREDENTIAL :RAZORPAY
+  PaypalCredentials :PaypalPaymentGatewayCred,
+  RAZORPAY_CREDENTIAL :RAZORPAY,
   TBO_CREDENTIALS?: FLIGHTDATA
 }
 

@@ -72,6 +72,7 @@ export class ConfigService {
       flight: parseInt(env.FLIGHT_PORT, 10) || defaultConfig.flight,
       userManagement: parseInt(env.USER_MANAGEMENT) || defaultConfig.userManagement,
       adminpanel: parseInt(env.ADMIN_PANEL) || defaultConfig.adminpanel,
+      hotel: parseInt(env.HOTEL_PORT) || defaultConfig.hotel,
     };
   }
 
