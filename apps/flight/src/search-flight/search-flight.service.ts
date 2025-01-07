@@ -249,8 +249,6 @@ export class SearchFlightService {
       const flight_segment = [];
 
       for (const segment of searchflight.Segments) {
-
-
         flight_segment.push(segment);
       }
 
@@ -288,6 +286,10 @@ export class SearchFlightService {
         TotalFare: flight.Fare.PublishedFare,
         Currency: flight.Fare.Currency,
         AirlineCode:flight.AirlineCode,
+        FareType:flight.FareType,
+        IsLCC:flight.IsLCC,
+        IsRefundable:flight.IsRefundable,
+        GSTAllowed:flight.GSTAllowed,
         AirlineLogo: `https:dev.page1travels.com/flight/AirlineLogo/${flight.AirlineCode}.gif`,
         departure,
         arrival
