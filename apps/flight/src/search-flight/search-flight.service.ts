@@ -6,7 +6,7 @@ import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 import { GenerateTokenService } from './generateToken.service';
 import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
 import { JOURNEYTYPEMAPPING, TimeFilter } from '../../../../libs/constants/flightConstant'
-// import { AirportType } from '../../../../libs/interfaces/flight/search.interface';
+import { RedisCacheService } from "../../../../libs/redis-cache-service/redis-cache-service";
 import { FlightValidator } from './search-utility';
 import { AirportType } from '../../../../libs/interfaces/flight/search.interface';
 import path from 'path';
@@ -17,8 +17,9 @@ export class SearchFlightService {
   constructor(
     private readonly searchrepositoryService: SearchRepositoryService,
     private readonly generateTokenService: GenerateTokenService,
-    private readonly httptboapiservice: HTTPSTboAPIService
-  ) {
+    private readonly httptboapiservice: HTTPSTboAPIService,
+     private readonly rediscacheservice: RedisCacheService,
+    ) {
   }
 
 
@@ -26,7 +27,7 @@ export class SearchFlightService {
     try {
 
 
-      let airport_list: AirportType[] = await this.generateTokenService.getCache('airportList') as AirportType[];
+      let airport_list: AirportType[] = await this.rediscacheservice.getCache('airportList') as AirportType[];
 
 
       if (typeof airport_list === "string") {
@@ -63,9 +64,9 @@ export class SearchFlightService {
 
       const airport_list = await this.searchrepositoryService.searchAirport();
 
-      await this.generateTokenService.deleteCache('airportList');
+      await this.rediscacheservice.deleteCache('airportList');
 
-      await this.generateTokenService.setCache('airportList', JSON.stringify(airport_list));
+      await this.rediscacheservice.setCache('airportList', JSON.stringify(airport_list), 86400);
 
       return { message: "Airport List fetched", data: airport_list }
     } catch (error) {
@@ -103,235 +104,252 @@ export class SearchFlightService {
         return { message: "Total passengers should not exceed 9", statusCode: ERROR_CODES.BAD_REQUEST };
       }
 
+        switch (journey_type) {
 
-      switch (journey_type) {
+          case JOURNEYTYPEMAPPING.ONEWAY:
+            FlightValidator.validateOriginDestination(origin, destination);
+            FlightValidator.validateFutureDate(departure_date, "Departure date should be a future date.");
+            FlightValidator.validateCabinClass(cabin_class);
+            break;
 
-        case JOURNEYTYPEMAPPING.ONEWAY:
-          FlightValidator.validateOriginDestination(origin, destination);
-          FlightValidator.validateFutureDate(departure_date, "Departure date should be a future date.");
-          FlightValidator.validateCabinClass(cabin_class);
-          break;
+          case JOURNEYTYPEMAPPING.ROUNDTRIP:
+            FlightValidator.validateOriginDestination(origin, destination);
+            FlightValidator.validateFutureDate(departure_date, "Departure date should be a future date.");
+            FlightValidator.validateCabinClass(cabin_class);
+            FlightValidator.validateReturnDate(departure_date, return_date, "Departure date should be less than return date");
+            break;
 
-        case JOURNEYTYPEMAPPING.ROUNDTRIP:
-          FlightValidator.validateOriginDestination(origin, destination);
-          FlightValidator.validateFutureDate(departure_date, "Departure date should be a future date.");
-          FlightValidator.validateCabinClass(cabin_class);
-          FlightValidator.validateReturnDate(departure_date, return_date, "Departure date should be less than return date");
-          break;
-
-        case JOURNEYTYPEMAPPING.MULTICITY:
-          if (multicity.length === 0) {
-            throw new Error("Multicity journey requires at least one segment.");
-          }
-          multicity.forEach((segment, index) => {
-            FlightValidator.validateOriginDestination(segment.origin, segment.destination);
-            FlightValidator.validateFutureDate(segment.departure_date, `Segment ${index + 1}: Departure date should be a future date.`);
-            FlightValidator.validateCabinClass(segment.cabin_class);
-          });
-          break;
-      }
-
-
+          case JOURNEYTYPEMAPPING.MULTICITY:
+            if (multicity.length === 0) {
+              throw new Error("Multicity journey requires at least one segment.");
+            }
+            multicity.forEach((segment, index) => {
+              FlightValidator.validateOriginDestination(segment.origin, segment.destination);
+              FlightValidator.validateFutureDate(segment.departure_date, `Segment ${index + 1}: Departure date should be a future date.`);
+              FlightValidator.validateCabinClass(segment.cabin_class);
+            });
+            break;
+        }
+     
+      
       const preferredTimeMapping: Record<string, string> = {
-        [TimeFilter.Morning]: '08:00:00',
-        [TimeFilter.AfterNoon]: '14:00:00',
-        [TimeFilter.Evening]: '19:00:00',
-        [TimeFilter.Night]: '01:00:00',
-        [TimeFilter.AnyTime]: '00:00:00',
-      };
+      [TimeFilter.Morning]: '08:00:00',
+      [TimeFilter.AfterNoon]: '14:00:00',
+      [TimeFilter.Evening]: '19:00:00',
+      [TimeFilter.Night]: '01:00:00',
+      [TimeFilter.AnyTime]: '00:00:00',
+    };
 
-      const preferredTimeValue = preferredTimeMapping[preferred_time] || '00:00:00';
+    const preferredTimeValue = preferredTimeMapping[preferred_time] || '00:00:00';
 
-      const journeyTypeMapping: Record<string, number> = {
-        [JOURNEYTYPEMAPPING.ONEWAY]: 1,
-        [JOURNEYTYPEMAPPING.ROUNDTRIP]: 2,
-        [JOURNEYTYPEMAPPING.MULTICITY]: 3,
-      };
-      const assigned_journey_type = journeyTypeMapping[journey_type] || 1;
+    const journeyTypeMapping: Record<string, number> = {
+      [JOURNEYTYPEMAPPING.ONEWAY]: 1,
+      [JOURNEYTYPEMAPPING.ROUNDTRIP]: 2,
+      [JOURNEYTYPEMAPPING.MULTICITY]: 3,
+    };
+    const assigned_journey_type = journeyTypeMapping[journey_type] || 1;
 
+    // const search_response_from_cache = await this.generateTokenService.getCache(`${journey_type}${origin}${destination}`);
 
+    // if (search_response_from_cache) {
+    //   return { message: "Flight list fetched successfully", data: (search_response_from_cache) };
+    // }
 
-      const { token, TBO_data } = await this.generateTokenService.getToken(ip_address);
+    const { token, TBO_data } = await this.generateTokenService.getToken(ip_address);
 
-      const { FLIGHT_SEARCH: base_url, FLIGHT_ENDUSERIP: base_ip } = TBO_data;
+    const { FLIGHT_SEARCH: base_url, FLIGHT_ENDUSERIP: base_ip } = TBO_data;
 
-      const response = await this.httptboapiservice.searchFlightAPI(token, base_url, base_ip, {
-        ...body,
-        journey_type: assigned_journey_type,
-        preferred_time: preferredTimeValue,
-      });
+    const responsefromTBO = await this.httptboapiservice.searchFlightAPI(token, base_url, base_ip, {
+      ...body,
+      journey_type: assigned_journey_type,
+      preferred_time: preferredTimeValue,
+    });
 
-      const trans = await this.fetchSegmentsDataAsPerJourneyType(response, assigned_journey_type)
+    const trans = await this.fetchSegmentsDataAsPerJourneyType(responsefromTBO, assigned_journey_type)
 
-      // const transform_flight_list = this.extractFlightData(response);
+    await this.rediscacheservice.setCache(`${journey_type}${origin}${destination}`, JSON.stringify(trans), 3600) // 1 minute
 
-      return { message: "Flight list fetched successfully", data: trans };
+    return { message: "Flight list fetched successfully", data: trans };
 
-    } catch (error) {
-      console.log("Error in the search flight function", error);
-      throw error;
-    }
+  } catch(error) {
+    console.log("Error in the search flight function", error);
+    throw error;
   }
+}
 
 
   async fetchSegmentsDataAsPerJourneyType(response, journey_type: number) {
-    try {
+  try {
 
-      const flightList = {};
-      const result = response.Response?.Results?.[0];
-      const origin = response.Response?.Origin;
-      const destination = response.Response?.Destination;
-      const trace_id = response.Response?.TraceId;
+    const flightList = {};
+    const result = response.Response?.Results?.[0];
+    const roundtrip_dometic_result = response.Response?.Results?.[1];
+    const origin = response.Response?.Origin;
+    const destination = response.Response?.Destination;
+    const trace_id = response.Response?.TraceId;
 
-      if (!result) {
-        console.error("Invalid response structure or empty Results.");
-        throw `("result is empty")`;
-      }
-
-
-      if (journey_type === 1) {
-        const segments = await this.segmentsFromResultArray(result);
-       
-        return { flight_list: segments, origin, destination, trace_id }; // Ensure you're returning the result here
-      }
-     
-
-      if (journey_type === 2) {
-        if (response.Response?.Results?.length === 1) {
-          //international flights 
-     
-          const { arrival_flight, departure_flight } = await this.getDepartureAndArrivalFlights(response.Response?.Results?.[0]);
-         
-          flightList['departure_flights'] = departure_flight;
-
-          flightList['arrival_flights'] = arrival_flight;
-
-        } else {
-          //domestic flights
-
-          const segment1 = await this.segmentsFromResultArray(result)
-          const segment2 = await this.segmentsFromResultArray(response.Response?.Results?.[1])
-
-          flightList['departure_flights'] = segment1;
-          flightList['arrival_flights'] = segment2
-
-        }
-        return { flight_list: flightList, origin, destination, trace_id };
-      }
-
-      if (journey_type === 3) {
-        // Domestic or International multiple segments
-        console.log("I am inside journey tyoe", journey_type);
-        const segment = await this.getDepartureAndArrivalFlightsForMulticity(result);
-        return { flight_list: segment, origin, destination, trace_id };
-      }
-
-      throw result
-    } catch (error) {
-      console.error("Error in fetchSegmentsDataAsPerJourneyType:", error);
-      throw ("Invalid travel type or data structure");
-    }
-  }
-
-
-  async segmentsFromResultArray(result) {
-
-    const flight_listing = result.flatMap(element =>
-      Array.isArray(element.Segments)
-        ? element.Segments.map(segment => segment) // Process segments
-        : []
-    );
-
-    return flight_listing;
-  }
-  
-  async getDepartureAndArrivalFlightsForMulticity(result) {
-    try {
-    
-      const journeys = [];
-  
-      result?.forEach(item => {
-        item.Segments.forEach((segment, index) => {
-          // Dynamically create journey labels based on segment index
-          const journeyLabel = `journey${index + 1}`;
-  
-          // Create the segment object with the corresponding journey label
-          const flight = {
-            ...segment,
-            journey: journeyLabel,
-          };
-  
-          // Push the segment into the journeys array
-          journeys.push(flight);
-        });
-      });
-  
-      console.log("Journeys:", journeys);
-  
-      return { journeys };
-      
-    } catch (error) {
-      console.log("Error in getDepartureAndArrivalFlights", error);
-      throw error;
-    }
-  }
-  
-
-  async getDepartureAndArrivalFlights(result) {
-    try {
-      console.log("getDepartureAndArrivalFlights", Array.isArray(result));
-      // Separate departure and arrival flights
-      const departure_flight = result?.flatMap(item =>
-        item.Segments[0].map(segment => ({
-          ...segment,
-          flightType: 'departure'
-        }))
-      );
-
-      const arrival_flight = result?.flatMap(item =>
-        item.Segments[1].map(segment => ({
-          ...segment,
-          flightType: 'arrival' 
-        }))
-      );
-
-      console.log("Departure Flights:", departure_flight[0]);
-      console.log("Arrival Flights:", arrival_flight[0]);
-
-
-      return { departure_flight, arrival_flight };
-
-    } catch (error) {
-      console.log("Error in getDepartureAndArrivalFlights", error);
-      throw error
+    if (!result) {
+      console.error("Invalid response structure or empty Results.");
+      throw `("result is empty")`;
     }
 
+    //Oneway 
+    if (journey_type === 1) {
+
+      const segments = await this.handleFlightListingSegments(result);
+      return { segments, origin, destination, trace_id };
+    }
+
+    //RoundTrip
+    if (journey_type === 2) {
+
+      if (response.Response?.Results?.length === 1) {
+        //international flights 
+
+        const { flightData } = await this.handleFlightListingSegments(result);
+
+        flightList['departure_flights'] = flightData
+      } else {
+        //domestic flights
+
+        const segment1 = await this.handleFlightListingSegments(result)
+        const segment2 = await this.handleFlightListingSegments(roundtrip_dometic_result)
+
+        flightList['departure_flights'] = segment1;
+        flightList['arrival_flights'] = segment2
+
+      }
+      return { flight_list: flightList, origin, destination, trace_id };
+    }
+
+    // Multicity
+    if (journey_type === 3) {
+
+      const segment = await this.handleFlightListingSegmentsForMulticity(result);
+
+      return { flight_list: segment, origin, destination, trace_id };
+    }
+
+    throw result
+  } catch (error) {
+    console.error("Error in fetchSegmentsDataAsPerJourneyType:", error);
+    throw ("Invalid travel type or data structure");
   }
+}
+
+
+
+  async handleFlightListingSegmentsForMulticity(searchflight) {
+  try {
+
+    const flightData = []
+
+    for (const flight of searchflight) {
+
+      const flight_segment = [];
+
+      for (const segment of searchflight.Segments) {
+
+
+        flight_segment.push(segment);
+      }
+
+
+      const flightJson = {
+        ResultIndex: flight.ResultIndex,
+        flight_segment
+
+      }
+
+      flightData.push(flightJson)
+    }
+
+    return { flightData };
+
+  } catch (error) {
+    console.log("Error in getDepartureAndArrivalFlights", error);
+    throw error;
+  }
+}
+  
+
+  async handleFlightListingSegments(searchflight) {
+  try {
+
+    const flightData = []
+
+    for (const flight of searchflight) {
+
+      const departure = flight.Segments && flight.Segments.length > 0 ? flight.Segments[0] : [];
+      const arrival = flight.Segments && flight.Segments.length > 1 ? flight.Segments[1] : [];
+   
+      const flightJson = {
+        ResultIndex: flight.ResultIndex,
+        TotalFare: flight.Fare.PublishedFare,
+        Currency: flight.Fare.Currency,
+        AirlineCode:flight.AirlineCode,
+        AirlineLogo: `https:dev.page1travels.com/flight/AirlineLogo/${flight.AirlineCode}.gif`,
+        departure,
+        arrival
+      }
+
+      flightData.push(flightJson)
+    }
+
+    return { flightData };
+
+  } catch (error) {
+    console.log("Error in getDepartureAndArrivalFlights", error);
+    throw error
+  }
+
+}
 
   async uploadAirport(file) {
-    try {
-      if (!file) {
-        throw { message: "No file uploaded. Please upload an Excel file.", statusCode: ERROR_CODES.BAD_REQUEST };
-      }
-      // Define the folder path
-      const uploadDir = path.join(__dirname, 'uploads');
+  try {
+    if (!file) {
+      throw { message: "No file uploaded. Please upload an Excel file.", statusCode: ERROR_CODES.BAD_REQUEST };
+    }
+    // Define the folder path
+    const uploadDir = path.join(__dirname, 'uploads');
 
-      // Check if the folder exists, if not create it
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });  // This creates the directory if it doesn't exist
-        console.log("Created uploads directory");
-      }
-
-      const uploadPath = path.join(uploadDir, file.originalname);
-      fs.writeFileSync(uploadPath, file.buffer);  // Save the file
-
-      console.log("File saved to:", uploadPath);
-      await this.searchrepositoryService.uploadExcelData(uploadPath);
-      return { message: "Uploaded airport successfully", data: null };
-    } catch (error) {
-      console.log("error in the upload file", error.message);
-      throw error;
+    // Check if the folder exists, if not create it
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });  // This creates the directory if it doesn't exist
+      console.log("Created uploads directory");
     }
 
+    const uploadPath = path.join(uploadDir, file.originalname);
+    fs.writeFileSync(uploadPath, file.buffer);  // Save the file
+
+    console.log("File saved to:", uploadPath);
+    await this.searchrepositoryService.uploadExcelData(uploadPath);
+    return { message: "Uploaded airport successfully", data: null };
+  } catch (error) {
+    console.log("error in the upload file", error.message);
+    throw error;
   }
+
+}
+
+
+
+// async getAirlineLogo(airlineCode: string) {
+//   try {
+//     const filePath = path.join( __dirname, '../assets/AirlineLogo', `${airlineCode}.gif`); 
+    
+
+//     // need to set the path then send
+//     //server
+//     if (fs.existsSync(filePath)) {
+//       return filePath; 
+//     } else {
+//       throw (`Logo for airline code "${airlineCode}" not found.`);
+//     }
+//   } catch (error) {
+//     console.error(error.message);
+//     return null;
+//   }
+// }
+
 }  

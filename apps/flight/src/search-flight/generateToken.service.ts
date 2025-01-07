@@ -4,6 +4,7 @@ import { FLIGHTDATA } from "../../../../libs/config/config.interface";
 import axios from 'axios';
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Cache } from 'cache-manager';
+import { RedisCacheService } from "../../../../libs/redis-cache-service/redis-cache-service";
 
 @Injectable()
 export class GenerateTokenService {
@@ -12,6 +13,7 @@ export class GenerateTokenService {
     constructor(
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
         private readonly tboConfigService: TBO_CredentialsService,
+        private readonly rediscacheservice: RedisCacheService,
     ) {
     }
 
@@ -30,7 +32,7 @@ export class GenerateTokenService {
             }
 
             const result = await axios.post(base_url, payload)
-            await this.setCache(`tboToken:${ip_address}`,result.data.TokenId);
+            await this.rediscacheservice.setCache(`tboToken:${ip_address}`,result.data.TokenId, 82800);
             return this.tbo_token;
            
         } catch (error) {
@@ -53,12 +55,12 @@ export class GenerateTokenService {
     async getToken(ip_address: string) {
         try {
            
-            let token = await this.getCache(`tboToken:${ip_address}`);
+            let token = await this.rediscacheservice.getCache(`tboToken:${ip_address}`);
             const tbo_credentials = await this.getTBOCredentials();
             if (!token) {
                 await this.generateTBOToken(ip_address);
 
-                token = await this.getCache(`tboToken:${ip_address}`);
+                token = await this.rediscacheservice.getCache(`tboToken:${ip_address}`);
             }
             
             const payload = {
@@ -76,19 +78,5 @@ export class GenerateTokenService {
     
     
 
-    async setCache(key: string, token: string,) {
-    
-        await this.cacheManager.set(key, `${token}`,  82800); // ttl in seconds
-    }
 
-    async getCache(key: string) {
-     
-        const value = await this.cacheManager.get(`${key}`); // ttl in seconds
-        return value
-    }
-
-    async deleteCache(key: string) {
-        const value = await this.cacheManager.del(key);
-        return value; 
-    }
 }

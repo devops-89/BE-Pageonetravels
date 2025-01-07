@@ -3,6 +3,7 @@ import axios from "axios";
 import { SearchFlightDto } from "../dtos/flight/search-flights.dto";
 import { IFareRule, IFlightSearch, ISearchFlight } from "../interfaces/flight/search.interface";
 import { JOURNEY_TYPE } from "../../libs/constants/flightConstant";
+import fs  from 'fs';
 
 @Injectable()
 export class HTTPSTboAPIService {

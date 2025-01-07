@@ -7,10 +7,16 @@ import { BadRequestException, Logger, ValidationError, ValidationPipe } from '@n
 import { NestFactory } from '@nestjs/core';
 import {ConfigService } from '../../../libs/config/config.service';
 import { AppModule } from './app/app.module';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 // import { TBO_CredentialsService } from '../../../libs/loadtbo-db-config/tbo-config.service';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+  
+    const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+    app.useStaticAssets(join(__dirname, './assets'))
+    
     app.enableCors({
         origin: "*",
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",

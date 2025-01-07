@@ -7,10 +7,6 @@ export class FlightDetailRequestDto {
 
   @IsUUID()
   @IsNotEmpty()
-  token: string;
-
-  @IsUUID()
-  @IsNotEmpty()
   trace_id: string;
 
   @IsString()
