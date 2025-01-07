@@ -43,8 +43,8 @@ export const DEFAULT_CONFIG: ConfigData = {
         FLIGHT_SEARCH : '',
         FLIGHT_FARERULE : '',
         FLIGHT_FAREQUOTE : '',
-        FLIGHT_BOOKING : '',
-        FLIGHT_TICKET : '',
+        FLIGHT_BOOKING_API_FORNONLCC : '',
+        FLIGHT_TICKET_FORLCC : '',
         FLIGHT_BOOKING_DETAILS : '',
         FLIGHT_CALENDER_DETAILS : '',
       
@@ -53,5 +53,13 @@ export const DEFAULT_CONFIG: ConfigData = {
         FLIGHT_USERNAME :  '',
         FLIGHT_PASSWORD : '',
         FLIGHT_ENDUSERIP : '',
+
+        HOTEL_SEARCH: '',
+        HOTEL_INFO: '',
+        HOTEL_ROOM_INFO: '',
+        HOTEL_BLOCK_ROOM: '',
+        HOTEL_BOOK: '',
+        HOTEL_BOOKING_DETAILS: '',
+        GET_HOTELSTATICDATA: '',
     }
 };

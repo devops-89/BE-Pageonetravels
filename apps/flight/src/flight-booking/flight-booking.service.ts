@@ -20,8 +20,8 @@ export class FlightBookingService {
             console.log("Booking Details", body, passenger_details);
             const { token, TBO_data } = await this.generateTokenService.getToken(ip_address);
 
-            const LCC_base_url = TBO_data.FLIGHT_TICKET; //Non LCC only
-            const Non_LCC_base_url = TBO_data.FLIGHT_BOOKING; //Non LCC only
+            const LCC_base_url = TBO_data.FLIGHT_TICKET_FORLCC; //Non LCC only
+            const Non_LCC_base_url = TBO_data.FLIGHT_BOOKING_API_FORNONLCC; //Non LCC only
 
             console.log("Token", token);
 
@@ -48,7 +48,7 @@ export class FlightBookingService {
 
     //     const { token, TBO_data } = await this.generateTokenService.getToken(ip_address);
 
-    //     const booking_base_url = TBO_data.FLIGHT_TICKET //Non LCC only
+    //     const booking_base_url = TBO_data.FLIGHT_TICKET_FORLCC //Non LCC only
 
     //     console.log("Token", token);
 

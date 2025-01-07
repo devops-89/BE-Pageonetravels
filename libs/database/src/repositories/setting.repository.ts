@@ -24,6 +24,16 @@ export class SettingRepositoryService {
         }
     }
 
+    async getHotelKeysAndValues() {
+        try {
+            const doc = await this.settingRepository.findOne({where : { key : 'hotel_settings' }});
+            return doc;
+        } catch (error) {
+            console.error('Error fetching settings from the database:', error);
+            throw error;
+        }
+    }
+
     // async generateToken(){
     //     try {
     //         const result = this.configService.get().TBO_CREDENTIALS;
