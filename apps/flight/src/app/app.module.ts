@@ -3,10 +3,9 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SearchFlightModule } from '../search-flight/search-flight.module';
-// import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.module';
 import { CacheModule } from '@nestjs/cache-manager';
-// import { FlightdetailModule } from './flightdetail/flightdetail.module';
 import * as redisStore from 'cache-manager-redis-store';
+import { FlightdetailModule } from '../flightdetail/flightdetail.module';
 
 @Module({
     imports: [
@@ -23,7 +22,7 @@ import * as redisStore from 'cache-manager-redis-store';
             }),
         }),
         SearchFlightModule,
-        // FlightdetailModule,
+        FlightdetailModule,
     ],
     controllers: [AppController],
     providers: [AppService],

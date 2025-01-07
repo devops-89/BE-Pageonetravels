@@ -6,7 +6,7 @@ import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 import { GenerateTokenService } from './generateToken.service';
 import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
 import { JOURNEYTYPEMAPPING, TimeFilter } from '../../../../libs/constants/flightConstant'
-// import { AirportType } from '../../../../libs/interfaces/flight/search.interface';
+import { RedisCacheService } from "../../../../libs/redis-cache-service/redis-cache-service";
 import { FlightValidator } from './search-utility';
 import { AirportType } from '../../../../libs/interfaces/flight/search.interface';
 import path from 'path';
@@ -17,7 +17,8 @@ export class SearchFlightService {
   constructor(
     private readonly searchrepositoryService: SearchRepositoryService,
     private readonly generateTokenService: GenerateTokenService,
-    private readonly httptboapiservice: HTTPSTboAPIService
+    private readonly httptboapiservice: HTTPSTboAPIService,
+     private readonly rediscacheservice: RedisCacheService,
     ) {
   }
 
@@ -26,7 +27,7 @@ export class SearchFlightService {
     try {
 
 
-      let airport_list: AirportType[] = await this.generateTokenService.getCache('airportList') as AirportType[];
+      let airport_list: AirportType[] = await this.rediscacheservice.getCache('airportList') as AirportType[];
 
 
       if (typeof airport_list === "string") {
@@ -63,9 +64,9 @@ export class SearchFlightService {
 
       const airport_list = await this.searchrepositoryService.searchAirport();
 
-      await this.generateTokenService.deleteCache('airportList');
+      await this.rediscacheservice.deleteCache('airportList');
 
-      await this.generateTokenService.setCache('airportList', JSON.stringify(airport_list), 86400);
+      await this.rediscacheservice.setCache('airportList', JSON.stringify(airport_list), 86400);
 
       return { message: "Airport List fetched", data: airport_list }
     } catch (error) {
@@ -148,11 +149,11 @@ export class SearchFlightService {
     };
     const assigned_journey_type = journeyTypeMapping[journey_type] || 1;
 
-    const search_response_from_cache = await this.generateTokenService.getCache(`${journey_type}${origin}${destination}`);
+    // const search_response_from_cache = await this.generateTokenService.getCache(`${journey_type}${origin}${destination}`);
 
-    if (search_response_from_cache) {
-      return { message: "Flight list fetched successfully", data: (search_response_from_cache) };
-    }
+    // if (search_response_from_cache) {
+    //   return { message: "Flight list fetched successfully", data: (search_response_from_cache) };
+    // }
 
     const { token, TBO_data } = await this.generateTokenService.getToken(ip_address);
 
@@ -166,7 +167,7 @@ export class SearchFlightService {
 
     const trans = await this.fetchSegmentsDataAsPerJourneyType(responsefromTBO, assigned_journey_type)
 
-    await this.generateTokenService.setCache(`${journey_type}${origin}${destination}`, JSON.stringify(trans), 3600) // 1 minute
+    await this.rediscacheservice.setCache(`${journey_type}${origin}${destination}`, JSON.stringify(trans), 3600) // 1 minute
 
     return { message: "Flight list fetched successfully", data: trans };
 
@@ -196,8 +197,7 @@ export class SearchFlightService {
     if (journey_type === 1) {
 
       const segments = await this.handleFlightListingSegments(result);
-
-      return { flight_list: segments, origin, destination, trace_id };
+      return { segments, origin, destination, trace_id };
     }
 
     //RoundTrip
@@ -282,13 +282,13 @@ export class SearchFlightService {
 
       const departure = flight.Segments && flight.Segments.length > 0 ? flight.Segments[0] : [];
       const arrival = flight.Segments && flight.Segments.length > 1 ? flight.Segments[1] : [];
-      const airline_logo = await this.getAirlineLogo(flight.AirlineCode);
+   
       const flightJson = {
         ResultIndex: flight.ResultIndex,
         TotalFare: flight.Fare.PublishedFare,
         Currency: flight.Fare.Currency,
         AirlineCode:flight.AirlineCode,
-        AirlineLogo: airline_logo,
+        AirlineLogo: `https:dev.page1travels.com/flight/AirlineLogo/${flight.AirlineCode}.gif`,
         departure,
         arrival
       }
@@ -334,19 +334,22 @@ export class SearchFlightService {
 
 
 
-async getAirlineLogo(airlineCode: string) {
-  try {
-    const filePath = path.join('./../assets/AirlineLogo', `${airlineCode}.png`); // Assuming PNG format
+// async getAirlineLogo(airlineCode: string) {
+//   try {
+//     const filePath = path.join( __dirname, '../assets/AirlineLogo', `${airlineCode}.gif`); 
+    
 
-    if (fs.existsSync(filePath)) {
-      return filePath; // Return the file path if it exists
-    } else {
-      throw (`Logo for airline code "${airlineCode}" not found.`);
-    }
-  } catch (error) {
-    console.error(error.message);
-    return null; // Return null if the file doesn't exist or there's an error
-  }
-}
+//     // need to set the path then send
+//     //server
+//     if (fs.existsSync(filePath)) {
+//       return filePath; 
+//     } else {
+//       throw (`Logo for airline code "${airlineCode}" not found.`);
+//     }
+//   } catch (error) {
+//     console.error(error.message);
+//     return null;
+//   }
+// }
 
 }  

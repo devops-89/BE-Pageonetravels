@@ -2,11 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
 import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
 import { FlightDetailRequestDto } from '../../../../libs/dtos/flight/flight-detail.dto'
+import { GenerateTokenService } from '../search-flight/generateToken.service';
 
 @Injectable()
 export class FlightDetailService {
-    constructor(private readonly httptboapiservice: HTTPSTboAPIService,
+    constructor(
+        private readonly httptboapiservice: HTTPSTboAPIService,
         private readonly tboConfigService: TBO_CredentialsService,
+        private readonly generateTokenService: GenerateTokenService
 
     ) { }
 
@@ -14,8 +17,11 @@ export class FlightDetailService {
     async FareRule(body: FlightDetailRequestDto) {
         try {
 
-            const { ip_address, token, trace_id, result_index } = body;
+            const { ip_address, trace_id, result_index } = body;
 
+            const { token } = await this.generateTokenService.getToken(ip_address);
+            console.log("Token", token);
+            
             const payload_request = {
 
                 "EndUserIp": ip_address,
@@ -42,8 +48,9 @@ export class FlightDetailService {
     async FlightDetail(body: FlightDetailRequestDto) {
         try {
 
-            const { ip_address, token, trace_id, result_index } = body;
-
+            const { ip_address, trace_id, result_index } = body;
+            const { token } = await this.generateTokenService.getToken(ip_address);
+            console.log("Token", token);
             const payload_request = {
 
                 "EndUserIp": ip_address,

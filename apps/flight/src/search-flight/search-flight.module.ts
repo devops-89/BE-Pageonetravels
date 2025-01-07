@@ -10,12 +10,15 @@ import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.m
 import { GenerateTokenService } from './generateToken.service';
 import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
 import { HTTPSTboAPIService } from "../../../../libs/http-api-service/tbo-api-service";
+import { RedisCacheServiceModule } from "../../../../libs/redis-cache-service/redis-cache-module";
+import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 
 @Module({
     imports:[
         DBModule.forRoot(),
         ConfigModule,
         ResponseHandlerModule,
+        RedisCacheServiceModule,
         TBOConfigModule.register(),    
         TypeOrmModule.forFeature([
             Setting,
@@ -25,6 +28,6 @@ import { HTTPSTboAPIService } from "../../../../libs/http-api-service/tbo-api-se
         ]),
     ],
     controllers: [SearchFlightController],
-    providers: [SearchFlightService, GenerateTokenService, TBO_CredentialsService, HTTPSTboAPIService],
+    providers: [SearchFlightService, GenerateTokenService, TBO_CredentialsService, HTTPSTboAPIService, RedisCacheService],
 })
 export class SearchFlightModule {}
