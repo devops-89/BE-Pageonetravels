@@ -110,12 +110,19 @@ export interface FLIGHTDATA {
   FLIGHT_SEARCH : string
   FLIGHT_FARERULE : string
   FLIGHT_FAREQUOTE : string
-  FLIGHT_BOOKING : string
-  FLIGHT_TICKET : string
+  FLIGHT_BOOKING_API_FORNONLCC : string
+  FLIGHT_TICKET_FORLCC : string
   FLIGHT_BOOKING_DETAILS : string
   FLIGHT_CALENDER_DETAILS : string
   FLIGHT_CLIENT_ID :  string
   FLIGHT_USERNAME :  string
   FLIGHT_PASSWORD : string
-  FLIGHT_ENDUSERIP : string
+  FLIGHT_ENDUSERIP : string,
+  HOTEL_SEARCH: string;
+  HOTEL_INFO: string;
+  HOTEL_ROOM_INFO: string;
+  HOTEL_BLOCK_ROOM: string;
+  HOTEL_BOOK: string;
+  HOTEL_BOOKING_DETAILS: string;
+  GET_HOTELSTATICDATA: string;
 }

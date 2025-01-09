@@ -1,10 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, OneToMany, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, OneToMany, JoinColumn, OneToOne } from "typeorm";
 import "reflect-metadata";
 import { OtpVerification } from "./otpVerification.entity";
 import { Address } from "./address.entity";
 import { LoginSession } from "./loginSession.entity";
 import { IsDefined } from "class-validator";
 import { USER_ACCOUNT_STATUS, USER_TYPE, USER_VERIFY_STATUS } from "../../../constants/autenticationConstants/userContants";
+import { Passenger } from "./passenger.entity";
+import { Booking } from "./booking.entity";
+import { TransactionDetail } from "./transaction.entity";
 
 @Entity('user')
 export class User {
@@ -23,7 +26,22 @@ export class User {
   @IsDefined()
   @Index()
   email: string
-  
+
+  @Column({ nullable: true })
+  gst_number: string
+
+  @Column({ nullable: true })
+  gst_registered_company_name: string
+
+  @Column({ nullable: true })
+  gst_registered_address: string
+
+  @Column({ nullable: true })
+  gst_registered_email: string
+
+  @Column({ nullable: true })
+  gst_registered_mobile_number: string
+
   @Column({ nullable: true })
   @IsDefined()
   password: string
@@ -31,6 +49,17 @@ export class User {
   @Column({ nullable: true })
   @IsDefined()
   reference_id: string
+
+  
+  @Column({nullable: true})
+  is_cancel: boolean
+
+  @Column({ nullable: true })
+  is_refundable: boolean
+
+  @Column({ nullable: true })
+  is_LCC: boolean
+
 
   @Column({ nullable: true })
   @IsDefined()
@@ -76,6 +105,21 @@ export class User {
   @OneToMany(() => Address, (address) => address.user)
   addresses: Address[];
   
+
+  @OneToMany(() => TransactionDetail, transaction => transaction.user, { cascade: true, nullable: true })
+  @JoinColumn({ name: 'transaction_id' })
+  transaction: TransactionDetail[]
+
+
+  @OneToMany(() => Booking, booking => booking.user, { cascade: true, nullable: true })
+  @JoinColumn({ name: 'booking_id' })
+  booking: Booking[]
+
+
+  @OneToOne(() => Passenger, p => p.id, { cascade: true, nullable: true })
+  @JoinColumn({ name: 'passenger_id' })
+  passenger: Passenger
+
 
   @OneToMany(() => LoginSession, session => session.user)
   login_sessions: LoginSession[];

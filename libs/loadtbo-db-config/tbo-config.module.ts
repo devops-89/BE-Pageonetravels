@@ -5,30 +5,6 @@ import { DBModule } from '../../libs/database/src/database.module';
 import { Setting , SettingRepositoryService} from '../../libs/database/src/';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from 'libs/config/config.service';
-// import { SettingRepositoryService } from "../../libs/database/src/repositories/setting.repository";
-
-// const configFactory = {
-//   provide: TBO_CredentialsService,
-//   useFactory: () => {
-//     const config = new TBO_CredentialsService(SettingRepositoryService, ConfigService);
-//     config.getSettingValues();
-//     return config;
-//   },
-//   inject: [SettingRepositoryService, ConfigService],
-// };
-// @Module({
-//     imports:[ConfigModule,
-//         DBModule,
-//         TypeOrmModule.forFeature([
-//             Setting,
-//             SettingRepositoryService
-//         ])
-//     ],
-//     providers: [TBO_CredentialsService, SettingRepositoryService],
-//     exports: [TBO_CredentialsService]
-// })
-// export class TBOConfigModule {}
-
 
 
 
