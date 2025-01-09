@@ -1,9 +1,7 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
 import { FLIGHTDATA } from "../../../../libs/config/config.interface";
 import axios from 'axios';
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { Cache } from 'cache-manager';
 import { RedisCacheService } from "../../../../libs/redis-cache-service/redis-cache-service";
 
 @Injectable()
@@ -11,7 +9,6 @@ export class GenerateTokenService {
 
     private tbo_token: string
     constructor(
-        @Inject(CACHE_MANAGER) private cacheManager: Cache,
         private readonly tboConfigService: TBO_CredentialsService,
         private readonly rediscacheservice: RedisCacheService,
     ) {

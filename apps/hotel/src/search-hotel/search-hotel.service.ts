@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { GenerateTokenService } from './generateToken.service';
 import { HotelSearchDto } from '../../../../libs/dtos/hotel/search-hotel.dto';
-import { HotelSearchResponse } from '../../../../libs/interfaces/hotel/search.interface';
+
 import { HotelTBOAPIService } from '../../../../libs/http-api-service/hoteltbo-api-service';
+import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 
 @Injectable()
 export class SearchHotelService {
@@ -12,66 +13,105 @@ export class SearchHotelService {
   ) {}
 
 
-  async searchHotel(body: HotelSearchDto): Promise<HotelSearchResponse> {
+  async searchHotel(body) {
     try {
+      console.log("body", HotelSearchDto);
       const {
-        check_in_date,
-        check_out_date,
-        adult_count,
-        child_count,
+        // check_in_date,
+        // check_out_date,
+        // adult_count,
+        // child_count,
         ip_address,
-        country_code,
-        city,
-        preferred_currency,
-        guest_nationality,
-        room_guests,
-        result_count = 10,
-        max_rating = 5, 
-        min_rating = 1, 
-        token_id,
+        // country_code,
+        // city,
+        // preferred_currency,
+        // guest_nationality,
+        // room_guests,
+        // result_count = 10,
+        // max_rating = 5, 
+        // min_rating = 1, 
       } = body;
 
+      // console.log(payload)
+      if (body.adult_count < 1) {
+        throw {message:'At least one adult is required.', statusCode: ERROR_CODES.BAD_REQUEST};
+      }
+      if (body.adult_count < body.child_count) {
+        throw { message :'Number of adults should be greater than or equal to children.', statusCode:ERROR_CODES.BAD_REQUEST};
+      }
+      if (new Date(body.check_in_date) >= new Date(body.check_out_date)) {
+        throw {message :'Check-out date must be after check-in date.', statusCode: ERROR_CODES.BAD_REQUEST};
+      }
     
-      this.validateSearchRequest(body);
 
 
-      const token = token_id || await this.generateTokenService.generateHotelToken(ip_address);
+      const {token} = await this.generateTokenService.getToken(ip_address);
 
-      const noOfNights = this.calculateNoOfNights(check_in_date, check_out_date).toString(); // Convert to string
+      console.log("5000000000000000", token);
 
       const payload = {
-        EndUserIp: ip_address,
-        TokenId: token,
-        CheckInDate: this.formatDate(check_in_date),
-        CheckOutDate: this.formatDate(check_out_date),
-        NoOfNights: noOfNights, 
-        CountryCode: country_code,
-        CityId: city, 
-        NoOfRooms: room_guests.length.toString(),
-        AdultCount: adult_count,
-        ChildCount: child_count,
-        IsTBOMapped: 'true', 
-        ResultCount: result_count.toString(), // Convert result_count to a string
-        PreferredCurrency: preferred_currency,
-        GuestNationality: guest_nationality,
-        MaxRating: max_rating,
-        MinRating: min_rating,
-        ReviewScore: 0,
-        IsNearBySearchAllowed: false,
-        RoomGuests: room_guests.map((guest) => ({
-          NoOfAdults: guest.no_of_adults.toString(),
-          NoOfChild: guest.no_of_children.toString(),
-          ChildAge: guest.child_ages ? guest.child_ages.map(age => age.toString()) : [],
-        })),
-      };
+        "CheckIn": "2025-01-20",
+        "CheckOut": "2025-01-22",
+        "HotelCodes": "1279415",
+        "GuestNationality": "IN",
+        "PaxRooms": [
+            {
+                "Adults": 1,
+                "Children": 0,
+                "ChildrenAges": null
+            }
+     
+        ],
+        "ResponseTime": 23.0,
+        "IsDetailedResponse": true,
+        "Filters": {
+            "Refundable": false,
+            "NoOfRooms": 1,
+            "MealType": 0,
+            "OrderBy": 0,
+            "StarRating": 0,
+            "HotelName": null
+        }
+    }
+    
+      const hotel_search_base_url = "https://affiliate.tektravels.com/HotelAPI/Search";
+      console.log("hotel_search_base_url", hotel_search_base_url);
 
-      // API call to fetch hotel search results
-      console.log("Request payload:", payload);
-      const response = await this.hotelTBOAPIService.searchHotelAPI(token, process.env.HOTEL_SEARCH, payload);
-      console.log("Request payload:", payload);
+      const response = await this.hotelTBOAPIService.searchHotelAPI(payload, hotel_search_base_url)
+      // const noOfNights = this.calculateNoOfNights(check_in_date, check_out_date).toString();
+      // console.log("noOfNights", noOfNights);
+      // const payload = {
+      //   EndUserIp: ip_address,
+      //   TokenId: token,
+      //   CheckInDate: this.formatDate(check_in_date),
+      //   CheckOutDate: this.formatDate(check_out_date),
+      //   NoOfNights: noOfNights, 
+      //   CountryCode: country_code,
+      //   CityId: city, 
+      //   NoOfRooms: room_guests.length.toString(),
+      //   AdultCount: adult_count,
+      //   ChildCount: child_count,
+      //   IsTBOMapped: 'true', 
+      //   ResultCount: result_count.toString(), // Convert result_count to a string
+      //   PreferredCurrency: preferred_currency,
+      //   GuestNationality: guest_nationality,
+      //   MaxRating: max_rating,
+      //   MinRating: min_rating,
+      //   ReviewScore: 0,
+      //   IsNearBySearchAllowed: false,
+      //   RoomGuests: room_guests.map((guest) => ({
+      //     NoOfAdults: guest.no_of_adults.toString(),
+      //     NoOfChild: guest.no_of_children.toString(),
+      //     ChildAge: guest.child_ages ? guest.child_ages.map(age => age.toString()) : [],
+      //   })),
+      // };
 
-      // Return the parsed response
-      return this.parseHotelResponse(response);
+      // const response = await this.hotelTBOAPIService.searchHotelAPI(token,  payload);
+      // console.log("Request payload:", payload);
+
+      // // Return the parsed response
+      // const respons = await this.parseHotelResponse(response);
+      return {message :"Hotel Search List fetched successfully", data : response }
     } catch (error) {
       console.error('Error in searchHotel:', error);
       throw new Error('Error during hotel search: ' + error.message);
@@ -95,7 +135,7 @@ export class SearchHotelService {
   }
 
   // Parse the hotel search response
-  private parseHotelResponse(responseData): HotelSearchResponse {
+  private parseHotelResponse(responseData) {
     if (responseData.HotelSearchResult.ResponseStatus !== 1) {
       throw new Error(`API Error: ${responseData.HotelSearchResult.Error.ErrorMessage}`);
     }
@@ -124,16 +164,5 @@ export class SearchHotelService {
     return `${price.Amount} ${price.CurrencyCode}`;
   }
 
-  // Validate the search request input
-  private validateSearchRequest(body: HotelSearchDto) {
-    if (body.adult_count < 1) {
-      throw new Error('At least one adult is required.');
-    }
-    if (body.adult_count < body.child_count) {
-      throw new Error('Number of adults should be greater than or equal to children.');
-    }
-    if (new Date(body.check_in_date) >= new Date(body.check_out_date)) {
-      throw new Error('Check-out date must be after check-in date.');
-    }
-  }
+ 
 }

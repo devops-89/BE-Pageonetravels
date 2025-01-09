@@ -8,7 +8,6 @@ import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.m
 import { GenerateTokenService } from './generateToken.service';
 import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
 import { RedisCacheServiceModule } from "../../../../libs/redis-cache-service/redis-cache-module";
-import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 import { SearchHotelService } from './search-hotel.service';
 import { SearchHotelController } from './search-hotel.controller';
 import { HotelTBOAPIService } from '../../../../libs/http-api-service/hoteltbo-api-service';
@@ -27,6 +26,6 @@ import { HotelTBOAPIService } from '../../../../libs/http-api-service/hoteltbo-a
         ]),
     ],
     controllers: [SearchHotelController],
-    providers: [SearchHotelService, GenerateTokenService, TBO_CredentialsService, HotelTBOAPIService, RedisCacheService],
+    providers: [SearchHotelService, GenerateTokenService, TBO_CredentialsService, HotelTBOAPIService],
 })
 export class SearchHotelModule {}

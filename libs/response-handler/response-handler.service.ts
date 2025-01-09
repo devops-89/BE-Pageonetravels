@@ -10,7 +10,7 @@ export class ResponseHandlerService {
     res.status(200).json(response);
   }
 
-  sendErrorResponse(res: any, errorBody: ApiResponse.ApiErrorType) {
+  sendErrorResponse(res: any, errorBody: any) {
     console.error('Error Response: ', JSON.stringify(errorBody));
 
     if (!errorBody.status_code || !errorBody.message) {
