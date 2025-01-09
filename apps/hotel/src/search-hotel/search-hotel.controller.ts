@@ -1,38 +1,26 @@
- import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
-import { Controller, Post, Req, Res, Body,  ValidationPipe } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { SearchHotelService } from '../../../hotel/src/search-hotel/search-hotel.service';
+import { Controller, Post, Body, Req } from '@nestjs/common';
+import { SearchHotelService } from './search-hotel.service';
 import { HotelSearchDto } from '../../../../libs/dtos/hotel/search-hotel.dto';
+import { HotelSearchResponse } from '../../../../libs/interfaces/hotel/search.interface';
+import { GenerateTokenService } from './generateToken.service';
+import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 
 @Controller('/hotel')
-export class HotelController {
+export class SearchHotelController {
   constructor(
-    private readonly hotelDetailService: SearchHotelService,
+    private readonly searchHotelService: SearchHotelService,
+    private readonly generateTokenService: GenerateTokenService,
     private readonly responseHandler: ResponseHandlerService,
   ) {}
 
-  // @Get('/search-location/:location')
-  // async searchHotelByLocation(
-  //   @Req() req: Request, @Res() res: Response
-  // ) {
-  //   try {
-  //     const { location } = req['params'];
-  //     const result = await this.hotelDetailService.searchHotelByLocation(location);
-  //     return this.responseHandler.sendSuccessResponse(res, result);
-  //   } catch (error) {
-  //     console.error("Failed in search hotel by location", error);
-  //     return this.responseHandler.sendErrorResponse(res, error);
-  //   }
-  // }
-
-  @Post('/search-hotel')
-  async searchHotel(@Req() req: Request, @Body(new ValidationPipe()) body: HotelSearchDto, @Res() res: Response) {
+  @Post('/search')
+  async searchHotel(@Req() req: Request, @Body() body: HotelSearchDto): Promise<HotelSearchResponse> {
     try {
-      const result = await this.hotelDetailService.searchHotel(body);
-      return this.responseHandler.sendSuccessResponse(res, result);
+      const result = await this.searchHotelService.searchHotel(body);
+      return result;
     } catch (error) {
-      console.error("Error in search hotel", error);
-      return this.responseHandler.sendErrorResponse(res, error);
+      console.error('Error in hotel search', error);
+      throw error;
     }
   }
 }

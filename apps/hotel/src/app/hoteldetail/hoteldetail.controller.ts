@@ -6,7 +6,7 @@ import { ResponseHandlerService } from '../../../../../libs/response-handler/res
 import { HotelDetailRequestDto } from '../../../../../libs/dtos/hotel/hotel-detail.dto';
 
 @Controller('/hotel')
-export class SearchHotelController {
+export class HotelDetailController {
   constructor(
     private readonly HotelDetailService: HotelDetailService,
     private readonly responseHandler: ResponseHandlerService

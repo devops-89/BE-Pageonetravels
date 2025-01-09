@@ -1,5 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn, CreateDateColumn,
-  } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
   
   @Entity('hotel') // Replace 'hotel' with your actual table name
   export class Hotel {
@@ -29,9 +28,12 @@ import {Entity, Column, PrimaryGeneratedColumn, CreateDateColumn,
     available_rooms: number;
   
     @Column('simple-json')
-    amenities: string[]; // Stored as JSON
-  
-    @CreateDateColumn()
-    created_at: Date;
+    amenities: string[];
+    
+    @Column({ type: 'timestamp', default: () => 'now()' })
+    created_at: Date
+
+    @Column({ type: 'timestamp', default: () => 'now()' })
+    updated_at: Date
   }
   

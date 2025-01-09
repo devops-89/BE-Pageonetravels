@@ -42,7 +42,6 @@ export class ConfigService {
   }
 
 
-
   private parseDBConfig(env: NodeJS.ProcessEnv, defaultConfig: Readonly<ConfigDatabase> ) {
     return {
       host: process.env.DB_HOST || "",
