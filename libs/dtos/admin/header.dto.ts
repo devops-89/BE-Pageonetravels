@@ -21,14 +21,9 @@ export class UpdateHeaderDto{
     @IsNotEmpty()
     header_id: string
 
+    
     @IsString()
-    @IsNotEmpty()
-    favicon?: string;
+    @IsOptional()
+    header_links?: string
 
-    @IsString()
-    @IsNotEmpty()
-    header_logo?: string;
-
-    @IsString()
-    header_links: string
 }

@@ -6,7 +6,7 @@ import { ApiResponse } from '../interfaces/commonTypes/apiResponse.interface';
 export class ResponseHandlerService {
   sendSuccessResponse(res: any, response: ApiResponse.ApiOK) {
     // response.status_code = 200;
-    // response.success = true;
+    response.success = true;
     res.status(200).json(response);
   }
 

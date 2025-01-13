@@ -3,11 +3,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HomeController } from './home.controller';
 import { HomeService } from './home.service';
 import { ConfigModule } from '../../../../../libs/config/config.module';
-import { About, Banner,  DBModule, Faq, Festival, Footer, Offer, TabService, Social,Headers, Testimonial, HeaderRepositoryService } from '../../../../../libs/database/src';
+import { About, Banner,  DBModule, Faq, Festival, Footer, Offer, Social,Headers,OfferRepositoryService, Testimonial, HeaderRepositoryService,FestivalRepositoryService, TestimonialRepositoryService, AboutRepositoryService, FaqRepositoryService, SocialRepositoryService ,FooterRepositoryService } from '../../../../../libs/database/src';
 import { ResponseHandlerModule } from '../../../../../libs/response-handler/response-handler.module';
 import { AboutService } from './about.service';
 import { BannerService } from './banner.service';
 import { FaqService } from './faq.service';
+import { TabService } from './tab.service';
 import { FestivalService } from './festival.service';
 import { TestimonialService } from './testimonial.service';
 import { FooterService } from './footer.service';
@@ -26,6 +27,6 @@ import { S3FileService } from '../../../../../libs/S3-Service/s3File.service';
         ResponseHandlerModule 
     ],
     controllers: [HomeController],
-    providers: [HomeService,AboutService,HeaderRepositoryService,BannerService,FaqService,FestivalService,TabService, TestimonialService,FooterService,SocialService,OfferService,TokenValidationMiddleware,JwtService, HeaderService, S3FileService],
+    providers: [HomeService,AboutService,HeaderRepositoryService,FooterRepositoryService,FaqRepositoryService,SocialRepositoryService,AboutRepositoryService,TestimonialRepositoryService,OfferRepositoryService,FestivalRepositoryService ,BannerService,FaqService,TabService,FestivalService, TestimonialService,FooterService,SocialService,OfferService,TokenValidationMiddleware,JwtService, HeaderService, S3FileService],
 })
 export class HomeModule {} 

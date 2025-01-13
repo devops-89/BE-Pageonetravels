@@ -9,13 +9,16 @@ export class Footer{
     footer_image: string;
 
     @Column({ type: 'text', nullable: false })
-    footer_description: string;
-
-    @Column({ type: 'text', nullable: false })
     our_services: string;
 
     @Column({ type: 'text', nullable: false })
-    usefull_links: string;
+    company: string;
+
+    @Column({ type: 'text', nullable: false })
+    support: string;
+
+    @Column({ type: 'text', nullable: false })
+    destinations: string;
 
     @Column({ type: 'text', nullable: false })
     contact_address: string;

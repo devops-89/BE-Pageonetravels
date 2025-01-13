@@ -12,8 +12,8 @@ export class Faq{
     @Column({ type: 'text', nullable: false })
     faq_answer: string;
 
-    @Column({ type: 'boolean', default: true })
-    faq_status: boolean; 
+    @Column({  default: true })
+    faq_status: string; 
 
     @CreateDateColumn()
     created_at: Date;

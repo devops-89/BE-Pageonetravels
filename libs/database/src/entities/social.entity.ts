@@ -11,8 +11,8 @@ export class Social{
     @Column({ type: 'text', nullable: false })
     icon_link: string;
 
-    @Column({ type: 'boolean', default: true })
-    icon_status: boolean;
+    @Column({ default: true })
+    icon_status: string;
 
     @CreateDateColumn()
     created_at: Date;

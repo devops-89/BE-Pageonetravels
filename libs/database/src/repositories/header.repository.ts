@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Headers } from '../entities/headers.entity';
-import { Iheader } from '../../../../libs/interfaces/commonTypes/home.interface';
+import { Iheader, Uheader } from '../../../../libs/interfaces/commonTypes/home.interface';
+import { retry } from 'rxjs';
 
 @Injectable()
 export class HeaderRepositoryService {
@@ -40,6 +41,36 @@ export class HeaderRepositoryService {
             console.error('Error fetching header list:', error);
             throw new Error('Failed to fetch header list. Please try again later.');
       }
+  }
+
+  async getHeaderbyId(id:string):Promise<Headers>{
+    try{
+        const header = await this.headerRepository.findOne({ where: { header_id: id } });
+		return header;
+    }catch(error){
+        console.log(`Failed to retrive Headers: ${error.message}`);
+		throw error;
+    }
+  } 
+
+
+  async updateHeader(input: Uheader){
+    try{ 
+        const { header_id } = input;
+        // fetch the header entity to update
+        const existingHeader = await this.headerRepository.findOne({where : { header_id}});
+        if(!existingHeader){
+            throw `Header not found with ID: ${header_id}`;
+        }
+        // Assign new values to the existing header entity
+        Object.assign(existingHeader,input);
+        // Save the updated header 
+        const updatedHeader = await this.headerRepository.save(existingHeader);
+        return updatedHeader;
+    }catch(error){
+        console.log(`Failed to Updated header: ${error.message}`);
+        throw (`Failed to update commission: ${error.message}`);
+    }
   }
 
 }

@@ -4,6 +4,7 @@ import { FLIGHTDATA } from "../../../../libs/config/config.interface";
 import axios from 'axios';
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Cache } from 'cache-manager';
+import {RedisCach}
 
 @Injectable()
 export class GenerateTokenService {

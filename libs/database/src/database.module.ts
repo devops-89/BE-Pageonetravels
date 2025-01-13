@@ -11,7 +11,16 @@ import {
     CommissionRepositoryService,
     SettingRepositoryService,
     SearchRepositoryService,
-    HeaderRepositoryService
+    HeaderRepositoryService,
+    BannerRepositoryService,
+    TabRepositoryService,
+    FestivalRepositoryService,
+    OfferRepositoryService,
+    TestimonialRepositoryService,
+    AboutRepositoryService,
+    FaqRepositoryService,
+    SocialRepositoryService,
+    FooterRepositoryService
  
 } from './';
 import { User, OtpVerification, LoginSession, Address, Setting,Commission, Airport,Faq,Banner,About,Festival,Offer, Social, Testimonial,Footer,Headers,TabService } from './';
@@ -91,7 +100,16 @@ export class DBModule {
                 CommissionRepositoryService,
                 SettingRepositoryService,
                 SearchRepositoryService,
-                HeaderRepositoryService
+                HeaderRepositoryService,
+                BannerRepositoryService,
+                TabRepositoryService,
+                FestivalRepositoryService,
+                OfferRepositoryService,
+                TestimonialRepositoryService,
+                AboutRepositoryService,
+                FaqRepositoryService,
+                SocialRepositoryService,
+                FooterRepositoryService
                
             ],
             exports: [
@@ -102,7 +120,16 @@ export class DBModule {
                 CommissionRepositoryService,
                 SettingRepositoryService,
                 SearchRepositoryService,
-                HeaderRepositoryService
+                HeaderRepositoryService,
+                BannerRepositoryService,
+                TabRepositoryService,
+                FestivalRepositoryService,
+                OfferRepositoryService,
+                TestimonialRepositoryService,
+                AboutRepositoryService,
+                FaqRepositoryService,
+                SocialRepositoryService,
+                FooterRepositoryService
             ],
         };
     }

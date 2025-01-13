@@ -11,8 +11,8 @@ export class TabService{
     @Column({ type: 'varchar', length: 255, nullable: false })
     service_name: string;
 
-    @Column({ type: 'boolean', default: true })
-    service_status: boolean;    
+    @Column({  default: true })
+    service_status: string;    
 
     @CreateDateColumn()
     created_at: Date;

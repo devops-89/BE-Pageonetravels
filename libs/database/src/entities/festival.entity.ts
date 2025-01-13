@@ -14,8 +14,8 @@ export class Festival{
     @Column({ type: 'text', nullable: false })
     festival_discount: string;
 
-    @Column({ type: 'boolean', default: true })
-    festival_status: boolean; 
+    @Column({  default: true })
+    festival_status: string; 
 
     @CreateDateColumn()
     created_at: Date;

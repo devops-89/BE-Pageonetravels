@@ -23,7 +23,7 @@ export class UpdateCommissionDto{
 
     @IsString()
     @IsNotEmpty()
-    commission_id: string
+    commission_id: string 
 
 
     @IsString()
@@ -37,4 +37,4 @@ export class UpdateCommissionDto{
     @IsBoolean()
     @IsNotEmpty()
     status: boolean
-}
+} 

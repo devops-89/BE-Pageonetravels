@@ -17,6 +17,9 @@ export class Testimonial{
     @Column({ type: 'varchar', length: 255, nullable: false })
     testimonial_profession: string;
 
+    @Column({ default: false })
+    status: string;
+
     @CreateDateColumn()
     created_at: Date;
 
