@@ -61,8 +61,8 @@ export class PassengerDto {
     @IsDateString()
     date_of_birth: string;
 
-    @IsNumber()
-    gender: number;
+    @IsString()
+    gender: string;
 
     @IsString()
     passport_no: string;
@@ -71,30 +71,7 @@ export class PassengerDto {
     passport_expiry: string;
 
     @IsString()
-    address_line1: string;
-
-    @IsOptional()
-    @IsString()
-    address_line2: string;
-
-    // @ValidateNested()
-    // @Type(() => PassengerFareDto)
-    // fare: PassengerFareDto;
-
-    @IsString()
-    city: string;
-
-    @IsString()
-    country_code: string;
-
-    @IsString()
-    cell_country_code: string;
-
-    @IsString()
     contact_no: string;
-
-    @IsString()
-    nationality: string;
 
     @IsString()
     email: string;
@@ -109,6 +86,61 @@ export class PassengerDto {
     @IsOptional()
     @IsString()
     ff_number: string;
+}
+
+export class BookingDto {
+    @IsString()
+    result_index: string;
+
+    @IsString()
+    ip_address: string;
+
+    @IsString()
+    @IsNotEmpty()
+    is_LCC: boolean;
+
+    @IsString()
+    cell_country_code: string;
+
+    @IsString()
+    country_code: string;
+
+    @IsString()
+    city: string;
+
+    @IsString()
+    contact_no: string;
+
+    @IsString()
+    country: string
+
+    @IsString()
+    house_number: string;
+
+    @IsString()
+    postal_code: string;
+
+    @IsString()
+    street: string;
+
+    @IsString()
+    state: string;
+
+    @IsString()
+    nationality: string;
+
+    @IsString()
+    email: string;
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => PassengerDto)
+    passenger_details: PassengerDto[];
+
+
+    @IsString()
+    trace_id: string;
+
 
     @IsOptional()
     @IsString()
@@ -129,28 +161,10 @@ export class PassengerDto {
     @IsOptional()
     @IsString()
     gst_company_email: string;
+
+    @IsNumber()
+    base_fare: number;
+
+    @IsNumber()
+    tax: number;
 }
-
-export class BookingDto {
-    @IsString()
-    result_index: string;
-
-    @IsString()
-    ip_address: string;
-
-    @IsString()
-    @IsNotEmpty()
-    is_LCC: boolean;
-
-
-
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => PassengerDto)
-    passenger_details: PassengerDto[];
-
-
-    @IsString()
-    trace_id: string;
-}
-

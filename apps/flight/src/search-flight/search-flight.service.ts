@@ -19,8 +19,7 @@ export class SearchFlightService {
     private readonly generateTokenService: GenerateTokenService,
     private readonly httptboapiservice: HTTPSTboAPIService,
      private readonly rediscacheservice: RedisCacheService,
-    ) {
-  }
+    ) { }
 
 
   async searchAirport(page: number, pageSize: number, search_query: string): Promise<ApiResponse.ApiOK> {
@@ -175,7 +174,7 @@ export class SearchFlightService {
     console.log("Error in the search flight function", error);
     throw error;
   }
-}
+  }
 
 
   async fetchSegmentsDataAsPerJourneyType(response, journey_type: number) {
@@ -235,9 +234,7 @@ export class SearchFlightService {
     console.error("Error in fetchSegmentsDataAsPerJourneyType:", error);
     throw ("Invalid travel type or data structure");
   }
-}
-
-
+  }
 
   async handleFlightListingSegmentsForMulticity(searchflight) {
   try {
@@ -268,7 +265,7 @@ export class SearchFlightService {
     console.log("Error in getDepartureAndArrivalFlights", error);
     throw error;
   }
-}
+  }
   
 
   async handleFlightListingSegments(searchflight) {
@@ -290,6 +287,8 @@ export class SearchFlightService {
         IsLCC:flight.IsLCC,
         IsRefundable:flight.IsRefundable,
         GSTAllowed:flight.GSTAllowed,
+        IsGSTMandatory:flight.IsGSTMandatory,
+        // IsGSTMandatory:flight.IsGSTMandatory,
         AirlineLogo: `https:dev.page1travels.com/flight/AirlineLogo/${flight.AirlineCode}.gif`,
         departure,
         arrival
@@ -305,7 +304,7 @@ export class SearchFlightService {
     throw error
   }
 
-}
+  }
 
   async uploadAirport(file) {
   try {
@@ -331,27 +330,25 @@ export class SearchFlightService {
     console.log("error in the upload file", error.message);
     throw error;
   }
+  }
 
+  async flightPricingFilter(flightData, min_price:number, max_price:number){
+
+    try {
+      if(flightData && Array.isArray(flightData)){
+        return flightData.filter((flight)=>{
+          if(flight.TotalFare > min_price && flight.TotalFare < max_price){
+            return flight;
+          }
+        })
+      }
+      console.log("flightData", JSON.stringify(flightData));
+
+      return flightData;
+
+    }catch(error){
+      console.log("Search the Pricing Filter", error);
+      throw error
+    }
+  }
 }
-
-
-
-// async getAirlineLogo(airlineCode: string) {
-//   try {
-//     const filePath = path.join( __dirname, '../assets/AirlineLogo', `${airlineCode}.gif`); 
-    
-
-//     // need to set the path then send
-//     //server
-//     if (fs.existsSync(filePath)) {
-//       return filePath; 
-//     } else {
-//       throw (`Logo for airline code "${airlineCode}" not found.`);
-//     }
-//   } catch (error) {
-//     console.error(error.message);
-//     return null;
-//   }
-// }
-
-}  

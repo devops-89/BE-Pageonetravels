@@ -5,7 +5,8 @@ import { BookingDto } from '../../../../libs/dtos/flight/booking-flight.dto';
 
 @Controller('flight-booking')
 export class FlightBookingController {
-    constructor(private readonly responsehandlderservice:ResponseHandlerService,
+    constructor(
+        private readonly responsehandlderservice:ResponseHandlerService,
         private readonly flightBookingService:FlightBookingService
     ){}
 
@@ -15,7 +16,7 @@ export class FlightBookingController {
             const result = await this.flightBookingService.bookFlight(body);
             this.responsehandlderservice.sendSuccessResponse(res, result);
           
-        }catch(err) {
+        } catch(err) {
             console.log(err);
             this.responsehandlderservice.sendErrorResponse(err, err);
         }
