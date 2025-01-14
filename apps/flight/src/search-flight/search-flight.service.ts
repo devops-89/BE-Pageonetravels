@@ -164,6 +164,9 @@ export class SearchFlightService {
       preferred_time: preferredTimeValue,
     });
 
+    if(responsefromTBO && responsefromTBO.Response && responsefromTBO.Response.Error.ErrorMessage){
+      throw {message : responsefromTBO.Response.Error.ErrorMessage , statusCode:ERROR_CODES.BAD_REQUEST}
+    }
     const trans = await this.fetchSegmentsDataAsPerJourneyType(responsefromTBO, assigned_journey_type)
 
     await this.rediscacheservice.setCache(`${journey_type}${origin}${destination}`, JSON.stringify(trans), 3600) // 1 minute

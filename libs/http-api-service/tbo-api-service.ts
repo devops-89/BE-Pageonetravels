@@ -12,9 +12,10 @@ export class HTTPSTboAPIService {
     async httpAPICall(baseURL: string, payload: object) {
         try {
             const result = await axios.post(baseURL, payload);
+        
             return result.data;
         } catch (error) {
-            console.log("Error in AXIOS api call", error.message);
+            console.error("Error in AXIOS api call", error.message);
             throw error.message;
         }
     }
@@ -65,7 +66,7 @@ export class HTTPSTboAPIService {
             
 
             const response = await this.httpAPICall(base_url, payload)
-            console.log(response);
+
             return response;
 
         } catch (error) {
@@ -118,7 +119,7 @@ export class HTTPSTboAPIService {
                 },
             ];
         } catch (error) {
-            console.log("Error in the generate segments fucntion", error);
+            console.log("Error in the generate segments function", error);
             throw error
         }
 
@@ -128,6 +129,16 @@ export class HTTPSTboAPIService {
     async fareRule(baseurl: string, payload: IFareRule) {
         try {
             let result = await this.httpAPICall(baseurl, payload);
+            return result;
+        } catch (error) {
+            console.log(error);
+            throw error
+        }
+    }
+
+    async FlightSeatDetails(base_url:string, payload:IFareRule) {
+        try {
+            let result = await this.httpAPICall(base_url, payload);
             return result;
         } catch (error) {
             console.log(error);
@@ -201,6 +212,8 @@ export class HTTPSTboAPIService {
     async BookingFlightForLCC(baseurl: string, body: any) {
         try {
             const { result_index, ip_address, token, trace_id, Passengerss, agent_number } = body;
+            
+
             const payload =
             {
                 "PreferredCurrency": null,
@@ -209,9 +222,14 @@ export class HTTPSTboAPIService {
                 "EndUserIp": ip_address,
                 "TokenId": token,
                 "TraceId": trace_id,
-                "ResultIndex": result_index
+                "ResultIndex": result_index,
+
             }
-            let result = await this.httpAPICall(baseurl, payload);
+           
+
+            const result = await this.httpAPICall(baseurl, payload);
+
+
             return result;
 
         } catch (error) {

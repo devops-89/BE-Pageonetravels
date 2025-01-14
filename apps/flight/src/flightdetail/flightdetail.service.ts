@@ -65,11 +65,42 @@ export class FlightDetailService {
 
             const base_url = tbo_credentials.FLIGHT_FAREQUOTE;
 
-            const response = await this.httptboapiservice.fareRule(base_url, payload_request);
+            const response = await this.httptboapiservice.fareRule(base_url, payload_request) ;
 
-            await this.redisCacheService.setCache(`FlightDetail${guest_token}`, response, 3600);
-
+            await this.redisCacheService.setCache(`FlightDetail${guest_token}`, JSON.stringify(response), 3600);
+            
             return { message: "Fare Rules fetched successfully", data: response };
+
+        } catch (error) {
+            console.log("Error in the fare rule function", error);
+            throw error;
+        }
+    }
+
+    async FetchSeatMealBaggaeDetails(body: FlightDetailRequestDto) {
+        try {
+            const guest_token = "1ABCD"
+            const { ip_address, trace_id, result_index } = body;
+            const { token } = await this.generateTokenService.getToken(ip_address);
+            console.log("Token", token);
+            const payload_request = {
+
+                "EndUserIp": ip_address,
+                "TokenId": token,
+                "TraceId": trace_id,
+                "ResultIndex": result_index
+
+            }
+
+  
+
+            const base_url = 'http://api.tektravels.com/BookingEngineService_Air/AirService.svc/rest/SSR'
+
+            const response :[]= await this.httptboapiservice.FlightSeatDetails(base_url, payload_request);
+
+            await this.redisCacheService.setCache(`FlightDetail${guest_token}`, JSON.stringify(response), 3600);
+            
+            return { message: "Seat Details fetched successfully", data: response };
 
         } catch (error) {
             console.log("Error in the fare rule function", error);

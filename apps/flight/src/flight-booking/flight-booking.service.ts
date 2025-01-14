@@ -16,36 +16,69 @@ export class FlightBookingService {
 
     async bookFlight(body: BookingDto) {
         try {
-            //PassengerType = 1 means Adudt
-            //PassengerType = 2 child
-            //PassegngerType = 3 infant inside FareBreakdiown
-            //BaseFare devide by passengercount and tax is also devided by passenger count
+         
             const guest_token = "1ABCD";
            
-            const { ip_address, passenger_details,contact_no, is_LCC, email, city, country_code , country,
+            const { ip_address, passenger_details,contact_no, email, city, country_code , country,
                 nationality, house_number, postal_code,state,street, gst_company_address, gst_company_contact_number,
-                gst_company_email, gst_company_name, gst_number, cell_country_code, base_fare, tax
+                gst_company_email, gst_company_name, gst_number, base_fare, tax
             } = body;
 
 
             const address_line1= ` ${house_number} ${street}`;
             const address_line2 = `${state} ${postal_code}`;
-            // if(is_gst_mandatory== true){
-                //gst_mandatory = 
-            // }
+            
+            
             await this.redisCacheService.getCache(`FlightDetail${guest_token}`);
+
             const Passengers = [];
 
+            const flight_detailsData_cache = await this.redisCacheService.getCache(`FlightDetail${guest_token}`) as string
 
+            const parse_flight_details = JSON.parse(flight_detailsData_cache);
+
+           
+            const flight_details = parse_flight_details?.Response?.Results;
+           
             
-               
-          
+
+            const BaseFare = flight_details?.Fare?.BaseFare;
+            const Tax = flight_details?.Fare?.Tax;
+            const AdditionalTxnFeePub = flight_details?.Fare?.AdditionalTxnFeePub;
+            const YQTax = flight_details?.Fare?.YQTax;
+            const AdditionalTxnFeeOfrd = flight_details?.Fare?.AdditionalTxnFeeOfrd;
+            const Discount = flight_details?.Fare?.AdditionalTxnFeeOfrd;
+            const PublishedFare = flight_details?.Fare?.PublishedFare;
+            const OfferedFare = flight_details?.OfferedFare;
+            const TdsOnCommission = flight_details?.Fare?.TdsOnCommission;
+            const TdsOnPLB = flight_details?.Fare?.TdsOnPLB;
+            const TdsOnIncentive = flight_details?.Fare?.TdsOnIncentive;
+            const ServiceFee = flight_details?.Fare?.ServiceFee;
+            const OtherCharges = flight_details?.Fare?.OtherCharges;
+            const Currency = flight_details?.Fare.Currency;
+            const GSTAllowed = flight_details.GSTAllowed;
+            const IsGSTMandatory = flight_details.IsGSTMandatory;
+            const IsLCC = flight_details.IsLCC;
+
+            // const  TaxBreakupArray = flight_details.Fare.TaxBreakup;
+            // let TransactionFee = 0;
+
+            // for(const taxbrk of TaxBreakupArray){
+            //     if(taxbrk.key == "TransactionFee"){
+            //         TransactionFee = taxbrk.value;
+            //     }
+            // }
+            console.log(BaseFare, Tax, AdditionalTxnFeeOfrd, AdditionalTxnFeeOfrd, OtherCharges);
+
             if(passenger_details && Array.isArray(passenger_details) && passenger_details.length > 0){
-                for(const passenger of passenger_details){
-                
-                    if (passenger && passenger.gender === 'Female') 
-                        passenger.gender ? 2 : 1;     
-                    
+        
+                for(const passenger of passenger_details){ 
+
+                    const Gender = passenger && passenger.gender === 'Female' ? '2' : '1';
+             
+
+                    console.log("gender",Gender );
+
                     const passengerTypeMap ={
                         1 :BookingValidator.adultAgeValidation,
                         2 :BookingValidator.childAgeValidation,
@@ -53,20 +86,32 @@ export class FlightBookingService {
                     }
                     const  validationFucntion = passengerTypeMap[passenger.pax_type];
 
-                    console.log(validationFucntion);
+                    if (validationFucntion) {
+                        try {
+                            validationFucntion(passenger.date_of_birth);
+                         
+                        } catch (error) {
+                            console.error(`Validation failed: ${error}`);
+                        }
+                    } else {
+                        throw ("Invalid passenger type.");
+                    }
 
                     const passenger_count = passenger_details.length;
 
-                    const perperson_base_fare = base_fare/passenger_count;
+                    const perperson_base_fare = BaseFare ? BaseFare/passenger_count : base_fare/passenger_count;
     
-                    const per_person_tax = tax/passenger_count;
+                    const per_person_tax = Tax ? Tax/passenger_count :  tax/passenger_count;
+
+                    console.log("base, tax", per_person_tax, perperson_base_fare);
 
                     Passengers.push({
                         "Title": passenger.title,
                         "FirstName": passenger.first_name,
                         "LastName": passenger.last_name,
-                        "PaxType": passenger.pax_type,
-                        "Gender": passenger.gender,
+                        "PaxType": `${passenger.pax_type}`,
+                        "DateOfBirth": passenger.date_of_birth,
+                        "Gender":  Gender,
 
                         "PassportNo": passenger.passport_no,
                         "PassportExpiry": passenger.passport_expiry,
@@ -74,44 +119,63 @@ export class FlightBookingService {
                         "AddressLine2": address_line2,
 
                         "Fare": {
-                            // "Currency": "INR",
                             "BaseFare": perperson_base_fare,
                             "Tax":per_person_tax,
-                            "YQTax": 0.0,
-                            "AdditionalTxnFeePub": 0.0,
-                            "AdditionalTxnFeeOfrd": 0.0,
-                            "OtherCharges": 116.96,
-                            // "Discount": 0.0,
-                            // "PublishedFare": 4581.96,
-                            // "OfferedFare": 4355.03,
-                            // "TdsOnCommission": 6.34,
-                            // "TdsOnPLB": 9.14,
-                            // "TdsOnIncentive": 6.22,
-                            // "ServiceFee": 10.0
+                            "YQTax":YQTax,
+                            "AdditionalTxnFeePub": AdditionalTxnFeePub,
+                            "AdditionalTxnFeeOfrd": AdditionalTxnFeeOfrd,
+                            "OtherCharges": OtherCharges
                         },
 
                         "City": city,
                         "CountryCode": country_code,
                         "CountryName": country,
-                        "CellCountryCode" : cell_country_code,  // Phone number country code
                         "ContactNo": contact_no,
                         "Nationality": nationality,
                         "Email": email,
                         "IsLeadPax": passenger.is_lead_pax,
-                        "FFAirlineCode": null,
+                        "FFAirlineCode": "",
                         "FFNumber": "",
-                        "GSTCompanyAddress": gst_company_address,
-                        "GSTCompanyContactNumber": gst_company_contact_number,
-                        "GSTCompanyName": gst_company_name,
-                        "GSTNumber": gst_number,
-                        "GSTCompanyEmail": gst_company_email
+                        "Baggage":null,
+                        "MealDynamic":null,
+                        "SeatDynamic":null,
+                        "SpecialServices":null,
+                        "GSTCompanyAddress": "",
+                        "GSTCompanyContactNumber": "",
+                        "GSTCompanyName": "",
+                        "GSTNumber": "",
+                        "GSTCompanyEmail": ""
                     })
+
+                    if(GSTAllowed && IsGSTMandatory){
+                        Passengers.push({
+                            "GSTCompanyAddress": gst_company_address,
+                            "GSTCompanyContactNumber": gst_company_contact_number,
+                            "GSTCompanyName": gst_company_name,
+                            "GSTNumber": gst_number,
+                            "GSTCompanyEmail": gst_company_email
+                        })
+                    }
+
+                    if(!IsLCC){
+                        Passengers['Fare'].push({
+                            "Currency": Currency,
+                            "Discount": Discount,
+                            "PublishedFare": PublishedFare,
+                            "OfferedFare": OfferedFare,
+                            "TdsOnCommission": TdsOnCommission,
+                            "TdsOnPLB": TdsOnPLB,
+                            "TdsOnIncentive": TdsOnIncentive,
+                            "ServiceFee": ServiceFee
+                        })
+                    }
+
                 }
             }
 
             const Passengerss = [];
 
-            Passengerss.forEach((elm) => {
+            Passengers.forEach((elm) => {
                 if (elm.IsLeadPax === true) {
                     Passengerss.unshift(elm);
                 } else {
@@ -119,28 +183,29 @@ export class FlightBookingService {
                 }
             });
 
-            console.log(Passengerss);
-
-            const { TBO_data } = await this.generateTokenService.getToken(ip_address);
+            const { token, TBO_data } = await this.generateTokenService.getToken(ip_address);
 
             const LCC_base_url = TBO_data.FLIGHT_TICKET_FORLCC; //Non LCC only
             const Non_LCC_base_url = TBO_data.FLIGHT_BOOKING_API_FORNONLCC; //Non LCC only
 
             const agent_number = "PageOneTravels98";
-            if (!is_LCC) {
-                await this.httptboapiservice.BookingFlightForNonLCC(Non_LCC_base_url, {...body,
+            let bookedFliught;
+            if (!IsLCC) {
+                bookedFliught = await this.httptboapiservice.BookingFlightForNonLCC(Non_LCC_base_url, {...body,
                     agent_number,
                     Passengerss
                 });
             } else {
-                await this.httptboapiservice.BookingFlightForLCC(LCC_base_url, {...body,
+           
+                bookedFliught = await this.httptboapiservice.BookingFlightForLCC(LCC_base_url, {...body,
                         agent_number,
-                        Passengerss
+                        Passengerss,
+                        token
                 });
             }
 
 
-            return { message: 'Flight booked successfully', data: null };
+            return { message: 'Flight booked successfully', data: bookedFliught };
         } catch (err) {
             console.log("Error in the FLight Booking Service For NON LCC", err);
             throw err;

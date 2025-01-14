@@ -1,50 +1,6 @@
 import { IsString, IsNumber, IsBoolean, IsOptional, IsDateString, ValidateNested, IsArray, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 
-// class PassengerFareDto {
-//     @IsString()
-//     currency: string;
-
-//     @IsNumber()
-//     base_fare: number;
-
-//     @IsNumber()
-//     tax: number;
-
-//     @IsNumber()
-//     yq_tax: number;
-
-//     @IsNumber()
-//     additional_txn_fee_pub: number;
-
-//     @IsNumber()
-//     additional_txn_fee_ofrd: number;
-
-//     @IsNumber()
-//     other_charges: number;
-
-//     @IsNumber()
-//     discount: number;
-
-//     @IsNumber()
-//     published_fare: number;
-
-//     @IsNumber()
-//     offered_fare: number;
-
-//     @IsNumber()
-//     tds_on_commission: number;
-
-//     @IsNumber()
-//     tds_on_plb: number;
-
-//     @IsNumber()
-//     tds_on_incentive: number;
-
-//     @IsNumber()
-//     service_fee: number;
-// }
-
 export class PassengerDto {
     @IsString()
     title: string;
@@ -95,9 +51,6 @@ export class BookingDto {
     @IsString()
     ip_address: string;
 
-    @IsString()
-    @IsNotEmpty()
-    is_LCC: boolean;
 
     @IsString()
     cell_country_code: string;
