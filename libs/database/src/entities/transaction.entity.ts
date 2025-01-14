@@ -1,6 +1,5 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
-import { Booking } from "./booking.entity";
 
 @Entity('transaction')
 export class TransactionDetail {
