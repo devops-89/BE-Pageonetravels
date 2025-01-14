@@ -59,6 +59,9 @@ export class BookingDto {
     country_code: string;
 
     @IsString()
+    receipt: string;
+
+    @IsString()
     city: string;
 
     @IsString()

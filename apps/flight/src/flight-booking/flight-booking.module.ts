@@ -9,17 +9,20 @@ import { RedisCacheServiceModule } from '../../../../libs/redis-cache-service/re
 import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.module';
 import { GenerateTokenService } from '../search-flight/generateToken.service';
 import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
+import { RazorpayModule } from '../../../../libs/paymentgateway/razorpay.module'
+import { RazorpayService } from "../../../../libs/paymentgateway/razorpay.service";
 
 @Module({
     imports: [
         DBModule.forRoot(),
         ConfigModule,
+        RazorpayModule,
         SearchFlightModule,
         ResponseHandlerModule,
         RedisCacheServiceModule,
         TBOConfigModule.register(),    
     ],
     controllers: [FlightBookingController],
-    providers: [FlightBookingService, GenerateTokenService, HTTPSTboAPIService],
+    providers: [FlightBookingService, GenerateTokenService, HTTPSTboAPIService, RazorpayService],
 })
 export class FlightBookingModule {}

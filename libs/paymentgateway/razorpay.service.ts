@@ -9,8 +9,10 @@ export class RazorpayService {
     private key:string;
     private secret : string;
     constructor(private readonly configService: ConfigService) {
+
         this.key = this.configService.get().RAZORPAY_CREDENTIAL.RAZORPAY_KEY;
         this.secret = this.configService.get().RAZORPAY_CREDENTIAL.RAZORPAY_KEY_SECRET;
+        
 
         this.razorpay = new Razorpay({
             key_id: this.key,

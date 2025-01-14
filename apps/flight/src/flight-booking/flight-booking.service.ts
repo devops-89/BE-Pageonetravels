@@ -4,13 +4,15 @@ import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-se
 import { GenerateTokenService } from "../search-flight/generateToken.service";
 import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 import { BookingValidator } from "./booking.utils";
+import { RazorpayService } from "../../../../libs/paymentgateway/razorpay.service";
 
 @Injectable()
 export class FlightBookingService {
     constructor(
         private readonly httptboapiservice: HTTPSTboAPIService,
         private readonly generateTokenService: GenerateTokenService,
-        private readonly redisCacheService: RedisCacheService
+        private readonly redisCacheService: RedisCacheService,
+        private readonly razorpayservice: RazorpayService
     ) {
     }
 
@@ -21,10 +23,9 @@ export class FlightBookingService {
            
             const { ip_address, passenger_details,contact_no, email, city, country_code , country,
                 nationality, house_number, postal_code,state,street, gst_company_address, gst_company_contact_number,
-                gst_company_email, gst_company_name, gst_number, base_fare, tax
+                gst_company_email, gst_company_name, gst_number, base_fare, tax, receipt
             } = body;
-
-
+            
             const address_line1= ` ${house_number} ${street}`;
             const address_line2 = `${state} ${postal_code}`;
             
@@ -60,15 +61,10 @@ export class FlightBookingService {
             const IsGSTMandatory = flight_details.IsGSTMandatory;
             const IsLCC = flight_details.IsLCC;
 
-            // const  TaxBreakupArray = flight_details.Fare.TaxBreakup;
-            // let TransactionFee = 0;
 
-            // for(const taxbrk of TaxBreakupArray){
-            //     if(taxbrk.key == "TransactionFee"){
-            //         TransactionFee = taxbrk.value;
-            //     }
-            // }
-            console.log(BaseFare, Tax, AdditionalTxnFeeOfrd, AdditionalTxnFeeOfrd, OtherCharges);
+
+            await this.razorpayservice.createPayment({amount:PublishedFare,currency:Currency, receipt: receipt });
+
 
             if(passenger_details && Array.isArray(passenger_details) && passenger_details.length > 0){
         
@@ -185,8 +181,8 @@ export class FlightBookingService {
 
             const { token, TBO_data } = await this.generateTokenService.getToken(ip_address);
 
-            const LCC_base_url = TBO_data.FLIGHT_TICKET_FORLCC; //Non LCC only
-            const Non_LCC_base_url = TBO_data.FLIGHT_BOOKING_API_FORNONLCC; //Non LCC only
+            const LCC_base_url = TBO_data.FLIGHT_TICKET_FORLCC;
+            const Non_LCC_base_url = TBO_data.FLIGHT_BOOKING_API_FORNONLCC;
 
             const agent_number = "PageOneTravels98";
             let bookedFliught;
@@ -206,32 +202,16 @@ export class FlightBookingService {
 
 
             return { message: 'Flight booked successfully', data: bookedFliught };
+
         } catch (err) {
+
             console.log("Error in the FLight Booking Service For NON LCC", err);
             throw err;
+
         }
     }
 
 
-    // async bookFlightForLCC(body: BookingDto) {
-
-    //     const {ip_address, passenger_details} = body;
-
-    //     console.log("Booking Details", body, passenger_details);
-
-    //     const { token, TBO_data } = await this.generateTokenService.getToken(ip_address);
-
-    //     const booking_base_url = TBO_data.FLIGHT_TICKET_FORLCC //Non LCC only
-
-    //     console.log("Token", token);
-
-    //     await this.httptboapiservice.BookingFlightForNonLCC(booking_base_url, body);
-
-    //     return { message : 'Flight booked successfully', data : null};
-    // }catch(err) {
-    //     console.log("Error in the FLight Booking Service For LCC", err);
-    //     throw err;
-    // }
 }
 
 
