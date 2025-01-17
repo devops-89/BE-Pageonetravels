@@ -7,6 +7,6 @@ export * from './address.repository';
 export * from './setting.repository';
 export * from './search.repository';
 export * from './guest.user.repository';
-
+export * from './booking.repository'
 
 

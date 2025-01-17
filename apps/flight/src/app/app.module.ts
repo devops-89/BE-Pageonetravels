@@ -6,7 +6,7 @@ import { SearchFlightModule } from '../search-flight/search-flight.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 import { FlightdetailModule } from '../flightdetail/flightdetail.module';
-import { FlightBookingModule } from '../flight-booking/flight-booking.module';
+// import { FlightBookingModule } from '../flight-booking/flight-booking.module';
 
 @Module({
     imports: [
@@ -24,7 +24,7 @@ import { FlightBookingModule } from '../flight-booking/flight-booking.module';
         }),
         SearchFlightModule,
         FlightdetailModule,
-        FlightBookingModule,
+        // FlightBookingModule,
     ],
     controllers: [AppController],
     providers: [AppService],

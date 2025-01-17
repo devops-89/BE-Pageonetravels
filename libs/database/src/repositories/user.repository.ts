@@ -283,6 +283,59 @@ export class UserRepositoryService {
         }
     }
 
+    async getUserByUserIdForAdmin(user_id: string, showPassword = false): Promise<UserI.UserSchema | null> {
+        try {
+            console.log(user_id
+            )
+            const selectFields: Record<string, boolean> = {
+                id: true,
+                full_name: true,
+                email: true,
+                phone_number: true,
+                country_code: true,
+                avatar: true,
+                // role_name: true,
+                user_type: true,
+                //parent: true,
+                is_phone_verified: true,
+                is_email_verified: true,
+                last_login: true,
+                status: true,
+                addresses: true,
+                created_at: true,
+            };
+            if (showPassword) selectFields.password = true;
+            
+            const user = await this.userRepository.createQueryBuilder('user')
+                .where('user.id = :user_id', { user_id })
+                .getOne();
+               
+            //const user = await this.userRepository.findOne({where :{ id : user_id, verify_status : USER_VERIFY_STATUS.VERIFIED}})
+            console.log("User  found", user);
+                if (!user) {
+                    console.log("User not found");
+                    return null;
+                }
+                // const last_login = user
+                // ?.loginSessions?.length
+                // const last_login = user.loginSessions.length
+                // ? user.loginSessions[0].created_at
+                // : null;
+
+            const result: Partial<UserI.UserSchema> = {};
+            for (const key in selectFields) {
+                if (selectFields[key] && user[key] !== undefined) {
+                    result[key] = user[key];
+                }
+            }
+
+            return result as UserI.UserSchema;
+        } catch (error) {
+            console.error("Error in Fetching User Details:", error);
+            throw error
+        }
+    }
+
     async updateUserAddress(address_id: string, user_id:string) {
         try {
             let fields = this.mapObject({ address_id });

@@ -10,10 +10,13 @@ import {
     AddressRepositoryService,
     CommissionRepositoryService,
     SettingRepositoryService,
-    SearchRepositoryService
+    SearchRepositoryService,
+    BookingRepositoryService
  
 } from './';
 import { User, OtpVerification, LoginSession, Address, Setting,Commission, Airport,Booking, TransactionDetail, Passenger} from './';
+import { TransactionManager } from './repositories/utils';
+import { DataSource } from 'typeorm';
 
 @Module({})
 export class DBModule {
@@ -94,7 +97,14 @@ export class DBModule {
                 AddressRepositoryService,
                 CommissionRepositoryService,
                 SettingRepositoryService,
-                SearchRepositoryService
+                SearchRepositoryService,
+                BookingRepositoryService,
+                {
+                    provide: TransactionManager, // Register TransactionManager
+                    useFactory: (dataSource: DataSource) => new TransactionManager(dataSource),
+                    inject: [DataSource], // Inject DataSource
+                  },
+
                
             ],
             exports: [
@@ -104,8 +114,8 @@ export class DBModule {
                 AddressRepositoryService,
                 CommissionRepositoryService,
                 SettingRepositoryService,
-                SearchRepositoryService
-
+                SearchRepositoryService,
+                BookingRepositoryService
             ],
         };
     }

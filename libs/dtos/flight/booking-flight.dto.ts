@@ -49,6 +49,9 @@ export class BookingDto {
     result_index: string;
 
     @IsString()
+    userId: string;
+
+    @IsString()
     ip_address: string;
 
 

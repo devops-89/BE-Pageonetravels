@@ -128,6 +128,45 @@ export class UserService {
     }
   }
 
+  async GetUserDetails(user_id: string): Promise<ApiResponse.ApiOK> {
+    try {
+      if (!user_id) {
+        return { message: "user_id can't be null", statusCode: ERROR_CODES.BAD_REQUEST };
+      }
+
+      const user = await this.userRepositoryService.getUserByUserIdForAdmin(user_id)
+      
+
+      if (!user) {
+        return { message: "User not found", statusCode: ERROR_CODES.NOT_FOUND };
+      }
+
+   // Return required Data, including the new fields
+   const { full_name, email, phone_number, last_login, id, addresses, avatar, country_code, is_email_verified, is_phone_verified, user_type, status, created_at } = user;
+   return {
+     message: "User details fetched successfully",
+     data: {
+       full_name,
+       email,
+       phone_number,
+       last_login,
+       id,
+       avatar,
+       country_code,
+       is_email_verified,
+       is_phone_verified,
+       user_type,
+       status,
+       addresses, // Include addresses
+       created_at
+     }
+   };
+    } catch (error) {
+      console.log('Error in Update User Status:', error);
+      throw { message: "User Status is Not Updated", statusCode: ERROR_CODES.ACCESS_DENIED };
+    }
+  }
+
 
   async updateLastLogin(user_id: string): Promise<void> {
     try {

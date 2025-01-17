@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { FlightBookingController } from './flight-booking.controller';
 import { FlightBookingService } from './flight-booking.service';
-import { DBModule } from '../../../../libs/database/src';
+import { BookingRepositoryService, DBModule, UserRepositoryService } from '../../../../libs/database/src';
 import { ConfigModule } from '../../../../libs/config/config.module';
 import { SearchFlightModule } from '../search-flight/search-flight.module';
 import { ResponseHandlerModule } from '../../../../libs/response-handler/response-handler.module';
@@ -23,6 +23,6 @@ import { RazorpayService } from "../../../../libs/paymentgateway/razorpay.servic
         TBOConfigModule.register(),    
     ],
     controllers: [FlightBookingController],
-    providers: [FlightBookingService, GenerateTokenService, HTTPSTboAPIService, RazorpayService],
+    providers: [FlightBookingService, GenerateTokenService, HTTPSTboAPIService, RazorpayService,BookingRepositoryService,UserRepositoryService],
 })
 export class FlightBookingModule {}

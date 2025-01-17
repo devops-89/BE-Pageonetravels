@@ -45,6 +45,17 @@ export class UserController {
     }
   }
 
+  @Get('/get_user_details/:user_id')
+  // @UseGuards(TokenValidationGuard, CheckIfAdminGuard)
+  async GetUserDetails(@Param('user_id') user_id: string, @Body('status') status: USER_ACCOUNT_STATUS, @Res() res: Response) {
+    try {
+      const result = await this.userService.GetUserDetails(user_id);
+      return this.responseHandler.sendSuccessResponse(res, result);
+    } catch (error) {
+      return this.responseHandler.sendErrorResponse(res, error);
+    }
+  }
+
   @Get('/user_details')
   @UseGuards(TokenValidationGuard)
   async getLoggedInUserDetails(@Req() req: Request, @Res() res: Response) {
