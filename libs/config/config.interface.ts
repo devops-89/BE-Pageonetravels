@@ -125,4 +125,6 @@ export interface FLIGHTDATA {
   HOTEL_BOOK: string;
   HOTEL_BOOKING_DETAILS: string;
   GET_HOTELSTATICDATA: string;
+  COUNTRY_SEARCH : string; 
+  CITY_SEARCH :  string
 }

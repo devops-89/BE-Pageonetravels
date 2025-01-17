@@ -38,6 +38,8 @@ export class TBO_CredentialsService {
             HOTEL_INFO : hotelConfig.HOTEL_INFO,
             HOTEL_ROOM_INFO : hotelConfig.HOTEL_ROOM_INFO,
             HOTEL_BLOCK_ROOM :  hotelConfig.HOTEL_BLOCK_ROOM,
+            COUNTRY_SEARCH :  hotelConfig.COUNTRY_SEARCH,
+            CITY_SEARCH :   hotelConfig.CITY_SEARCH,
             HOTEL_BOOK : hotelConfig.HOTEL_BOOK,
             HOTEL_BOOKING_DETAILS : hotelConfig.HOTEL_BOOKING_DETAILS,
             GET_HOTELSTATICDATA : hotelConfig.GET_HOTELSTATICDATA,

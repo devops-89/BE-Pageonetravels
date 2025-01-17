@@ -14,7 +14,6 @@ export class GenerateTokenService {
   ) {
   }
 
-
   async generateTBOToken(ip_address:string) {
       try {
           const tbo_credentials = await this.getTBOCredentials();
@@ -30,7 +29,7 @@ export class GenerateTokenService {
 
           const result = await axios.post(base_url, payload)
           await this.rediscacheservice.setCache(`tboToken:${ip_address}`,result.data.TokenId, 82800);
-          return this.tbo_token;
+          return this.tbo_token;        
          
       } catch (error) {
           console.log("Error in the generate token", error);
@@ -48,7 +47,6 @@ export class GenerateTokenService {
       }
   }
   
-
   async getToken(ip_address: string) {
       try {
          
@@ -59,11 +57,14 @@ export class GenerateTokenService {
 
               token = await this.rediscacheservice.getCache(`tboToken:${ip_address}`);
           }
+
+          console.log('Generated token:', token);
           
           const payload = {
               TBO_data: tbo_credentials,
               token: token as string,
           };
+          console.log('Generated token:', token);
   
           return payload;
   
@@ -72,5 +73,57 @@ export class GenerateTokenService {
           throw error;
       }
   }
-
 }
+
+// import { Injectable } from "@nestjs/common";
+// import axios from "axios";
+// import { FLIGHTDATA } from "../../../../libs/config/config.interface";
+// import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
+// import { RedisCacheService } from "../../../../libs/redis-cache-service/redis-cache-service";
+
+// @Injectable()
+// export class GenerateTokenService {
+  
+//   private tbo_token: string;
+
+//   constructor(
+//     private readonly tboConfigService: TBO_CredentialsService,
+//     private readonly rediscacheservice: RedisCacheService,
+//   ) {}
+
+//   private async fetchCredentials(): Promise<FLIGHTDATA> {
+//     try {
+//       return await this.tboConfigService.getTBOCredentials();
+//     } catch (error) {
+//       console.error("Error fetching credentials:", error);
+//       throw error;
+//     }
+//   }
+
+//   async generateTBOToken(ip_address: string) {
+//     try {
+//       const tbo_credentials = await this.fetchCredentials();
+//       const payload = {
+//         ClientId: tbo_credentials.FLIGHT_CLIENT_ID,
+//         UserName: tbo_credentials.FLIGHT_USERNAME,
+//         Password: tbo_credentials.FLIGHT_PASSWORD,
+//         EndUserIp: ip_address,
+//       };
+      
+//       const result = await axios.post(tbo_credentials.FLIGHT_AUTHENTICATION, payload);
+//       await this.rediscacheservice.setCache(`tboToken:${ip_address}`, result.data.TokenId, 82800);  // Cache for 23 hours
+//       return result.data.TokenId;
+//     } catch (error) {
+//       console.error("Error in generating token:", error);
+//       throw new Error("Failed to generate token.");
+//     }
+//   }
+
+//   async getToken(ip_address: string): Promise<string> {
+//     let token = await this.rediscacheservice.getCache(`tboToken:${ip_address}`);
+//     if (!token) {
+//       token = await this.generateTBOToken(ip_address);
+//     }
+//     return;
+//   }
+// }

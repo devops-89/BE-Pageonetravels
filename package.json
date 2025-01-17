@@ -29,6 +29,7 @@
     "dotenv": "^16.4.5",
     "fcm-node": "^1.6.1",
     "firebase-admin": "^12.7.0",
+    "flatten": "^1.0.3",
     "fs": "^0.0.1-security",
     "google-auth-library": "^9.14.1",
     "html-pdf": "^3.0.1",

@@ -62,5 +62,7 @@ export const DEFAULT_CONFIG: ConfigData = {
         HOTEL_BOOK: '',
         HOTEL_BOOKING_DETAILS: '',
         GET_HOTELSTATICDATA: '',
+        COUNTRY_SEARCH :  '',
+        CITY_SEARCH :   ''
     }
 };
