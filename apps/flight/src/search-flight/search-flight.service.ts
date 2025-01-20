@@ -167,11 +167,11 @@ export class SearchFlightService {
     if(responsefromTBO && responsefromTBO.Response && responsefromTBO.Response.Error.ErrorMessage){
       throw {message : responsefromTBO.Response.Error.ErrorMessage , statusCode:ERROR_CODES.BAD_REQUEST}
     }
-    // const trans = await this.fetchSegmentsDataAsPerJourneyType(responsefromTBO, assigned_journey_type)
+    const trans = await this.fetchSegmentsDataAsPerJourneyType(responsefromTBO, assigned_journey_type)
 
     // await this.rediscacheservice.setCache(`${journey_type}${origin}${destination}`, JSON.stringify(trans), 3600) // 1 minute
 
-    return { message: "Flight list fetched successfully", data: responsefromTBO };
+    return { message: "Flight list fetched successfully", data: trans };
 
   } catch(error) {
     console.log("Error in the search flight function", error);
