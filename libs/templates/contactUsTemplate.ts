@@ -7,7 +7,7 @@ export const contactUsTemplate = function (username:string) {
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thank You for Contacting Bharat Hast Kaushal</title>
+  <title>Thank You for Contacting Page One Travels</title>
   <!--[if mso]><style type="text/css">body, table, td, a { font-family: Arial, Helvetica, sans-serif !important; }</style><![endif]-->
   <style>
     body {
@@ -75,21 +75,21 @@ export const contactUsTemplate = function (username:string) {
         <table role="presentation" class="container">
           <tr>
             <td class="header">
-              <img src = ${LOGO} alt="Bharat Hast Kaushal">
+              <img src = ${LOGO} alt="Page One Travels">
             </td>
           </tr>
           <tr>
             <td class="content">
               <h1>Thank You for Contacting Us!</h1>
               <p>Dear ${username},</p>
-              <p>Thank you for reaching out to Bharat Hast Kaushal. We have received your message and one of our team members will be in touch with you shortly.</p>
+              <p>Thank you for reaching out to Page One Travels. We have received your message and one of our team members will be in touch with you shortly.</p>
               <p>We value your interest and look forward to assisting you with your inquiry. If you have any additional information to provide, please reply to this email.</p>
-              <p>Best regards,<br>The Bharat Hast Kaushal Team</p>
+              <p>Best regards,<br>The Page One Travels Team</p>
             </td>
           </tr>
           <tr>
             <td class="footer">
-              <p>&copy; 2024 Bharat Hast Kaushal. All rights reserved.</p>
+              <p>&copy; 2024 Page One Travels. All rights reserved.</p>
             </td>
           </tr>
         </table>

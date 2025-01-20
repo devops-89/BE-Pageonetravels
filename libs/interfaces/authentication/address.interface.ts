@@ -11,7 +11,7 @@ export declare namespace AddressI
         postal_code: string,
         is_default?:boolean,
         user_id?: string,
-        address_type: string
+        
     }
 
     interface UpdateAdress extends Partial<AddAdress>

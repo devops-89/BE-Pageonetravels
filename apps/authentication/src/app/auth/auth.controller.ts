@@ -1,11 +1,11 @@
 
-import { Body, Controller, Get, Post, Req, Res, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Post,Req, Res, UseGuards, ValidationPipe } from '@nestjs/common';
 import { DefaultUserService } from './services/defaultUserService';
 import { AuthService } from './services/auth.service';
 // import { UserI } from '../../../../../libs/interfaces/authentication/user.interface';
 import { ResponseHandlerService } from '../../../../../libs/response-handler/response-handler.service';
 import { ChangePasswordDto, LoginDto, LoginOrRegisterDto, RegisterDto, VerifyDto } from '../../../../../libs/dtos/authentication/user.dto';
-import { TokenValidationGuard } from '../../../../../libs/middlewares/authMiddleware.guard';
+import { OptionalTokenValidationAndGuestUserGuard, TokenValidationGuard } from '../../../../../libs/middlewares/authMiddleware.guard';
 import { ResetPasswordDto, ForgotPasswordDto } from '../../../../../libs/dtos/authentication/forgotPassword.dto'
 
 @Controller('auth')
@@ -25,6 +25,16 @@ export class AuthController {
     }
 
 
+    @Get('/guest_login')
+    async guestLogin(@Res() res: Response) {
+        try {
+            const result = await this.authService.guestLogin();
+            return this.ResponseHandler.sendSuccessResponse(res, result);
+        } catch (error) {
+            return this.ResponseHandler.sendErrorResponse(res, error);
+        }
+    }
+
     @Post('/login_or_register')
     async loginOrRegister(@Res() res: Request, @Req() req: Request, @Body(new ValidationPipe()) body: LoginOrRegisterDto) {
         try {
@@ -38,6 +48,7 @@ export class AuthController {
 
 
     @Post('/login')
+    // @UseGuards(OptionalTokenValidationAndGuestUserGuard)
     async login(@Res() res: Response, @Req() req: Request, @Body(new ValidationPipe()) body: LoginDto) {
         try {
             const device_type = req.headers['devicetype'];
@@ -61,9 +72,11 @@ export class AuthController {
 
 
     @Post('/register')
+    @UseGuards(OptionalTokenValidationAndGuestUserGuard)
     async register(@Res() res: Response, @Req() req: Request, @Body() body: RegisterDto) {
         try {
-            const result = await this.authService.registerWithEmailPassword(body);
+            const payload = req['userPayload']
+            const result = await this.authService.registerWithEmailPassword(body,payload);
             this.ResponseHandler.sendSuccessResponse(res, result);
         } catch (error) {
             this.ResponseHandler.sendErrorResponse(res, error);

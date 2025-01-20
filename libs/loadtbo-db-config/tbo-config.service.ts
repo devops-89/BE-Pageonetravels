@@ -5,10 +5,11 @@ import { ConfigService } from "libs/config/config.service";
 
 @Injectable()
 export class TBO_CredentialsService {
-    constructor(
-        private readonly settingRepo: SettingRepositoryService,
-        private readonly configService: ConfigService
-    ){}
+  constructor(
+    private readonly settingRepo: SettingRepositoryService,
+    private readonly configService: ConfigService
+  ) {}
+
 
     async getSettingValues(){
         try {
@@ -37,28 +38,42 @@ export class TBO_CredentialsService {
             HOTEL_INFO : hotelConfig.HOTEL_INFO,
             HOTEL_ROOM_INFO : hotelConfig.HOTEL_ROOM_INFO,
             HOTEL_BLOCK_ROOM :  hotelConfig.HOTEL_BLOCK_ROOM,
+            COUNTRY_SEARCH :  hotelConfig.COUNTRY_SEARCH,
+            CITY_SEARCH :   hotelConfig.CITY_SEARCH,
             HOTEL_BOOK : hotelConfig.HOTEL_BOOK,
             HOTEL_BOOKING_DETAILS : hotelConfig.HOTEL_BOOKING_DETAILS,
             GET_HOTELSTATICDATA : hotelConfig.GET_HOTELSTATICDATA,
-          })
+ 
+      })
 
-        console.log('Configuration updated successfully');
+      console.log('Configuration updated successfully');
 
-        }catch(error){
-          console.log("Error in the getSettingValues from database", error);
-          throw error;
-        }
+    } catch (error) {
+      console.log("Error in the getSettingValues from database", error);
+      throw error;
     }
+  }
 
-    async getTBOCredentials(){
-        try {
-          const tboConfig = this.configService.get().TBO_CREDENTIALS;
-          return tboConfig as FLIGHTDATA;
 
-        } catch(error){
-            console.log(error);
-            throw error
-        }
+  async getTBOCredentials() {
+    try {
+      const tboConfig = this.configService.get().TBO_CREDENTIALS;
+      return tboConfig as FLIGHTDATA;
+
+    } catch (error) {
+      console.log(error);
+      throw error
     }
-
+  }
 }
+//   async  getHotelTBOCredentials() {
+//     try {
+//       const tboConfig = this.configService.get().TBO_CREDENTIALS;
+//       return tboConfig as FLIGHTDATA;
+
+//     } catch (error) {
+//       console.log(error);
+//       throw error;
+//     }
+//   }
+// }

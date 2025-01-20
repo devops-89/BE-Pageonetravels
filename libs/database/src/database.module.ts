@@ -14,7 +14,7 @@ import {
     BookingRepositoryService
  
 } from './';
-import { User, OtpVerification, LoginSession, Address, Setting,Commission, Airport,Booking, TransactionDetail, Passenger} from './';
+import { User, OtpVerification, LoginSession, Address, Setting,Commission, Airport,Booking, TransactionDetail, Passenger, Hotel} from './';
 import { TransactionManager } from './repositories/utils';
 import { DataSource } from 'typeorm';
 
@@ -39,7 +39,8 @@ export class DBModule {
                 Airport,
                 Booking,
                 TransactionDetail,
-                Passenger
+                Passenger,
+                Hotel
                 
             ],
             synchronize: true,
@@ -86,7 +87,8 @@ export class DBModule {
                     Airport,
                     Booking,
                     TransactionDetail,
-                    Passenger
+                    Passenger,
+                    Hotel
                 ]),
             ],
             controllers: [],

@@ -31,7 +31,7 @@ export const shipmentTrackingTemplate = function (shipmentData: any) {
     <body>
         <div class="container">
             <div style="text-align: center; margin: 20px 0;">
-                <img src="${LOGO}" alt="Bharat Hast Kaushal Logo" style="width: 100px;">
+                <img src="${LOGO}" alt="Page One Travels Logo" style="width: 100px;">
             </div>
             <h1>Hello ${customerName},</h1>
             <p>Your order with ID <strong>${orderId}</strong> has been shipped!</p>
@@ -40,9 +40,9 @@ export const shipmentTrackingTemplate = function (shipmentData: any) {
             <p>Estimated Delivery: <strong>${estimatedDelivery}</strong></p>
             <p>Track your shipment <a href="${trackingLink}">here</a>.</p>
             <p>If you have any questions, please feel free to contact us.</p>
-            <p>Thank you,<br>Bharat Hast Kaushal</p>
+            <p>Thank you,<br>Page One Travels</p>
         </div>
-        <div class="footer">© 2024 Bharat Hast Kaushal. All rights reserved.</div>
+        <div class="footer">© 2024 Page One Travels. All rights reserved.</div>
     </body>
     </html>`;
 
@@ -55,7 +55,7 @@ export const shipmentTrackingTemplate = function (shipmentData: any) {
     Track your shipment here: ${trackingLink}
     If you have any questions, please feel free to contact us.
     Thank you,
-    Bharat Hast Kaushal`;
+    Page One Travels`;
 
     return { html, text };
 };

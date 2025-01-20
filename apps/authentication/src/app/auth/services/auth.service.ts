@@ -75,7 +75,6 @@ export class AuthService {
 
                 if (otpReq.send_on === OTP_SEND_ON.EMAIL) {
                     userStatus.is_email_verified = true;
-console.log(">>>>>>>>",userStatus)
 
                     if (!user.passwordExist) {
                         const password = getRandomString(8, true, false);
@@ -293,7 +292,23 @@ console.log(">>>>>>>>",userStatus)
         }
     }
 
-    async  registerWithEmailPassword(input: RegisterDto): Promise<ApiResponse.ApiOK> {
+    async guestLogin(): Promise<ApiResponse.ApiOK> {
+        try {
+           
+        
+            const access_token = await this.jwtService.generateJWTNeverExpToken({
+                token_type: TOKEN_TYPE.GUEST_LOGIN
+            });
+
+            return { message: `Guest login success...`, data: { access_token } };
+        } catch (error) {
+            console.log('Error generating guest token:', error);
+            throw error;
+        }
+    }
+
+    
+    async  registerWithEmailPassword(input: RegisterDto, userPayload:JWTPayload): Promise<ApiResponse.ApiOK> {
         try {
             input.email = input.email.toLowerCase();
             const { email, password, full_name, user_type, phone_number, country_code } = input;
@@ -311,6 +326,15 @@ console.log(">>>>>>>>",userStatus)
                 throw ({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: COMMON_MSG.EMAIL_ALREADY_EXIST });
             }
 
+            if (phone_number) {
+                const isPhoneExist = await this.UserModel.checkPhoneNumberExist(phone_number);
+                if (isPhoneExist) {
+                    throw {
+                        status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER,
+                        message: COMMON_MSG.PHONE_ALREADY_EXIST,
+                    };
+                }
+            }
             const password_hash = await generatePasswordHash(password);
 
             const user: UserI.InsertUserByEmail = {
@@ -362,11 +386,12 @@ console.log(">>>>>>>>",userStatus)
 
     async loginWithEmailOrPhonePassword(input: LoginDto,device_type: string): Promise<ApiResponse.ApiOK> {
         try {
+            input.identity = input.identity.toLowerCase()
             const { identity, password, country_code } = input;
     
             if (validateEmail(identity)) {
-                const email = identity.toLowerCase();
-                const user = await this.UserModel.getUserByEmail(email);
+                
+                const user = await this.UserModel.getUserByEmail(identity);
                 if (!user) {
                 throw {
                         message: LOGIN_MSG.INVALID_EMAIL_PASSWORD,
@@ -655,7 +680,7 @@ console.log(">>>>>>>>",userStatus)
 
         return { message: OTP_VERIFY_MSG.PASSWORD_RESET, data: null };
     }
+}
 
     
-    
-}
+  

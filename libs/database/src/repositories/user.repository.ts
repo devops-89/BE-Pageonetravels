@@ -104,6 +104,19 @@ export class UserRepositoryService {
     }
 
 
+    async checkPhoneNumberExist(phone_number: string): Promise<boolean> {
+        try {
+            const doc = await this.userRepository.count({
+                where: { phone_number: phone_number.trim(), is_phone_verified: true },
+            });
+            return doc > 0;
+        } catch (error) {
+            console.log('Phone Number Not Found', error);
+            throw error;
+        }
+    }
+    
+
     async insertDefaultUser(input: UserI.InsertDefaultUser): Promise<User> {
         try {
             const { email, status, password, user_type, full_name, is_email_verified } = input;
@@ -352,6 +365,23 @@ export class UserRepositoryService {
             throw error;
         }
     }
+
+    // async updateUserAddress(address_id: string, user_id: string) {
+    //     try {
+    //         // Prepare the fields for the update
+    //         const fields = address_id ? { address: { id: address_id } } : {};
+    
+    //         // Update the user record with the new address reference
+    //         const savedAdd = await this.userRepository.update({ id: user_id }, fields);
+    
+    //         // Return the updated record or status
+    //         return savedAdd;
+    //     } catch (error) {
+    //         console.error("Error in updating user address:", error);
+    //         throw error;
+    //     }
+    // }
+    
 
     async getUsersWithFilters(filter: UserFilterDto, pagination: PaginationDto): Promise<IPaginationObject> {
         try {   

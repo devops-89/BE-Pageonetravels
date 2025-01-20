@@ -26,7 +26,7 @@ export const productApprovalTemplate = function (data) {
             <p>Thank you,</p>
             <p>Your Team</p>
         </div>
-        <div class="footer">© 2024 Bharat Hast Kaushal. All rights reserved.</div>
+        <div class="footer">© 2024 Page One Travels. All rights reserved.</div>
     </body>
     </html>`;
 

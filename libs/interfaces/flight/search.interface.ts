@@ -18,12 +18,9 @@ export interface IFlightSearch {
     PreferredArrivalTime: string;
   }[];
   Sources?: string[] | null;      // Optional
+  MinPrice?: string;  // Add MinPrice as an optional field
+  MaxPrice?: string; 
 }
-
-
-
-  
- 
 export interface CabinClass {
     ALL: 1,
     ECONOMY:2,

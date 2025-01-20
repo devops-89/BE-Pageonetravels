@@ -29,9 +29,9 @@ export class AddressRepositoryService {
 
     async insertAddress(input: AddressI.AddAdress): Promise<Address> {
         try {
-            const { city, country, house_number, is_default, postal_code, street, state,  address_type } = input;
+            const { city, country, house_number, is_default, postal_code, street, state } = input;
             const isDefaultValue = is_default || false;
-            const addType = address_type || "HOME";
+            //const addType = address_type || "HOME";
             
             const address = this.addressRepository.create({
                 city,
@@ -40,8 +40,8 @@ export class AddressRepositoryService {
                 isdefault:isDefaultValue,
                 postal_code,
                 state,
-                street,
-                address_type : addType,
+                street
+                // address_type : addType,
             });
 
             const res = await this.addressRepository.save(address);
@@ -67,30 +67,42 @@ export class AddressRepositoryService {
     //     return;
     // }
 
+    // async updateAddress(input: AddressI.UpdateAdress): Promise<void> {
+    //     try {
+    //         const { city, country, house_number, is_default, postal_code, street, id, user_id } = input;
+
+    //         const updateFields = this.mapObject({ city, country, house_number, is_default, postal_code, street });
+            
+    //         // await this.addressRepository.update({ id, user: { id: user_id } }, updateFields);
+    //         return;
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
+
     async updateAddress(input: AddressI.UpdateAdress): Promise<void> {
         try {
-            const { city, country, house_number, is_default, postal_code, street, address_type, id, user_id } = input;
+            const { id, ...updateFields } = input;
 
-            const updateFields = this.mapObject({ city, country, house_number, is_default, postal_code, street, address_type });
-            // await this.addressRepository.update({ id, user: { id: user_id } }, updateFields);
-            return;
-        } catch (error) {
+            await this.addressRepository.update(id, updateFields);
+            } catch (error) {
+            console.error('Error in updating address:', error);
             throw error;
         }
     }
 
-    async updateStoreAddress(id:string, input: AddressI.UpdateAdress): Promise<void> {
-        try {
-            const { city, country, house_number, is_default, postal_code, street, address_type, user_id } = input;
+    // async updateStoreAddress(id:string, input: AddressI.UpdateAdress): Promise<void> {
+    //     try {
+    //         const { city, country, house_number, is_default, postal_code, street, user_id } = input;
 
-            const updateFields = this.mapObject({ city, country, house_number, is_default, postal_code, street, address_type });
-            // await this.addressRepository.update({ id, user: { id: user_id } }, updateFields);
-            return;
-        } catch (error) {
-            console.log("Error in update store addreess query",error)
-            throw error;
-        }
-    }
+    //         const updateFields = this.mapObject({ city, country, house_number, is_default, postal_code, street });
+    //         // await this.addressRepository.update({ id, user: { id: user_id } }, updateFields);
+    //         return;
+    //     } catch (error) {
+    //         console.log("Error in update store addreess query",error)
+    //         throw error;
+    //     }
+    // }
 
     async updateDefaultByIds(ids: string[], user_id: string): Promise<void> {
         try {
@@ -102,8 +114,12 @@ export class AddressRepositoryService {
         }
     }
 
-    async getAddressesById(id: string) {
-        // const address = await this.addressRepository.findOne({where:{(id)}});
-        // return address
-    }
+    async getAddressesById(id: string): Promise<Address | null> {
+        try {
+            return await this.addressRepository.findOne({ where: { id } });
+        } catch (error) {
+            console.error('Error fetching address by ID:', error);
+            throw error;
+        }
+    }  
 }

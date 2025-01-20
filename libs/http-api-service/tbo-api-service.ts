@@ -20,6 +20,78 @@ export class HTTPSTboAPIService {
         }
     }
 
+    // async searchFlightAPI(
+    //     token: any, 
+    //     base_url: string, 
+    //     base_ip: string, 
+    //     body: ISearchFlight
+    // ) {
+    //     try {
+          
+    //         const {
+    //             min_price,
+    //             max_price,
+    //             multicity = [],
+    //             return_date,
+    //             preferred_time,
+    //             journey_type,
+    //             origin,
+    //             destination,
+    //             departure_date,
+    //             adult,
+    //             child = 0,
+    //             infant = 0,
+    //             direct_flight,
+    //             one_stop_flight,
+    //             cabin_class
+    //         } = body;
+           
+
+    //         const segments = await this.generateSegments({ journey_type, origin,  destination, departure_date, return_date, multicity, cabin_class,preferred_time});
+        
+    //         const payload: IFlightSearch = {
+    //             EndUserIp: base_ip,
+    //             TokenId: token,
+    //             AdultCount: adult,
+    //             ChildCount: child,
+    //             InfantCount: infant,
+    //             DirectFlight: direct_flight,
+    //             JourneyType: journey_type,
+    //             OneStopFlight: one_stop_flight,
+    //             PreferredAirlines: null,
+    //             Segments: segments,
+    //             Sources: null,
+    //             MinPrice: min_price,
+    //             MaxPrice: max_price,
+    //         };
+          
+          
+    //         const response = await this.httpAPICall(base_url, payload);
+
+    //         const availablePrices = response.Response.Results.flatMap(result =>
+    //             result.map(flight => flight.Fare.PublishedFare)
+    //         );
+
+
+    //     const minFlightPrice = Math.min(...availablePrices);
+    //     const maxFlightPrice = Math.max(...availablePrices);
+          
+    //         //return response;
+    //         return {
+    //             message: "Flight list fetched successfully",
+    //             data: {
+    //                 minFlightPrice,
+    //                 maxFlightPrice,
+    //                 flights: response.Response.Results
+    //             }
+    //         }
+    
+    //     } catch (error) {
+    //         console.error("Error in searchFlightAPI function:", error);
+    //         throw (error.message || "Failed to fetch flight data in search flight api service");
+    //     }
+    // }
+
     async searchFlightAPI(
         token: any,
         base_url: string,
@@ -27,7 +99,6 @@ export class HTTPSTboAPIService {
         body: ISearchFlight
     ) {
         try {
-
             const {
                 min_price,
                 max_price,
@@ -61,6 +132,8 @@ export class HTTPSTboAPIService {
                 PreferredAirlines: null,
                 Segments: segments,
                 Sources: null,
+                MinPrice: min_price,
+                MaxPrice: max_price,
             };
             console.log("Payload in searchFlightAPI", payload);
             
@@ -70,8 +143,16 @@ export class HTTPSTboAPIService {
             return response;
 
         } catch (error) {
+            // Enhanced error handling
             console.error("Error in searchFlightAPI function:", error);
-            throw (error.message || "Failed to fetch flight data in search flight api service");
+            
+            if (typeof error === "string") {
+                throw { message: error, status_code: 400 };
+            } else if (error.message) {
+                throw { message: error.message, status_code: 500 };
+            }
+    
+            throw { message: "An unknown error occurred.", status_code: 500 };
         }
     }
 
