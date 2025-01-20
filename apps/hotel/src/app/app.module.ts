@@ -9,7 +9,8 @@ import * as redisStore from 'cache-manager-redis-store';
 // import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 
 @Module({
-    imports: [SearchHotelModule,
+    imports: [
+        SearchHotelModule,
         CacheModule.registerAsync({
             isGlobal: true,
             useFactory: () => ({
