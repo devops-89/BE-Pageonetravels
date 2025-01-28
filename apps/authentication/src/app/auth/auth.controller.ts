@@ -6,7 +6,7 @@ import { AdminLoginDto } from '../../../../../libs/dtos/authentication/admin.dto
 // import { UserI } from '../../../../../libs/interfaces/authentication/user.interface';
 import { ResponseHandlerService } from '../../../../../libs/response-handler/response-handler.service';
 import { ChangePasswordDto, LoginDto, LoginOrRegisterDto, RegisterDto, VerifyDto } from '../../../../../libs/dtos/authentication/user.dto';
-import { CheckIfAdminGuard, TokenValidationGuard } from '../../../../../libs/middlewares/authMiddleware.guard';
+import {  TokenValidationGuard } from '../../../../../libs/middlewares/authMiddleware.guard';
 import { ResetPasswordDto, ForgotPasswordDto } from '../../../../../libs/dtos/authentication/forgotPassword.dto'
 
 @Controller('auth')
