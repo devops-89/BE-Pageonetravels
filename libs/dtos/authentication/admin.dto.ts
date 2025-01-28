@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsIn, IsNumber, IsOptional, IsNotEmpty } from 'class-validator';
+import { IsString, IsEmail, IsIn, IsNumber, IsOptional, IsNotEmpty, IsEnum } from 'class-validator';
 import { DEFAULT_USER_ROLES, USER_TYPE } from '../../constants/autenticationConstants/userContants';
 
 export class GetUserListDto {
@@ -28,9 +28,14 @@ export class GetUserListDto {
   search: string;
 }
 
+
 export class AdminLoginDto {
   @IsEmail({}, { message: 'Invalid email format' })
   email: string;
+
+   @IsEnum(USER_TYPE)
+   @IsOptional()
+   user_type: USER_TYPE;
 
   @IsString()
   @IsNotEmpty({ message: 'Password is required' })

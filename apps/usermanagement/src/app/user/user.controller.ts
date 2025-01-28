@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import { UpdatePersonalDetailDto, UserFilterDto } from '../../../../../libs/dtos/authentication/user.dto';
 import { PaginationDto } from '../../../../../libs/dtos/authentication/user.dto';
 import { InsertAddressDto } from '../../../../../libs/dtos/authentication/address.dto';
+
 import { UserService } from './user.service';
 import { TokenValidationGuard } from '../../../../../libs/middlewares/authMiddleware.guard';
 import { JWTPayload } from '../../../../../libs/interfaces/authentication/jwtPayload.interface';
@@ -22,13 +23,11 @@ export class UserController {
   @Get('/get_user_list')
   @UseGuards(TokenValidationGuard, CheckIfAdminGuard)
   async getUsers(@Res() res: Response, @Req() req: Request, @Query() query: UserFilterDto & PaginationDto) {
-    try {
-
+    try { 
       const pagination = { page: query.page || 1, limit: query.limit || 10 };
       const filters = { user_type: query.user_type, search: query.search, status: query.status, };
       const result = await this.userService.getUsersByGroup(filters, pagination);
       return this.responseHandler.sendSuccessResponse(res, result)
-
     } catch (error) {
       return this.responseHandler.sendErrorResponse(res, error);
     }
@@ -82,4 +81,7 @@ export class UserController {
       return this.responseHandler.sendErrorResponse(res, error);
     }
   }
+
+  
+
 }

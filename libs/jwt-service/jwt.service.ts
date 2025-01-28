@@ -22,15 +22,15 @@ export class JwtService {
   }
 
   public generateJWTToken(payload: Partial<JWTPayload>): Promise<string> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => { 
       const { expiryTimeInSecs, JWTSecretKey } = this.getJWTTokenInfo();
 
       jwt.sign(payload, Buffer.from(JWTSecretKey, 'base64'), { expiresIn: expiryTimeInSecs, algorithm: 'HS512' }, function (err: any, token: string | PromiseLike<string>) {
-        if (err || !token) {
+        if (err || !token) { 
           reject({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: 'Error while creating JWT token', extraError: err });
           return;
         } else {
-          resolve(token);
+          resolve(token);   
           return;
         }
       });

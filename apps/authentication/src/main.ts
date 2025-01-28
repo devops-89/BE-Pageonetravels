@@ -17,7 +17,7 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
 
   app.useGlobalPipes(
-    new ValidationPipe({
+    new ValidationPipe({ 
       exceptionFactory: (validationErrors: ValidationError[] = []) => {
         let msg = '';
         for (const error of validationErrors) {

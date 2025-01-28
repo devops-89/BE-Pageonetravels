@@ -35,6 +35,7 @@ export class InsertAddressDto {
     address_id:string
 
     @IsString()
+    @IsOptional()
     address_type: string
   }
 

@@ -9,6 +9,7 @@ import { paginate } from '../../../utils/basicUtils';
 import { IPaginationObject } from '../../../interfaces/commonTypes/custom.interface';
 import { UserFilterDto, PaginationDto } from 'libs/dtos/authentication/user.dto';
 import { Address, Setting } from '../entities';
+import { CostOptimizationHub } from 'aws-sdk';
 
 @Injectable()
 export class UserRepositoryService {
@@ -51,7 +52,7 @@ export class UserRepositoryService {
 
             const user = await this.userRepository.findOne({ where: { id: user_id }, select: selectFields });
 
-            const passwordExist = !!(user && user.password);
+            const passwordExist = !(user && user.password);
             if (passwordExist) {
                 user.password = '';
             }
@@ -103,11 +104,22 @@ export class UserRepositoryService {
         }
     }
 
+    async checkAdminEmail(email:string):Promise<User>{
+        try{
+            const checkAdmin = await this.userRepository.findOne({
+                                where: { email: email.toLowerCase().trim() }
+                                });
+            return checkAdmin;
+        }catch(error){
+            console.log('Admin Email not Exist',error);
+            throw error;
+        }
+    }
+
 
     async insertDefaultUser(input: UserI.InsertDefaultUser): Promise<User> {
         try {
             const { email, status, password, user_type, full_name, is_email_verified } = input;
-
 
             const insertVal = { email, status, password, user_type, full_name, is_email_verified: is_email_verified ? is_email_verified : false , verify_status:USER_VERIFY_STATUS.VERIFIED};
 
@@ -178,7 +190,7 @@ export class UserRepositoryService {
 
             await this.userRepository.save(this.userRepository.create(insertVal));
             const user = await this.userRepository.findOne({ where: { email }, select: { password: false } });
-            return user || null;
+            return user || null; 
         } catch (error) {
             throw error;
         }
@@ -187,7 +199,6 @@ export class UserRepositoryService {
     async getUserByEmail(email: string): Promise<(User) | null> {
         try {
             const user = await this.userRepository.findOne({ where: { email, verify_status: USER_VERIFY_STATUS.VERIFIED, is_email_verified: true }, loadRelationIds: true });
-            console.log()
             return (user as any) || null;
         } catch (error) {
             console.log('Cannot Find User By Email', error);
@@ -275,7 +286,7 @@ export class UserRepositoryService {
                     result[key] = user[key];
                 }
             }
-
+            
             return result as UserI.UserSchema;
         } catch (error) {
             console.error("Error in Fetching User Details:", error);
@@ -310,7 +321,7 @@ export class UserRepositoryService {
                 .orderBy('user.created_at', 'DESC')
                 .skip((page - 1) * limit)
                 .take(limit);
-        
+            
             if(user_type) {
                 queryBuilder.andWhere('user.user_type = :user_type', { user_type });
             }
@@ -329,20 +340,20 @@ export class UserRepositoryService {
             }
         
             const [data, count] = await queryBuilder.getManyAndCount();
-        
-            const userList = data.map(user => {
-                const last_login = user.login_sessions.length
-                    ? user.login_sessions.reduce((latest, session) => {
-                        return session.created_at > latest ? session.created_at : latest;
-                    }, user.login_sessions[0].created_at)
-                    : null;
+            
+            const userList = data.map(user => {   
+                const last_login = user.login_sessions.length   
+                    ? user.login_sessions.reduce((latest, session) => {  
+                        return session.created_at > latest ? session.created_at : latest;  
+                    }, user.login_sessions[0].created_at)  
+                    : null; 
         
                 return {
                     ...user,
                     last_login,
                 };
             });
-        
+            console.log(userList);
             const sanitizedUserList = userList.map(user => {
                 const { login_sessions, ...sanitizedUser } = user;
                 return sanitizedUser;

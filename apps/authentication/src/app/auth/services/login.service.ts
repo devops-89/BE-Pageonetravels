@@ -16,14 +16,14 @@ async getLoginToken(input: LoginSessionI.GetLoginToken)
 {
     try {
         const { user_id, loginBy, login_identity, device_type, user_type } = input
-        const refresh_token = getRandomString(16, false, false);
+        const refresh_token = getRandomString(16, false, false); 
         const expiryTimeStamp = Date.now() + 60 * 60 * 24 * 30 * 1000;   // 90 days
 
         const loginSession: LoginSessionI.insertLoginSession = {
             loginStatus: SESSION_STATUS.LOGGED_IN, refresh_token, refreshTokenExpiry: expiryTimeStamp, user_id, loginBy, login_identity ,device_type
         }
 
-        const session = await this.LoginSessionModel.insertLoginSession(loginSession);
+        const session = await this.LoginSessionModel.insertLoginSession(loginSession); 
         const jwt_token = await this.jwtService.generateJWTToken({
             reference_id: user_id,
             refresh_token,
