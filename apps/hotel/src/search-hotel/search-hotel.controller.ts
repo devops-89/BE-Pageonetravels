@@ -3,6 +3,7 @@ import { SearchHotelService } from './search-hotel.service';
 // import { HotelSearchDto } from '../../../../libs/dtos/hotel/search-hotel.dto';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { GenerateTokenService } from './generateToken.service';
+import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 
 @Controller('/hotel')
 export class SearchHotelController {
@@ -12,16 +13,6 @@ export class SearchHotelController {
     private readonly generateTokenService: GenerateTokenService
   ) { }
 
-  // @Post('/search')
-  // async searchHotel(@Res() res: Response, @Body() body) {
-  //   try {
-  //     const result = await this.searchHotelService.searchHotel(body);
-  //     return this.responseHandler.sendErrorResponse(res, result)
-  //   } catch (error) {
-  //     console.error('Error in hotel search', error);
-  //     throw error;
-  //   }
-  // }
   @Get('/country-list')
   async getCountryList(@Res() res: Response) {
     try {
@@ -37,22 +28,79 @@ export class SearchHotelController {
   }
   
   @Post('/cities')
-  async getCities(@Body('countryCode') countryCode: string, @Res() res: Response) {
+  async getCities(@Body('country_code') country_code: string, @Res() res: Response) {
     try {
-      if (!countryCode) {
+      if (!country_code) {
         return this.responseHandler.sendErrorResponse(res, {
           message: 'Country code is required',
+          statusCode:ERROR_CODES.BAD_REQUEST
         });
       }
   
-      const result = await this.searchHotelService.searchCity(countryCode);
+      const result = await this.searchHotelService.searchCity(country_code);
       return this.responseHandler.sendSuccessResponse(res, result);
     } catch (error) {
-      console.error('Error fetching cities:', error.message);
+     
       return this.responseHandler.sendErrorResponse(res, {
         message: 'Error fetching cities',
-        error: error.message,
+        statusCode: ERROR_CODES.UNEXPECTED_ERROR,
       });
+    }
+  }
+
+  @Get('/listofhotels')
+  async HotelList(@Res() res: Response) {
+    try {
+  
+      const result = await this.searchHotelService.HotelCityCodeList();
+      return this.responseHandler.sendSuccessResponse(res, result);
+    } catch (error) {
+     
+      return this.responseHandler.sendErrorResponse(res, {
+        message: 'Error fetching cities',
+        statusCode: ERROR_CODES.UNEXPECTED_ERROR,
+      });
+    }
+  }
+
+  @Post('/hoteldetails')
+  async HotelDetails(@Body() body: string,@Res() res: Response) {
+    try {
+  
+      const result = await this.searchHotelService.HotelDetails(body);
+      return this.responseHandler.sendSuccessResponse(res, result);
+    } catch (error) {
+     
+      return this.responseHandler.sendErrorResponse(res, {
+        message: 'Error fetching cities',
+        statusCode: ERROR_CODES.UNEXPECTED_ERROR,
+      });
+    }
+  }
+
+  @Post('/cityhoteldetails')
+  async CityHotelDetails(@Body() body: string,@Res() res: Response) {
+    try {
+  
+      const result = await this.searchHotelService.CityHotelDetails(body);
+      return this.responseHandler.sendSuccessResponse(res, result);
+    } catch (error) {
+     
+      return this.responseHandler.sendErrorResponse(res, {
+        message: 'Error fetching cities',
+        statusCode: ERROR_CODES.UNEXPECTED_ERROR,
+      });
+    }
+  }
+
+  @Post('/search')
+  async searchHotel(@Res() res: Response, @Body() body) {
+    try {
+      const result = await this.searchHotelService.searchHotel(body);
+      return this.responseHandler.sendErrorResponse(res, result)
+    } catch (error) {
+      console.error('Error in hotel search', error);
+      throw error;
     }
   }
 }

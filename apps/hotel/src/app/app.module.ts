@@ -5,8 +5,6 @@ import { SearchHotelModule } from '../search-hotel/search-hotel.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 
-// import { GenerateTokenService } from '../search-hotel/generateToken.service';
-// import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 
 @Module({
     imports: [

@@ -33,7 +33,7 @@ scp -i $PEM_FILE ${BUILD_FOLDER}.tar.gz $SERVER_USER@$SERVER_IP:$SERVER_PATH
 ssh -i $PEM_FILE $SERVER_USER@$SERVER_IP <<EOF
   cd $SERVER_PATH
 
-  rm -rf build
+  rm -rf build/dist
   
   # Extract the tar.gz archive
   tar -xzf ${BUILD_FOLDER}.tar.gz

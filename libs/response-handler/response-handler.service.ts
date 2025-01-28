@@ -5,26 +5,29 @@ import { ApiResponse } from '../interfaces/commonTypes/apiResponse.interface';
 @Injectable()
 export class ResponseHandlerService {
   sendSuccessResponse(res: any, response: ApiResponse.ApiOK) {
-    // response.status_code = 200;
+    // response.statusCode = 200;
     // response.success = true;
     res.status(200).json(response);
   }
 
   sendErrorResponse(res: any, errorBody: any) {
-    console.error('Error Response: ', JSON.stringify(errorBody));
+    console.error('Error Response: ', JSON.stringify(errorBody),
+    errorBody.statusCode,
+    errorBody.message);
 
-    if (!errorBody.status_code || !errorBody.message) {
-      errorBody.status_code = ERROR_CODES.UNEXPECTED_ERROR;
+    if (!errorBody.statusCode || !errorBody.message) {
+      console.log("i amiffff");
+      errorBody.statusCode = ERROR_CODES.UNEXPECTED_ERROR;
       errorBody.message = ErrorMessages.UNEXPECTED_ERROR;
     }
 
     const body: ApiResponse.ApiResponseType = {
-      status_code: errorBody.status_code,
+      status_code: errorBody.statusCode,
       message: errorBody.message,
       data: undefined,
       extraError: errorBody.extraError,
       success: false
     };
-    res.status(errorBody.status_code).json(body);
+    res.status(errorBody.statusCode).json(body);
   }
 }

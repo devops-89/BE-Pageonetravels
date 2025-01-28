@@ -165,14 +165,14 @@ export class HTTPSTboAPIService {
                     {
                         Origin: origin,
                         Destination: destination,
-                        FlightCabinClass: cabin_class,
+                        FlightCabinClass: Number(cabin_class),
                         PreferredDepartureTime: `${departure_date}T${preferred_time}`,
                         PreferredArrivalTime: `${departure_date}T${preferred_time}`,
                     },
                     {
                         Origin: destination,
                         Destination: origin,
-                        FlightCabinClass: cabin_class,
+                        FlightCabinClass: Number(cabin_class),
                         PreferredDepartureTime: `${return_date}T${preferred_time}`,
                         PreferredArrivalTime: `${return_date}T${preferred_time}`,
                     },
@@ -183,7 +183,7 @@ export class HTTPSTboAPIService {
                 return multicity.map((segment) => ({
                     Origin: segment.origin,
                     Destination: segment.destination,
-                    FlightCabinClass: segment.cabin_class,
+                    FlightCabinClass: Number(segment.cabin_class),
                     PreferredDepartureTime: `${segment.departure_date}T${preferred_time}`,
                     PreferredArrivalTime: `${segment.departure_date}T${preferred_time}`,
                 }));
@@ -194,7 +194,7 @@ export class HTTPSTboAPIService {
                 {
                     Origin: origin,
                     Destination: destination,
-                    FlightCabinClass: cabin_class,
+                    FlightCabinClass: Number(cabin_class),
                     PreferredDepartureTime: `${departure_date}T${preferred_time}`,
                     PreferredArrivalTime: `${departure_date}T${preferred_time}`,
                 },
