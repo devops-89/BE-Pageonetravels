@@ -25,7 +25,7 @@ export class SearchFlightService {
   async searchAirport(page: number, pageSize: number, search_query: string): Promise<ApiResponse.ApiOK> {
     try {
 
-
+      
       let airport_list: AirportType[] = await this.rediscacheservice.getCache('airportList') as AirportType[];
 
 
@@ -122,7 +122,7 @@ export class SearchFlightService {
             if (multicity.length === 0) {
               throw new Error("Multicity journey requires at least one segment.");
             }
-            multicity.forEach((segment, index) => {
+            multicity.forEach((segment, index) => {  
               FlightValidator.validateOriginDestination(segment.origin, segment.destination);
               FlightValidator.validateFutureDate(segment.departure_date, `Segment ${index + 1}: Departure date should be a future date.`);
               FlightValidator.validateCabinClass(segment.cabin_class);
@@ -132,12 +132,12 @@ export class SearchFlightService {
      
       
       const preferredTimeMapping: Record<string, string> = {
-      [TimeFilter.Morning]: '08:00:00',
-      [TimeFilter.AfterNoon]: '14:00:00',
-      [TimeFilter.Evening]: '19:00:00',
-      [TimeFilter.Night]: '01:00:00',
-      [TimeFilter.AnyTime]: '00:00:00',
-    };
+        [TimeFilter.Morning]: '08:00:00',
+        [TimeFilter.AfterNoon]: '14:00:00',
+        [TimeFilter.Evening]: '19:00:00',
+        [TimeFilter.Night]: '01:00:00',
+        [TimeFilter.AnyTime]: '00:00:00',
+      };
 
     const preferredTimeValue = preferredTimeMapping[preferred_time] || '00:00:00';
 
@@ -241,18 +241,17 @@ export class SearchFlightService {
 
   async handleFlightListingSegmentsForMulticity(searchflight) {
   try {
-
+    
     const flightData = []
 
     for (const flight of searchflight) {
-
       const flight_segment = [];
 
       for (const segment of searchflight.Segments) {
         flight_segment.push(segment);
       }
 
-
+      
       const flightJson = {
         ResultIndex: flight.ResultIndex,
         flight_segment
@@ -315,15 +314,14 @@ export class SearchFlightService {
     if (!file) {
       throw { message: "No file uploaded. Please upload an Excel file.", statusCode: ERROR_CODES.BAD_REQUEST };
     }
-    // Define the folder path
+    // Define the folder path 
     const uploadDir = path.join(__dirname, 'uploads');
-
+    
     // Check if the folder exists, if not create it
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });  // This creates the directory if it doesn't exist
       console.log("Created uploads directory");
     }
-
     const uploadPath = path.join(uploadDir, file.originalname);
     fs.writeFileSync(uploadPath, file.buffer);  // Save the file
 

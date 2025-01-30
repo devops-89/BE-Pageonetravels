@@ -5,17 +5,17 @@ import { ResponseHandlerService } from '../../../../libs/response-handler/respon
 import { GenerateTokenService } from './generateToken.service';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 
-@Controller('/hotel')
-export class SearchHotelController {
-  constructor(
+@Controller('/hotel') 
+export class SearchHotelController { 
+  constructor( 
     private readonly searchHotelService: SearchHotelService,
     private readonly responseHandler: ResponseHandlerService,
     private readonly generateTokenService: GenerateTokenService
-  ) { }
-
-  @Get('/country-list')
-  async getCountryList(@Res() res: Response) {
-    try {
+  ) { } 
+   
+  @Get('/country-list') 
+  async getCountryList(@Res() res: Response) { 
+    try { 
       const result = await this.searchHotelService.searchCountry();
       return this.responseHandler.sendSuccessResponse(res, result);
     } catch (error) {
@@ -104,3 +104,6 @@ export class SearchHotelController {
     }
   }
 }
+
+
+

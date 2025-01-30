@@ -12,7 +12,7 @@ export class HTTPSTboAPIService {
     async httpAPICall(baseURL: string, payload: object) {
         try {
             const result = await axios.post(baseURL, payload);
-        
+            console.log(result.data.Response.FareRules);
             return result.data;
         } catch (error) {
             console.error("Error in AXIOS api call", error.message);

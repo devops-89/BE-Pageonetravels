@@ -20,7 +20,6 @@ export class SearchHotelService {
       
       const country_list_from_cache = await this.rediscacheservice.getCache('CountryList') as string;
       
-      
       if (country_list_from_cache) {
         return { message: "Country list sent successfully", data: JSON.parse(country_list_from_cache) };
       }
@@ -30,13 +29,11 @@ export class SearchHotelService {
       
      
       const country_list = await this.hotelTBOAPIService.fetchCountryList(country_search_base_url);
-  
+      
      
       if (country_list && country_list.length) {
-     
         await this.rediscacheservice.setCache('CountryList', JSON.stringify(country_list), 88000);
       }
-  
      
       return {
         message: 'Country list fetched successfully',
@@ -55,7 +52,6 @@ export class SearchHotelService {
       
       const city_list_from_cache = await this.rediscacheservice.getCache('CityList') as string;
       
-      
       if (city_list_from_cache) {
         return { message: "Country list sent successfully", data: JSON.parse(city_list_from_cache) };
       }
@@ -65,13 +61,12 @@ export class SearchHotelService {
       
      
       const city_list = await this.hotelTBOAPIService.fetchCityList(city_search_base_url, country_code);
-  
      
       if (city_list && city_list.length) {
         await this.rediscacheservice.setCache('CityList', JSON.stringify(city_list), 88000);
       }
   
-     
+      
       return { message: 'Country list fetched successfully',  data: city_list };
 
     } catch (error) {

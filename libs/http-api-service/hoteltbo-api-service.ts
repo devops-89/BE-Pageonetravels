@@ -9,11 +9,8 @@ export class HotelTBOAPIService {
   private async httpAPICall(baseURL: string, headers: object): Promise<any> {
     try {
       const config = { headers };
-    
       const result = await axios.get(baseURL, config)
-      
       return result.data;
-     
     } catch (error) {
       console.error('Error in Axios API call:', error.message);
       if (error.response) {
@@ -48,15 +45,13 @@ export class HotelTBOAPIService {
       const password = "Tbo@11530818";
   
       const credentials = Buffer.from(`${username}:${password}`).toString('base64');
-     
       const headers = {
         'Authorization': `Basic ${credentials}`,
         'Content-Type': 'application/json',
       };
   
-     
       const response = await this.httpAPICall(countryListURL, headers);
-      
+
       return response;
   
     } catch (error) {
@@ -84,7 +79,6 @@ export class HotelTBOAPIService {
       }
 
       const response = await this.httpPostAPICall(cityListURL, payload ,headers);
-
      
       return response;
 

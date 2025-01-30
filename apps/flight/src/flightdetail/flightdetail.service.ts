@@ -24,18 +24,16 @@ export class FlightDetailService {
             const { token } = await this.generateTokenService.getToken(ip_address);
             
             const payload_request = {
-
                 "EndUserIp": ip_address,
                 "TokenId": token,
                 "TraceId": trace_id,
                 "ResultIndex": result_index
-
             }
 
             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
-
+            
             const base_url = tbo_credentials.FLIGHT_FARERULE;
-
+            
             const response = await this.httptboapiservice.fareRule(base_url, payload_request);
 
             return { message: "Fare Rules fetched successfully", data: response };
@@ -48,7 +46,7 @@ export class FlightDetailService {
 
     async FlightDetail(body: FlightDetailRequestDto) {
         try {
-            const guest_token = "1ABCD"
+            const guest_token = "1ABCD"  //fronted will give us 
             const { ip_address, trace_id, result_index } = body;
             const { token } = await this.generateTokenService.getToken(ip_address);
             console.log("Token", token);
@@ -91,8 +89,6 @@ export class FlightDetailService {
                 "ResultIndex": result_index
 
             }
-
-  
 
             const base_url = 'http://api.tektravels.com/BookingEngineService_Air/AirService.svc/rest/SSR'
 

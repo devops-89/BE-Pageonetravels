@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post,  Res } from '@nestjs/common';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { FlightBookingService } from './flight-booking.service';
 import { BookingDto } from '../../../../libs/dtos/flight/booking-flight.dto';
@@ -10,12 +10,12 @@ export class FlightBookingController {
         private readonly flightBookingService:FlightBookingService
     ){}
 
-    @Post('booking')
+    @Post("/booking") 
     async bookFlightForLCC(@Res() res : Response, @Body() body: BookingDto) {
-        try {
+        try { 
+            console.log(body);
             const result = await this.flightBookingService.bookFlight(body);
             this.responsehandlderservice.sendSuccessResponse(res, result);
-          
         } catch(err) {
             console.log(err);
             this.responsehandlderservice.sendErrorResponse(err, err);

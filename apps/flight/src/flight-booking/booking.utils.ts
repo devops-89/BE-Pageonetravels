@@ -17,6 +17,7 @@ export class BookingValidator {
         if (age > 12) {
             throw "Child age must be less than or equal to 12 years.";
         }
+        
         return age
     }
 

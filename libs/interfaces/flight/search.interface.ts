@@ -6,10 +6,10 @@ export interface IFlightSearch {
   AdultCount: number;
   ChildCount: number;
   InfantCount: number;
-  DirectFlight?: boolean;         // Optional
+  DirectFlight?: boolean;         // Optional 
   OneStopFlight: boolean;
-  JourneyType?: any;           // Optional
-  PreferredAirlines?: string;     // Optional
+  JourneyType?: any;           // Optional 
+  PreferredAirlines?: string;     // Optional 
   Segments: {
     Origin: string;
     Destination: string;

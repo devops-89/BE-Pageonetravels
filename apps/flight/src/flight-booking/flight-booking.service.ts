@@ -35,13 +35,12 @@ export class FlightBookingService {
             const address_line2 = `${state} ${postal_code}`;
 
 
-
             await this.redisCacheService.getCache(`FlightDetail${guest_token}`);
 
             const Passengers = [];
 
             const flight_detailsData_cache = await this.redisCacheService.getCache(`FlightDetail${guest_token}`) as string
-
+            console.log(flight_detailsData_cache);
             const parse_flight_details = JSON.parse(flight_detailsData_cache);
 
 
@@ -91,7 +90,7 @@ export class FlightBookingService {
                         1: BookingValidator.adultAgeValidation,
                         2: BookingValidator.childAgeValidation,
                         3: BookingValidator.infantAgeValidation
-                    }
+                    } 
                     const validationFucntion = passengerTypeMap[passenger.pax_type];
 
                     if (validationFucntion) {

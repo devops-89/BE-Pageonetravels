@@ -96,18 +96,18 @@ export class SearchRepositoryService {
     async uploadExcelData(filePath) {
         try {
             // Step 1: Read the Excel file
+            
             const workbook = XLSX.readFile(filePath);
             const sheetName = workbook.SheetNames[0]; // Get the first sheet
             const sheet = workbook.Sheets[sheetName];
 
             // Step 2: Convert Excel sheet to JSON
             const jsonData = XLSX.utils.sheet_to_json(sheet) as any;
-
+            
             // Step 3: Insert data into the database with UPSERT
             for (const row of jsonData) {
-
                 const { iata_code, airport_name, city_name, city_code, country_code } = row;
-
+                
                 if (!iata_code || !airport_name) {
                     console.log("Missing IATA code in row:", iata_code, airport_name);
                     continue; // Skip this row if there's no IATA code

@@ -1,7 +1,7 @@
-import { FLIGHTDATA } from "libs/config/config.interface";
+import { FLIGHTDATA } from "../../libs/config/config.interface";
 import { Injectable } from '@nestjs/common';
 import { SettingRepositoryService } from "../../libs/database/src/repositories/setting.repository";
-import { ConfigService } from "libs/config/config.service";
+import { ConfigService } from "../../libs/config/config.service";
 
 @Injectable()
 export class TBO_CredentialsService {

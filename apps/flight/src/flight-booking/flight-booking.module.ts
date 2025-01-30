@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { FlightBookingController } from './flight-booking.controller';
 import { FlightBookingService } from './flight-booking.service';
-import { BookingRepositoryService, DBModule, UserRepositoryService } from '../../../../libs/database/src';
+import { Booking, BookingRepositoryService, DBModule, UserRepositoryService } from '../../../../libs/database/src';
 import { ConfigModule } from '../../../../libs/config/config.module';
 import { SearchFlightModule } from '../search-flight/search-flight.module';
 import { ResponseHandlerModule } from '../../../../libs/response-handler/response-handler.module';
@@ -11,10 +11,18 @@ import { GenerateTokenService } from '../search-flight/generateToken.service';
 import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
 import { RazorpayModule } from '../../../../libs/paymentgateway/razorpay.module'
 import { RazorpayService } from "../../../../libs/paymentgateway/razorpay.service";
+import { TypeOrmModule } from '@nestjs/typeorm/dist/typeorm.module';
+import { TransactionManager } from '../../../../libs/database/src/repositories/utils';
 
 @Module({
     imports: [
         DBModule.forRoot(),
+        TypeOrmModule.forFeature([
+             BookingRepositoryService,
+             Booking,
+             TransactionManager,
+             UserRepositoryService
+        ]),
         ConfigModule,
         RazorpayModule,
         SearchFlightModule,
@@ -23,6 +31,6 @@ import { RazorpayService } from "../../../../libs/paymentgateway/razorpay.servic
         TBOConfigModule.register(),    
     ],
     controllers: [FlightBookingController],
-    providers: [FlightBookingService, GenerateTokenService, HTTPSTboAPIService, RazorpayService,BookingRepositoryService,UserRepositoryService],
+    providers: [FlightBookingService, GenerateTokenService,Booking,TransactionManager, HTTPSTboAPIService, RazorpayService,BookingRepositoryService,UserRepositoryService],
 })
 export class FlightBookingModule {}
