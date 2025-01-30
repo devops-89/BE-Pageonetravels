@@ -65,7 +65,7 @@ export class CommissionRepositoryService {
             const commission = await this.commissionRepository.findOne({ where: { commission_id: id } });
             return commission;
         }catch(error){
-            console.log(`Failed to retrive brand: ${error.message}`);
+            console.log(`Failed to retrive commission: ${error.message}`);
             throw error;
         }
     }
@@ -79,8 +79,6 @@ export class CommissionRepositoryService {
                 throw `Commission not found with ID: ${commission_id}`;
             }
             
-             
-            
             const comm_percent = parseFloat((input.percentage).toFixed(2));
             input.percentage = comm_percent;
             
@@ -89,7 +87,7 @@ export class CommissionRepositoryService {
             // Save the updated commission
             const updatedCommission = await this.commissionRepository.save(existingCommission);
             return updatedCommission;
-        }catch(error){
+        }catch(error){ 
             console.log(`Failed to update commission: ${error.message}`);
             throw (`Failed to update commission: ${error.message}`);
         }

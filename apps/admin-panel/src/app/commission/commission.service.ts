@@ -13,8 +13,8 @@ export class CommissionService {
         try { 
             const { type, percentage, status } = commissionDto;           
             const commission = await this.commissionRepositoryService.insertCommission({ type, percentage, status });
-            return { message: 'Successfully Inserted Commission', commission: commission };
-        } catch (error) {
+            return { message: 'Successfully Inserted Commission', commission: commission }; 
+        } catch (error) { 
             console.log('Adding Commission', error);
             throw error;
         }
@@ -55,3 +55,6 @@ export class CommissionService {
     }
 
 }
+
+
+

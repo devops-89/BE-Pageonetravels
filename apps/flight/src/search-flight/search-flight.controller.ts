@@ -6,8 +6,8 @@ import { imageFileFilter } from '../../../../libs/utils/fileUpload';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('/flight')
-export class SearchFlightController { 
-    constructor(private readonly searchflightsearvice:SearchFlightService,
+export class SearchFlightController {
+    constructor(private readonly searchflightsearvice: SearchFlightService,
         private readonly responseHandler: ResponseHandlerService,
     ){}
 
@@ -33,9 +33,9 @@ export class SearchFlightController {
             const {search_query} = req['params'];
             const result = await this.searchflightsearvice.searchAirport(page, pageSize, search_query);
             return this.responseHandler.sendSuccessResponse(res, result);
-        } catch(error){
+        } catch (error) {
             console.error("Failed in the search airport", error)
-            return this.responseHandler.sendErrorResponse(res,error)
+            return this.responseHandler.sendErrorResponse(res, error)
         }
     }
 
@@ -57,7 +57,7 @@ export class SearchFlightController {
         try{
             const result = await this.searchflightsearvice.searchFlight(body);
             return this.responseHandler.sendSuccessResponse(res, result);
-        }catch(error){
+        } catch (error) {
             console.error("Error in the Search Flight", error);
             return this.responseHandler.sendErrorResponse(res, error);
         }

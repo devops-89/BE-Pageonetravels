@@ -9,7 +9,7 @@ export interface JWTPayload
     user_role: string,
     session_id: string,
     user_type: USER_TYPE,
-    token_type: TOKEN_TYPE
+    token_type: TOKEN_TYPE 
 }
 export interface JWTPayloadForGuest
 {
