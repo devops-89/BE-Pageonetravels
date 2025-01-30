@@ -7,7 +7,7 @@ import { User } from '../entities/user.entity';
 import { OTP_TYPE } from '../../../constants/autenticationConstants/userContants';
 
 @Injectable()
-export class OtpVerificationService {
+export class OtpVerificationService { 
   constructor(
     @InjectRepository(OtpVerification)
     private readonly otpVerificationRepository: Repository<OtpVerification>,
@@ -66,19 +66,20 @@ async addOtpVerificationRequest(input: OtpVerificationI.VerifyOtpRequest): Promi
 
       let insertedId: string | undefined;
       const oldOtp = await this.otpVerificationRepository.findOne({ where: { otp_type, user: { id: user_id } }, loadRelationIds: true });
-
+      
       if (oldOtp) {
-        insertedId = oldOtp.id;
+        
+        insertedId = oldOtp.id; 
         await this.otpVerificationRepository.update({ otp_type, user: { id: user_id } }, updateValue);
       } else {
         const insertResult = await this.otpVerificationRepository.insert(updateValue);
-
         const otpres = JSON.parse(JSON.stringify(insertResult));
         if (otpres.identifiers && otpres.identifiers.length > 0 && otpres.identifiers[0].id) {
           insertedId = otpres.identifiers[0].id
+          
         }
       }
-
+      
       return insertedId as any;
     } catch (error) {
       throw error;

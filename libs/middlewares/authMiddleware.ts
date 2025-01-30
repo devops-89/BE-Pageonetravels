@@ -75,7 +75,11 @@ export class TokenValidationMiddleware implements NestMiddleware
 @Injectable()
 export class TokenValidationAndGuestMiddleware implements NestMiddleware {
 
-    constructor(private jwtService: JwtService, private LoginSessionModel:LoginSessionService, private readonly ResponseHandler: ResponseHandlerService){}
+    constructor(
+      private jwtService: JwtService, 
+      private LoginSessionModel:LoginSessionService, 
+      private readonly ResponseHandler: ResponseHandlerService
+    ){}
 
   async use(req: Request, res: Response, next: NextFunction) {
     const errorResponse: ApiResponse.ApiErrorType = {
@@ -145,7 +149,11 @@ export class TokenValidationAndGuestMiddleware implements NestMiddleware {
 @Injectable()
 export class OptionalTokenValidationAndGuestMiddleware implements NestMiddleware {
 
-    constructor(private jwtService: JwtService, private LoginSessionModel:LoginSessionService, private readonly ResponseHandler: ResponseHandlerService){}
+    constructor(
+      private jwtService: JwtService, 
+      private LoginSessionModel:LoginSessionService, 
+      private readonly ResponseHandler: ResponseHandlerService
+    ){}
 
   async use(req: Request, res: Response, next: NextFunction) {
     const errorResponse: ApiResponse.ApiErrorType = {

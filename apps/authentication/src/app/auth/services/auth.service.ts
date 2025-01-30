@@ -22,6 +22,7 @@ import { welcomeEmailTemplate } from '../../.././../../../libs/templates/welcome
 import { loginPasswordTemplate } from '../../../../../../libs/templates/loginPasswordTemplate';
 import { ForgotPasswardI } from '../../../../../../libs/interfaces/authentication/forgotPassword.interface';
 import { resetPassword } from '../../../../../../libs/templates/resetPasswordTemplate';
+import { AdminLoginDto } from '../../../../../../libs/dtos/authentication/admin.dto';
 
 
 
@@ -29,7 +30,8 @@ import { resetPassword } from '../../../../../../libs/templates/resetPasswordTem
 @Injectable()
 export class AuthService {
 
-    constructor(private readonly UserModel: UserRepositoryService,
+    constructor(
+        private readonly UserModel: UserRepositoryService,
         private readonly OtpVerificationModel: OtpVerificationService,
         private readonly LoginService: LoginService,
         private readonly jwtService: JwtService,
@@ -65,7 +67,7 @@ export class AuthService {
             }
 
 
-            if (otpReq.otp_type === OTP_TYPE.REGISTER_OTP) {
+            if (otpReq.otp_type === OTP_TYPE.REGISTER_OTP) {   
                 const userStatus: UserI.UpdateUserStatus = {
                     id: otpReq.user,
                     status: USER_ACCOUNT_STATUS.ACTIVE,
@@ -131,7 +133,6 @@ export class AuthService {
 
             if (validateEmail(identity)) {
                 identity = identity.toLowerCase()
-
                 const emailResult = await this.loginWithEmail({ email: identity, user_type });
                 return emailResult;
             } else {
@@ -308,7 +309,7 @@ export class AuthService {
     }
 
     
-    async  registerWithEmailPassword(input: RegisterDto, userPayload:JWTPayload): Promise<ApiResponse.ApiOK> {
+    async  registerWithEmailPassword(input: RegisterDto): Promise<ApiResponse.ApiOK> {
         try {
             input.email = input.email.toLowerCase();
             const { email, password, full_name, user_type, phone_number, country_code } = input;
@@ -373,7 +374,7 @@ export class AuthService {
             };
 
             const otpId = await this.OtpVerificationModel.addOtpVerificationRequest(otpObj);
-
+            // console.log(">>>>>>>>>>", full_name, OTP)
             const emailTemplate = otpVerificationTemplate(full_name, OTP);
             await this.EmailService.sendEmail(email, 'Email Verification', emailTemplate.html);
 
@@ -388,7 +389,7 @@ export class AuthService {
         try {
             input.identity = input.identity.toLowerCase()
             const { identity, password, country_code } = input;
-    
+            
             if (validateEmail(identity)) {
                 
                 const user = await this.UserModel.getUserByEmail(identity);
@@ -649,7 +650,7 @@ export class AuthService {
         };
 
         const otpId = await this.OtpVerificationModel.addOtpVerificationRequest(otpObj);
-        const resetTemplate = resetPassword(OTP, user.full_name);
+        const resetTemplate = resetPassword(OTP, user.full_name);  
         await this.EmailService.sendEmail(lowercasedEmail, 'Reset Password', resetTemplate.html);
 
         return { message: 'OTP has been sent to your registered email', data: { reference_id: otpId } };
@@ -680,7 +681,41 @@ export class AuthService {
 
         return { message: OTP_VERIFY_MSG.PASSWORD_RESET, data: null };
     }
-}
 
+
+
+    async adminLoginDetails(device_type:string,input:AdminLoginDto): Promise <ApiResponse.ApiOK>{
+    try{
+        const { email, password ,user_type} = input;
+        
+        if (user_type) {
+            if(input.user_type == USER_TYPE.ADMIN){
+                console.log("email data",email);
+                const checkIfEmailExist = await this.UserModel.checkAdminEmail(email);
+                if(!checkIfEmailExist){
+                    throw ({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: 'Admin Email Not Exist.' });
+                }
+                // const password_hash = await generatePasswordHash(password);
+                const isPasswordCorrect = await checkPasswordHash(password, checkIfEmailExist.password);
+                console.log(isPasswordCorrect);
+                return null;
+            }else{
+                throw ({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: COMMON_MSG.ADMIN_EXIST });
+            }
+        }else{
+            throw ({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: COMMON_MSG.ADMIN_NOT_EXIST });
+        }
+
+        // const emailCheck = validateEmail(email) ? email.toLowerCase() : undefined;
+        
+        // const password_hash = await generatePasswordHash(password);
+
+        // return password_hash;
+
+    }catch(error){ 
+        console.log('Admin Login Error : ',error);
+        throw error;
+    }
+  }
     
-  
+}

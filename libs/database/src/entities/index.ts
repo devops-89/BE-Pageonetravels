@@ -10,3 +10,15 @@ export * from './hotel.entity'
 export * from './booking.entity'
 export * from './passenger.entity'
 export * from './transaction.entity'
+export * from './settings.entity';
+export * from './airport.entity';
+export * from './banner.entity';
+export * from './headers.entity';
+export * from './tabService.entity';
+export * from './festival.entity';
+export * from './offer.entity';
+export * from './about.entity';
+export * from './faq.entity';
+export * from './testimonial.entity';
+export * from './social.entity';
+export * from './footer.entity';

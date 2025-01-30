@@ -16,6 +16,10 @@ export class LoginDto {
   country_code: string;
 }
 
+
+
+
+
 export class UserQueryDto {
   @IsOptional()
   @IsString()
@@ -52,6 +56,7 @@ export class UserFilterDto {
   @IsOptional() 
   @IsEnum(USER_TYPE)
   user_type: USER_TYPE; 
+  
   @IsOptional()
   @IsString()
   search: string;

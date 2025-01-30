@@ -6,6 +6,9 @@ import { ApiResponse } from '../../../../../libs/interfaces/commonTypes/apiRespo
 import { S3FileService } from '../../../../../libs/S3-Service/s3File.service';
 import { ERROR_CODES } from '../../../../../libs/constants/commonConstants';
 import { USER_ACCOUNT_STATUS } from '../../../../../libs/constants/autenticationConstants/userContants';
+// import { AdminLoginDto } from '../../../../../libs/dtos/authentication/admin.dto';
+// import { identity } from '../../../../../../../rxjs';
+// import { validateEmail } from '../../../../../libs/utils/basicUtils';
 //import { UserI } from '../../../../../libs/interfaces/authentication/user.interface';
 //import { IPaginationObject } from '../../../../../libs/interfaces/commonTypes/custom.interface';
 //import { EditAddressDto, InsertAddressDto } from '../../../../../libs/dtos/authentication/address.dto';
@@ -21,11 +24,9 @@ export class UserService {
   async updateUserProfile(payload: JWTPayload, userDto: UpdatePersonalDetailDto, file): Promise<ApiResponse.ApiOK> {
     try {
       const { reference_id } = payload;
-
-
       const existingUser = await this.userRepositoryService.getUserByUserId(reference_id);
       if (!existingUser) {
-        throw { message: "User Not Found to Update User Profile", status_code: ERROR_CODES.NOT_FOUND }
+        throw { message: "User Not Found to Update User Profile.", status_code: ERROR_CODES.NOT_FOUND }
       }
 
       let s3FileLocation: string = existingUser.avatar;
@@ -132,6 +133,7 @@ export class UserService {
 
   async getUsersByGroup(filter: UserFilterDto, pagination: PaginationDto): Promise<ApiResponse.ApiOK> {
     try {
+        
       const usersList = await this.userRepositoryService.getUsersWithFilters(filter, pagination);
       return { message: "User List fetched successfully", data: usersList }
     }
@@ -140,6 +142,10 @@ export class UserService {
       throw error;
     }
   }
+
+
+ 
+
 
   async updateUserStatus(user_id: string, status: USER_ACCOUNT_STATUS): Promise<ApiResponse.ApiOK> {
     try {
@@ -221,7 +227,7 @@ export class UserService {
     try {
       const { reference_id } = payload
       const user = await this.userRepositoryService.getUserByUserId(reference_id);
-
+      
       if (!user) {
         throw { message: "User not found", status_code: ERROR_CODES.NOT_FOUND };
       }
@@ -252,3 +258,5 @@ export class UserService {
     }
   }
 }
+
+

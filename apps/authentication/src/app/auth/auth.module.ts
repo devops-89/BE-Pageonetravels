@@ -9,7 +9,7 @@ import { LoginService } from './services/login.service';
 import { JwtService } from '../../../../../libs/jwt-service/jwt.service';
 import { ConfigModule } from '../../../../../libs/config/config.module';
 import { ResponseHandlerModule } from '../../../../../libs/response-handler/response-handler.module';
-import { OptionalTokenValidationAndGuestMiddleware, TokenValidationAndGuestMiddleware, TokenValidationMiddleware } from '../../../../../libs/middlewares/authMiddleware';
+import { checkIfAdmin, checkIfAdminUser, OptionalTokenValidationAndGuestMiddleware, TokenValidationAndGuestMiddleware, TokenValidationMiddleware } from '../../../../../libs/middlewares/authMiddleware';
 import { ConfigService } from '../../../../../libs/config/config.service';
  import { EmailService } from '../../../../../libs/email-service/email.service';
 // import { SmsService } from '../../../../../libs/sms-service/sms.service';
@@ -28,9 +28,10 @@ import { ConfigService } from '../../../../../libs/config/config.service';
       JwtService,
       LoginSessionService,
       ConfigService,
+      checkIfAdminUser
     ]),
   ],
-  providers: [DefaultUserService,EmailService, AuthService, LoginService,  LoginSessionService, JwtService, TokenValidationMiddleware, TokenValidationAndGuestMiddleware, OptionalTokenValidationAndGuestMiddleware],
+  providers: [DefaultUserService,EmailService,checkIfAdmin, AuthService, LoginService,  LoginSessionService, JwtService, TokenValidationMiddleware, TokenValidationAndGuestMiddleware, OptionalTokenValidationAndGuestMiddleware],
   controllers: [AuthController],
 })
 export class AuthModule {}

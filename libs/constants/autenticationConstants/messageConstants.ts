@@ -1,4 +1,6 @@
 export const COMMON_MSG = {
+    ADMIN_NOT_EXIST: "User type is Empty",
+    ADMIN_EXIST: "User type is Exist",
     USER_NOT_EXIST: "User doesn't exist",
     INVALID_EMAIL: "Please provide a valid Email",
     INVALID_PHONE: "Please provide a valid phone number",
@@ -28,7 +30,7 @@ export const LOGIN_MSG = {
 };
 
 export const SIGNUP_MSG = {
-   
+    
     INVALID_ROLE: "Invalid user roles",
     LINK_SEND: "Verification link has been sent to ",
     PROFILE_UPDATE: "Profile updated",

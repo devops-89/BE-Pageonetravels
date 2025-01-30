@@ -18,10 +18,11 @@ export class DefaultUserService {
   async addDefaultUser(): Promise<void> {
     try {
       const checkIfExist = await this.userModel.checkUserEmailExist(defaultUser.email);
-      if (checkIfExist) {
+      
+      if (checkIfExist) { 
         return;
       }
-
+      
       const password_hash = await generatePasswordHash(defaultUser.password);
 
       const userObj: UserI.InsertDefaultUser = 
@@ -34,7 +35,7 @@ export class DefaultUserService {
         status: USER_ACCOUNT_STATUS.ACTIVE,
 
       };
-    
+      
       await this.userModel.insertDefaultUser(userObj);
 
       return;
