@@ -66,14 +66,3 @@ export class TBO_CredentialsService {
     }
   }
 }
-//   async  getHotelTBOCredentials() {
-//     try {
-//       const tboConfig = this.configService.get().TBO_CREDENTIALS;
-//       return tboConfig as FLIGHTDATA;
-
-//     } catch (error) {
-//       console.log(error);
-//       throw error;
-//     }
-//   }
-// }
