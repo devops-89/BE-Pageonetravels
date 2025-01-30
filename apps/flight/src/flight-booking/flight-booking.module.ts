@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { FlightBookingController } from './flight-booking.controller';
 import { FlightBookingService } from './flight-booking.service';
-import { Booking, BookingRepositoryService, DBModule, UserRepositoryService } from '../../../../libs/database/src';
+import { Booking, BookingRepositoryService, DBModule, User, UserRepositoryService } from '../../../../libs/database/src';
 import { ConfigModule } from '../../../../libs/config/config.module';
 import { SearchFlightModule } from '../search-flight/search-flight.module';
 import { ResponseHandlerModule } from '../../../../libs/response-handler/response-handler.module';
@@ -21,6 +21,7 @@ import { TransactionManager } from '../../../../libs/database/src/repositories/u
              BookingRepositoryService,
              Booking,
              TransactionManager,
+             User,
              UserRepositoryService
         ]),
         ConfigModule,
