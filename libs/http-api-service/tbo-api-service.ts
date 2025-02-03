@@ -10,9 +10,8 @@ export class HTTPSTboAPIService {
     constructor() { }
 
     async httpAPICall(baseURL: string, payload: object) {
-        try {
+        try { 
             const result = await axios.post(baseURL, payload);
-            console.log(result.data.Response.FareRules);
             return result.data;
         } catch (error) {
             console.error("Error in AXIOS api call", error.message);
@@ -98,7 +97,7 @@ export class HTTPSTboAPIService {
         base_ip: string,
         body: ISearchFlight
     ) {
-        try {
+        try {  
             const {
                 min_price,
                 max_price,
@@ -119,7 +118,7 @@ export class HTTPSTboAPIService {
 
 
             const segments = await this.generateSegments({ journey_type, origin, destination, departure_date, return_date, multicity, cabin_class, preferred_time });
-
+            
             const payload: IFlightSearch = {
                 EndUserIp: base_ip,
                 TokenId: token,
@@ -139,7 +138,6 @@ export class HTTPSTboAPIService {
             
 
             const response = await this.httpAPICall(base_url, payload)
-
             return response;
 
         } catch (error) {

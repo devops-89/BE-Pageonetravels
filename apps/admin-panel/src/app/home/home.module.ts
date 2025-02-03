@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HomeController } from './home.controller';
 import { HomeService } from './home.service';
 import { ConfigModule } from '../../../../../libs/config/config.module';
-import { About, Banner,  DBModule, Faq, Festival, Footer, Offer, Social,Headers,OfferRepositoryService, Testimonial, HeaderRepositoryService,FestivalRepositoryService, TestimonialRepositoryService, AboutRepositoryService, FaqRepositoryService, SocialRepositoryService ,FooterRepositoryService } from '../../../../../libs/database/src';
+import { About, Banner,  DBModule, Faq, Festival, Footer, Offer, Social,Headers,OfferRepositoryService, Testimonial, HeaderRepositoryService,FestivalRepositoryService, TestimonialRepositoryService, AboutRepositoryService, FaqRepositoryService, SocialRepositoryService ,FooterRepositoryService, BannerRepositoryService, TabRepositoryService } from '../../../../../libs/database/src';
 import { ResponseHandlerModule } from '../../../../../libs/response-handler/response-handler.module';
 import { AboutService } from './about.service';
 import { BannerService } from './banner.service';
@@ -23,10 +23,11 @@ import { S3FileService } from '../../../../../libs/S3-Service/s3File.service';
     imports: [
         DBModule.forRoot(),
         ConfigModule,
-        TypeOrmModule.forFeature([Faq,Banner,About,Festival,Offer, Social, Testimonial,Footer,Headers]),
+        TypeOrmModule.forFeature([Faq,Banner,About,Festival,Offer, Social, Testimonial,Footer,Headers,TabService]),
         ResponseHandlerModule 
     ],
     controllers: [HomeController],
-    providers: [HomeService,AboutService,HeaderRepositoryService,FooterRepositoryService,FaqRepositoryService,SocialRepositoryService,AboutRepositoryService,TestimonialRepositoryService,OfferRepositoryService,FestivalRepositoryService ,BannerService,FaqService,TabService,FestivalService, TestimonialService,FooterService,SocialService,OfferService,TokenValidationMiddleware,JwtService, HeaderService, S3FileService],
-})
+    providers: [HomeService,AboutService,HeaderRepositoryService,TabRepositoryService,BannerRepositoryService,FooterRepositoryService,FaqRepositoryService,SocialRepositoryService,AboutRepositoryService,TestimonialRepositoryService,OfferRepositoryService,FestivalRepositoryService ,BannerService,FaqService,TabService,FestivalService, TestimonialService,FooterService,SocialService,OfferService,TokenValidationMiddleware,JwtService, HeaderService, S3FileService],
+}) 
+
 export class HomeModule {} 

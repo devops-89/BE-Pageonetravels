@@ -14,6 +14,15 @@ export enum JOURNEY_TYPE {
     SPECIALRETURN = 'SPECIALRETURN',
   }
   
+  export enum JOURNEYTYPE{
+    ONEWAY = 'ONEWAY',
+    ROUNDTRIP = 'ROUNDTRIP',
+    MULTICITY = 'MULTICITY'
+  }
+  export enum JOURNEY{
+    DOMESTIC = "DOMESTIC",
+    INTERNATIONAL = "INTERNATIONAL"
+  }
 
   export enum TimeFilter {
     AnyTime = 'AnyTime',

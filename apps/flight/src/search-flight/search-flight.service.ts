@@ -140,14 +140,15 @@ export class SearchFlightService {
       };
 
     const preferredTimeValue = preferredTimeMapping[preferred_time] || '00:00:00';
-
+      
     const journeyTypeMapping: Record<string, number> = {
       [JOURNEYTYPEMAPPING.ONEWAY]: 1,
       [JOURNEYTYPEMAPPING.ROUNDTRIP]: 2,
       [JOURNEYTYPEMAPPING.MULTICITY]: 3,
     };
+    
     const assigned_journey_type = journeyTypeMapping[journey_type] || 1;
-
+    
     // const search_response_from_cache = await this.generateTokenService.getCache(`${journey_type}${origin}${destination}`);
 
     // if (search_response_from_cache) {
@@ -155,19 +156,20 @@ export class SearchFlightService {
     // }
 
     const { token, TBO_data } = await this.generateTokenService.getToken(ip_address);
-
+    
     const { FLIGHT_SEARCH: base_url, FLIGHT_ENDUSERIP: base_ip } = TBO_data;
-
+    
     const responsefromTBO = await this.httptboapiservice.searchFlightAPI(token, base_url, base_ip, {
       ...body,
       journey_type: assigned_journey_type,
       preferred_time: preferredTimeValue,
     });
-
+    
     if(responsefromTBO && responsefromTBO.Response && responsefromTBO.Response.Error.ErrorMessage){
       throw {message : responsefromTBO.Response.Error.ErrorMessage , statusCode:ERROR_CODES.BAD_REQUEST}
     }
-    const trans = await this.fetchSegmentsDataAsPerJourneyType(responsefromTBO, assigned_journey_type)
+    const trans = await this.fetchSegmentsDataAsPerJourneyType(responsefromTBO, assigned_journey_type);
+    // const trans = responsefromTBO;
 
     // await this.rediscacheservice.setCache(`${journey_type}${origin}${destination}`, JSON.stringify(trans), 3600) // 1 minute
 
@@ -189,7 +191,7 @@ export class SearchFlightService {
     const origin = response.Response?.Origin;
     const destination = response.Response?.Destination;
     const trace_id = response.Response?.TraceId;
-
+    
     if (!result) {
       console.error("Invalid response structure or empty Results.");
       throw `("result is empty")`;
@@ -204,31 +206,36 @@ export class SearchFlightService {
 
     //RoundTrip
     if (journey_type === 2) {
-
+        
       if (response.Response?.Results?.length === 1) {
         //international flights 
 
         const { flightData } = await this.handleFlightListingSegments(result);
+        flightList['departure_flights'] = flightData;
 
-        flightList['departure_flights'] = flightData
-      } else {
+        const type = "INTERNATIONAL";
+        return { flight_list: flightList, origin, destination, trace_id,type };
+    
+      } else  { 
         //domestic flights
 
         const segment1 = await this.handleFlightListingSegments(result)
         const segment2 = await this.handleFlightListingSegments(roundtrip_dometic_result)
 
         flightList['departure_flights'] = segment1;
-        flightList['arrival_flights'] = segment2
+        flightList['arrival_flights'] = segment2;
+        const type = "DOMESTIC";
+        
+        return { flight_list: flightList, origin, destination, trace_id,type };
 
       }
-      return { flight_list: flightList, origin, destination, trace_id };
+      
     }
 
     // Multicity
     if (journey_type === 3) {
-
       const segment = await this.handleFlightListingSegmentsForMulticity(result);
-
+      console.log(result);
       return { flight_list: segment, origin, destination, trace_id };
     }
 
@@ -243,24 +250,26 @@ export class SearchFlightService {
   try {
     
     const flightData = []
-
-    for (const flight of searchflight) {
-      const flight_segment = [];
-
-      for (const segment of searchflight.Segments) {
-        flight_segment.push(segment);
+        // console.log("search Flight ... >> Data >",searchflight);
+      for (const segment of searchflight) {
+        console.log(segment.Segment.length);
+        const data = {
+          ResultIndex: segment.ResultIndex,
+          TotalFare:segment.Fare.PublishedFare,
+          Tax:segment.Fare.Tax,
+          Currency:segment.Currency,
+          AirlineCode:segment.AirlineCode,
+          IsLCC:segment.IsLCC,
+          IsRefundable:segment.IsRefundable,
+          GSTAllowed:segment.GSTAllowed,
+          IsGSTMandatory:segment.IsGSTMandatory,
+          AirlineLogo:`https://dev.page1travels.com/flight/AirlineLogo/${segment.AirlineCode}.gif`,
+          departure:segment.Segments
+        }
+        
+        flightData.push(data);
       }
-
       
-      const flightJson = {
-        ResultIndex: flight.ResultIndex,
-        flight_segment
-
-      }
-
-      flightData.push(flightJson)
-    }
-
     return { flightData };
 
   } catch (error) {
@@ -276,7 +285,6 @@ export class SearchFlightService {
     const flightData = []
 
     for (const flight of searchflight) {
-
       const departure = flight.Segments && flight.Segments.length > 0 ? flight.Segments[0] : [];
       const arrival = flight.Segments && flight.Segments.length > 1 ? flight.Segments[1] : [];
    

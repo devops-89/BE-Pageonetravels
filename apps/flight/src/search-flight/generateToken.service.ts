@@ -53,6 +53,7 @@ export class GenerateTokenService {
         try {
            
             let token = await this.rediscacheservice.getCache(`tboToken:${ip_address}`);
+            
             const tbo_credentials = await this.getTBOCredentials();
             if (!token) {
                 await this.generateTBOToken(ip_address);
@@ -64,7 +65,7 @@ export class GenerateTokenService {
                 TBO_data: tbo_credentials,
                 token: token as string,
             };
-    
+            
             return payload;
     
         } catch (error) {
