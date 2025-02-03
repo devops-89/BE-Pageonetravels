@@ -1,7 +1,7 @@
 import { Controller, Post, Req, Res, ValidationPipe, Body } from '@nestjs/common';
 import { FlightDetailService } from './flightdetail.service';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
-import { FlightDetailRequestDto } from '../../../../libs/dtos/flight/flight-detail.dto';
+import { FlightDetailRequestDto,FlightRuleDto } from '../../../../libs/dtos/flight/flight-detail.dto';
 
 
 @Controller('flightdetail')
@@ -12,7 +12,7 @@ export class FlightdetailController {
 
     @Post('/farerule')
     async FareRule(@Req() req: Request, @Res() res: Response,
-    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })) body: FlightDetailRequestDto,) {
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })) body: FlightRuleDto,) {
         try {
             const result = await this.flightdetailservice.FareRule(body);
             return this.responseHandler.sendSuccessResponse(res, result);

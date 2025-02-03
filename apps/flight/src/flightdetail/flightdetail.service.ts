@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
 import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
-import { FlightDetailRequestDto } from '../../../../libs/dtos/flight/flight-detail.dto'
+import { FlightDetailRequestDto, FlightRuleDto } from '../../../../libs/dtos/flight/flight-detail.dto'
 import { GenerateTokenService } from '../search-flight/generateToken.service';
 import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 import { JOURNEYTYPE,JOURNEY} from '../../../../libs/constants/flightConstant'
@@ -18,7 +18,7 @@ export class FlightDetailService {
     ) { }
 
     //ifGSTmandatory then we have to fill the information
-    async FareRule(body: FlightDetailRequestDto) {
+    async FareRule(body: FlightRuleDto) {
         try {
 
             const { ip_address, trace_id, result_index } = body;
@@ -45,73 +45,6 @@ export class FlightDetailService {
             throw error;
         }
     }
-
-    // async FlightDetail(body: FlightDetailRequestDto) {
-    //     try {
-    //         const guest_token = "1ABCD"  //fronted will give us 
-    //         const { ip_address, trace_id, result_index,journey_type,journey,result_index_ib } = body;
-
-    //         if (!Object.values(JOURNEYTYPE).includes(journey_type)) {
-    //             throw new Error("Invalid journey type provided. Accepted values are: ONEWAY, ROUNDTRIP, MULTICITY.");
-    //         }
-
-    //         if (!Object.values(JOURNEY).includes(journey)) {
-    //             throw new Error("Invalid journey category provided. Accepted values are: DOMESTIC, INTERNATIONAL.");
-    //         }
-
-    //         const { token } = await this.generateTokenService.getToken(ip_address);
-    //         const tbo_credentials = await this.tboConfigService.getTBOCredentials();
-
-    //         const base_url = tbo_credentials.FLIGHT_FAREQUOTE;
-
-
-    //         if (journey_type === JOURNEYTYPE.ROUNDTRIP && journey === JOURNEY.DOMESTIC) {
-
-    //             if (!result_index_ib || result_index_ib === null) {
-    //                 throw new Error("Missing required parameter: Result Index for Inbound journey.");
-    //             }
-
-    //             const payload_request_OB = {
-    //                             "EndUserIp": ip_address,
-    //                             "TokenId": token,
-    //                             "TraceId": trace_id,
-    //                             "ResultIndex": result_index
-    //                         }
-
-    //             const payload_request_IB = {
-    //                             "EndUserIp": ip_address,
-    //                             "TokenId": token,
-    //                             "TraceId": trace_id,
-    //                             "ResultIndex": result_index_ib
-    //                         }
-
-    //             const response_ob = await this.httptboapiservice.fareRule(base_url, payload_request_OB) ;
-    //             const response_ib = await this.httptboapiservice.fareRule(base_url, payload_request_IB) ;
-    //             const response = [response_ob,response_ib];
-    //             return { message: "Fare Details fetched successfully", data: response };
-                
-    //         }
-
-    //         const payload_request = {
-    //             "EndUserIp": ip_address,
-    //             "TokenId": token,
-    //             "TraceId": trace_id,
-    //             "ResultIndex": result_index
-    //         }
-            
-    //         const response = await this.httptboapiservice.fareRule(base_url, payload_request) ;
-
-    //         await this.redisCacheService.setCache(`FlightDetail${guest_token}`, JSON.stringify(response), 3600);
-            
-    //         return { message: "Fare Details fetched successfully", data: response };
-
-    //     } catch (error) {
-    //         console.log("Error in the fare Details function", error);
-    //         throw error;
-    //     }
-    // }
-
-    
         async FlightDetail(body: FlightDetailRequestDto) {
         try {
             const guest_token = "1ABCD"; // Frontend will provide this
