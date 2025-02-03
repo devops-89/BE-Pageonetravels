@@ -20,6 +20,7 @@ import { TransactionManager } from '../../../../libs/database/src/repositories/u
         TypeOrmModule.forFeature([
              BookingRepositoryService,
              Booking,
+             User,
              TransactionManager,
              User,
              UserRepositoryService
