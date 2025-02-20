@@ -5,6 +5,7 @@ import { FlightDetailRequestDto, FlightRuleDto } from '../../../../libs/dtos/fli
 import { GenerateTokenService } from '../search-flight/generateToken.service';
 import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 import { JOURNEYTYPE,JOURNEY} from '../../../../libs/constants/flightConstant'
+import { ERROR_CODES } from 'libs/constants/commonConstants';
 
 
 @Injectable()
@@ -63,9 +64,11 @@ export class FlightDetailService {
             // Generate token and get TBO credentials
             const { token } = await this.generateTokenService.getToken(ip_address);
             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
+            const base_url_ssr = tbo_credentials.FLIGHT_SSR;
             const base_url = tbo_credentials.FLIGHT_FAREQUOTE;
-
+            
             let response;
+            let ssrResponse;
 
             if (journey_type === JOURNEYTYPE.ROUNDTRIP && journey === JOURNEY.DOMESTIC) {
                 // Validate result_index_ib for round trip domestic journey
@@ -87,10 +90,28 @@ export class FlightDetailService {
                     "ResultIndex": result_index_ib
                 };
 
-                const [response_ob, response_ib] = await Promise.all([
+                let [respons_ob, respons_ib] = await Promise.all([
                     this.httptboapiservice.fareRule(base_url, payload_request_OB),
                     this.httptboapiservice.fareRule(base_url, payload_request_IB)
                 ]);
+
+                respons_ob = await this.httptboapiservice.flightFormat(respons_ob);
+                await this.addImage(respons_ob);
+                respons_ib = await this.httptboapiservice.flightFormat(respons_ib);
+                await this.addImage(respons_ib);
+
+
+                let [ssr_ob, ssr_ib] = await Promise.all([
+                    this.httptboapiservice.ssr(base_url_ssr, payload_request_OB),
+                    this.httptboapiservice.ssr(base_url_ssr, payload_request_IB)
+                ]);
+
+                ssr_ob = await this.httptboapiservice.flightFormat(ssr_ob);
+                ssr_ib = await this.httptboapiservice.flightFormat(ssr_ib);
+                
+                
+                let response_ob = [respons_ob, ssr_ob];
+                let  response_ib = [respons_ib, ssr_ib];
 
                 response = [response_ob, response_ib];
             } else {
@@ -100,8 +121,14 @@ export class FlightDetailService {
                     "TraceId": trace_id,
                     "ResultIndex": result_index
                 };
-
+                
                 response = await this.httptboapiservice.fareRule(base_url, payload_request);
+                response = await this.httptboapiservice.flightFormat(response);
+                await this.addImage(response);
+
+                ssrResponse = await this.httptboapiservice.ssr(base_url_ssr, payload_request);
+                ssrResponse = await this.httptboapiservice.flightFormat(ssrResponse);
+                response = [response, ssrResponse]; 
             }
 
             // Cache the response
@@ -122,12 +149,10 @@ export class FlightDetailService {
             const { token } = await this.generateTokenService.getToken(ip_address);
             console.log("Token", token);
             const payload_request = {
-
                 "EndUserIp": ip_address,
                 "TokenId": token,
                 "TraceId": trace_id,
                 "ResultIndex": result_index
-
             }
 
             const base_url = 'http://api.tektravels.com/BookingEngineService_Air/AirService.svc/rest/SSR'
@@ -144,5 +169,20 @@ export class FlightDetailService {
         }
     }
 
+    async addImage(response:any){
+        try{
+            let segment = response.Results.Segments[0];
+            if (segment.length === 1) {
+                segment[0].AccumulatedDuration = segment[0].Duration;
+            }
+            
+            for (const data of segment) {
+                data.AirlineLogo = `https://dev.page1travels.com/flight/AirlineLogo/${data.Airline.AirlineCode}.gif`;
+            }
+            return response;
+        }catch(error){ 
+            throw error;
+        }
+    }
 
 }

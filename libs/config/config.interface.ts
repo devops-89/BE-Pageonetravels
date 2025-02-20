@@ -110,6 +110,7 @@ export interface FLIGHTDATA {
   FLIGHT_SEARCH : string
   FLIGHT_FARERULE : string
   FLIGHT_FAREQUOTE : string
+  FLIGHT_SSR : string
   FLIGHT_BOOKING_API_FORNONLCC : string
   FLIGHT_TICKET_FORLCC : string
   FLIGHT_BOOKING_DETAILS : string

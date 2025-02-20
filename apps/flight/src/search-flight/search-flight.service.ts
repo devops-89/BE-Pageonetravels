@@ -76,7 +76,7 @@ export class SearchFlightService {
 
   async searchFlight(body: SearchFlightDto) {
     try {
-
+      
       const {
         preferred_time,
         origin,
@@ -91,7 +91,7 @@ export class SearchFlightService {
         infant = 0,
         ip_address,
       } = body;
-
+      
       if (adult < 1) {
         return { message: "At least one adult passenger is required", statusCode: ERROR_CODES.BAD_REQUEST };
       }
@@ -168,6 +168,9 @@ export class SearchFlightService {
     if(responsefromTBO && responsefromTBO.Response && responsefromTBO.Response.Error.ErrorMessage){
       throw {message : responsefromTBO.Response.Error.ErrorMessage , statusCode:ERROR_CODES.BAD_REQUEST}
     }
+
+
+
     const trans = await this.fetchSegmentsDataAsPerJourneyType(responsefromTBO, assigned_journey_type);
     // const trans = responsefromTBO;
 
@@ -235,7 +238,6 @@ export class SearchFlightService {
     // Multicity
     if (journey_type === 3) {
       const segment = await this.handleFlightListingSegmentsForMulticity(result);
-      console.log(result);
       return { flight_list: segment, origin, destination, trace_id };
     }
 
@@ -250,9 +252,8 @@ export class SearchFlightService {
   try {
     
     const flightData = []
-        // console.log("search Flight ... >> Data >",searchflight);
-      for (const segment of searchflight) {
-        console.log(segment.Segment.length);
+    const uniqueFlight = this.extractUniqueFlightNumber(searchflight);
+    for (const segment of uniqueFlight) {
         const data = {
           ResultIndex: segment.ResultIndex,
           TotalFare:segment.Fare.PublishedFare,
@@ -277,14 +278,44 @@ export class SearchFlightService {
     throw error;
   }
   }
+
+  extractUniqueFlightNumber(searchflight){
+    try{
+      const ddd = new Set(); // Using Set to store unique Flight Numbers
+      const arrayData = [];
+
+      for (const a of searchflight) {
+        const data = a.Segments;
+
+        for (const b of data) {
+          if (b.length > 0) {
+            const flightNumber = b[0].Airline.FlightNumber;
+
+            if (!ddd.has(flightNumber)) { // Check if the flight number is unique
+              ddd.add(flightNumber); // Add FlightNumber to Set
+              arrayData.push(a); // Add the entire flight object to arrayData
+            }
+          }
+        }
+      }
+
+      const uniqueFlightNumbers = Array.from(ddd); // Convert Set to Array
+      // console.log("Unique Flight Numbers:", uniqueFlightNumbers);
+      console.log("Unique Flight Data:", arrayData);
+      return arrayData;
+    }catch(error){
+      console.log("Error In Fetching Unique Flights",error)
+      throw error;
+    }
+  }
   
 
   async handleFlightListingSegments(searchflight) {
   try {
 
-    const flightData = []
-
-    for (const flight of searchflight) {
+    const flightData = [];
+    const uniqueFlight = this.extractUniqueFlightNumber(searchflight);
+    for (const flight of uniqueFlight) {
       const departure = flight.Segments && flight.Segments.length > 0 ? flight.Segments[0] : [];
       const arrival = flight.Segments && flight.Segments.length > 1 ? flight.Segments[1] : [];
    
@@ -316,6 +347,8 @@ export class SearchFlightService {
   }
 
   }
+
+  
 
   async uploadAirport(file) {
   try {
