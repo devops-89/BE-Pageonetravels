@@ -1,35 +1,62 @@
-import { IsString, IsNumber, IsBoolean, IsOptional, IsDateString, ValidateNested, IsArray, IsNotEmpty } from 'class-validator';
+import {
+    IsString,
+    IsNumber,
+    IsBoolean,
+    IsOptional,
+    IsDateString,
+    ValidateNested,
+    IsArray,
+    IsIn,
+    IsNotEmpty,
+    ArrayMinSize,
+    MinLength,
+    IsInt
+} from 'class-validator';
 import { Type } from 'class-transformer';
+
+
+
+
 
 export class PassengerDto {
     @IsString()
+    @IsNotEmpty()
     title: string;
 
     @IsString()
+    @IsNotEmpty()
     first_name: string;
 
     @IsString()
+    @IsNotEmpty()
     last_name: string;
 
-    @IsNumber()
-    pax_type: number;
+    @IsInt()
+    @IsIn([1, 2, 3], { message: 'pax_type must be 1 (Adult), 2 (Child), or 3 (Infant)' })
+    pax_type: number; // 1: Adult, 2: Child, 3: Infant
 
     @IsDateString()
+    @IsNotEmpty()
     date_of_birth: string;
 
     @IsString()
+    @IsNotEmpty()
     gender: string;
 
+    @IsOptional()
     @IsString()
-    passport_no: string;
+    passport_no?: string | null;
 
+    @IsOptional()
     @IsDateString()
-    passport_expiry: string;
+    passport_expiry?: string | null;
 
     @IsString()
+    @IsNotEmpty()
     contact_no: string;
 
     @IsString()
+    @IsNotEmpty()
     email: string;
 
     @IsBoolean()
@@ -37,23 +64,117 @@ export class PassengerDto {
 
     @IsOptional()
     @IsString()
-    ff_airline_code: string | null;
+    ff_airline_code?: string | null;
 
     @IsOptional()
     @IsString()
-    ff_number: string;
+    ff_number?: string | null;
+
 }
 
-export class BookingDto {
+
+
+
+
+
+export class PassengerDetailsDto {
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => PassengerDto)
+    @ArrayMinSize(1, { message: 'At least one adult is required' })
+    adult: PassengerDto[];
+
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => PassengerDto)
+    child: PassengerDto[] = [];  // Default empty array
+
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => PassengerDto)
+    infant: PassengerDto[] = []; // Default empty array
+}
+
+
+
+export class FareDto {
+    @IsString()
+    Currency: string;
+
+    @IsNumber()
+    BaseFare: number;
+
+    @IsNumber()
+    Tax: number;
+
+    @IsNumber()
+    YQTax: number;
+
+    @IsNumber()
+    AdditionalTxnFeeOfrd: number;
+
+    @IsNumber()
+    AdditionalTxnFeePub: number;
+
+    @IsNumber()
+    OtherCharges: number;
+
+    @IsNumber()
+    Discount: number;
+
+    @IsNumber()
+    PublishedFare: number;
+
+    @IsNumber()
+    OfferedFare: number;
+
+    @IsNumber()
+    TdsOnCommission: number;
+
+    @IsNumber()
+    TdsOnPLB: number;
+
+    @IsNumber()
+    TdsOnIncentive: number;
+
+    @IsNumber()
+    ServiceFee: number;
+}
+
+export class FareBreakdownDto {
+    @IsString()
+    Currency: string;
+
+    @IsNumber()
+    PassengerType: number;
+
+    @IsNumber()
+    PassengerCount: number;
+
+    @IsNumber()
+    BaseFare: number;
+
+    @IsNumber()
+    Tax: number;
+
+    @IsNumber()
+    YQTax: number;
+
+    @IsNumber()
+    AdditionalTxnFeeOfrd: number;
+
+    @IsNumber()
+    AdditionalTxnFeePub: number;
+}
+
+export class BookingNonLccDto {
     @IsString()
     result_index: string;
 
     @IsString()
-    userId: string;
-
-    @IsString()
     ip_address: string;
-
 
     @IsString()
     cell_country_code: string;
@@ -62,16 +183,13 @@ export class BookingDto {
     country_code: string;
 
     @IsString()
-    receipt: string;
-
-    @IsString()
     city: string;
 
     @IsString()
     contact_no: string;
 
     @IsString()
-    country: string
+    country: string;
 
     @IsString()
     house_number: string;
@@ -91,39 +209,213 @@ export class BookingDto {
     @IsString()
     email: string;
 
+    @IsString()
+    trace_id: string;
+
+    @ValidateNested()
+    @Type(() => PassengerDetailsDto)
+    @IsNotEmpty()
+    passenger_details: PassengerDetailsDto;
+
+    @IsOptional()
+    @IsString()
+    gst_company_address?: string;
+
+    @IsOptional()
+    @IsString()
+    gst_company_contact_number?: string;
+
+    @IsOptional()
+    @IsString()
+    gst_company_name?: string;
+
+    @IsOptional()
+    @IsString()
+    gst_number?: string;
+
+    @IsOptional()
+    @IsString()
+    gst_company_email?: string;
+
     @IsArray()
     @ValidateNested({ each: true })
-    @Type(() => PassengerDto)
-    passenger_details: PassengerDto[];
+    @Type(() => FareDto)
+    @IsNotEmpty()
+    fare: FareDto[];
 
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => FareBreakdownDto)
+    @IsNotEmpty()
+    fareBreakdown: FareBreakdownDto[];
+
+    
+}
+
+export class TicketDto {
+    @IsString()
+    ip_address: string;
+
+    @IsString()
+    tokenId: string;
+
+    @IsString()
+    traceId: string;
+
+    @IsString()
+    pnr: string;
+
+    @IsNumber()
+    bookingId: number;
+}
+
+
+
+class MealDetailDto {
+    @IsString()
+    AirlineCode: string;
+  
+    @IsString()
+    FlightNumber: string;
+  
+    @IsNumber()
+    WayType: number;
+  
+    @IsString()
+    Code: string;
+  
+    @IsNumber()
+    Description: number;
+  
+    @IsString()
+    AirlineDescription: string;
+  
+    @IsNumber()
+    Quantity: number;
+  
+    @IsString()
+    Currency: string;
+  
+    @IsNumber()
+    Price: number;
+  
+    @IsString()
+    Origin: string;
+  
+    @IsString()
+    Destination: string;
+  }
+  
+  class MealTypeDto {
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => MealDetailDto)
+    adult: MealDetailDto[];
+  
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => MealDetailDto)
+    @IsOptional()
+    child?: MealDetailDto[];
+  
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => MealDetailDto)
+    @IsOptional()
+    infant?: MealDetailDto[];
+  }
+  
+
+
+
+export class BookingDto{
+    @IsString()
+    result_index: string;
+
+    @IsString()
+    ip_address: string;
+
+    @IsString()
+    cell_country_code: string;
+
+    @IsString()
+    country_code: string;
+
+    @IsString()
+    city: string;
+
+    @IsString()
+    contact_no: string;
+
+    @IsString()
+    country: string;
+
+    @IsString()
+    house_number: string;
+
+    @IsString()
+    postal_code: string;
+
+    @IsString()
+    street: string;
+
+    @IsString()
+    state: string;
+
+    @IsString()
+    nationality: string;
+
+    @IsString()
+    email: string;
 
     @IsString()
     trace_id: string;
 
+    @ValidateNested()
+    @Type(() => PassengerDetailsDto)
+    @IsNotEmpty()
+    passenger_details: PassengerDetailsDto;
 
     @IsOptional()
     @IsString()
-    gst_company_address: string;
+    gst_company_address?: string;
 
     @IsOptional()
     @IsString()
-    gst_company_contact_number: string;
+    gst_company_contact_number?: string;
 
     @IsOptional()
     @IsString()
-    gst_company_name: string;
+    gst_company_name?: string;
 
     @IsOptional()
     @IsString()
-    gst_number: string;
+    gst_number?: string;
 
     @IsOptional()
     @IsString()
-    gst_company_email: string;
+    gst_company_email?: string;
 
-    @IsNumber()
-    base_fare: number;
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => FareDto)
+    @IsNotEmpty()
+    fare: FareDto[];
 
-    @IsNumber()
-    tax: number;
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => FareBreakdownDto)
+    @IsNotEmpty()
+    fareBreakdown: FareBreakdownDto[];
+
+    
+    @ValidateNested()
+    @Type(() => MealTypeDto)
+    @IsOptional()
+    meals: MealTypeDto;
+   
 }
+
+
+
+

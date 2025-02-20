@@ -23,6 +23,7 @@ export class TBO_CredentialsService {
             FLIGHT_SEARCH : flightConfig.FLIGHT_SEARCH,
             FLIGHT_FARERULE : flightConfig.FLIGHT_FARERULE,
             FLIGHT_FAREQUOTE : flightConfig.FLIGHT_FAREQUOTE,
+            FLIGHT_SSR: flightConfig.FLIGHT_SSR,
             FLIGHT_BOOKING_API_FORNONLCC : flightConfig.FLIGHT_BOOKING,
             FLIGHT_TICKET_FORLCC : flightConfig.FLIGHT_TICKET,
             FLIGHT_BOOKING_DETAILS : flightConfig.FLIGHT_BOOKING_DETAILS,

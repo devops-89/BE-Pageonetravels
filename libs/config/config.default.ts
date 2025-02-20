@@ -44,6 +44,7 @@ export const DEFAULT_CONFIG: ConfigData = {
         FLIGHT_SEARCH : '',
         FLIGHT_FARERULE : '',
         FLIGHT_FAREQUOTE : '',
+        FLIGHT_SSR : '',
         FLIGHT_BOOKING_API_FORNONLCC : '',
         FLIGHT_TICKET_FORLCC : '',
         FLIGHT_BOOKING_DETAILS : '',

@@ -3,6 +3,8 @@ import axios from "axios";
 import { SearchFlightDto } from "../dtos/flight/search-flights.dto";
 import { IFareRule, IFlightSearch, ISearchFlight } from "../interfaces/flight/search.interface";
 import { JOURNEY_TYPE } from "../../libs/constants/flightConstant";
+import { TicketDto } from "libs/dtos/flight/booking-flight.dto";
+import { ERROR_CODES } from "libs/constants/commonConstants";
 
 @Injectable()
 export class HTTPSTboAPIService {
@@ -12,6 +14,7 @@ export class HTTPSTboAPIService {
     async httpAPICall(baseURL: string, payload: object) {
         try { 
             const result = await axios.post(baseURL, payload);
+            console.log(result.data);
             return result.data;
         } catch (error) {
             console.error("Error in AXIOS api call", error.message);
@@ -19,77 +22,7 @@ export class HTTPSTboAPIService {
         }
     }
 
-    // async searchFlightAPI(
-    //     token: any, 
-    //     base_url: string, 
-    //     base_ip: string, 
-    //     body: ISearchFlight
-    // ) {
-    //     try {
-          
-    //         const {
-    //             min_price,
-    //             max_price,
-    //             multicity = [],
-    //             return_date,
-    //             preferred_time,
-    //             journey_type,
-    //             origin,
-    //             destination,
-    //             departure_date,
-    //             adult,
-    //             child = 0,
-    //             infant = 0,
-    //             direct_flight,
-    //             one_stop_flight,
-    //             cabin_class
-    //         } = body;
-           
-
-    //         const segments = await this.generateSegments({ journey_type, origin,  destination, departure_date, return_date, multicity, cabin_class,preferred_time});
-        
-    //         const payload: IFlightSearch = {
-    //             EndUserIp: base_ip,
-    //             TokenId: token,
-    //             AdultCount: adult,
-    //             ChildCount: child,
-    //             InfantCount: infant,
-    //             DirectFlight: direct_flight,
-    //             JourneyType: journey_type,
-    //             OneStopFlight: one_stop_flight,
-    //             PreferredAirlines: null,
-    //             Segments: segments,
-    //             Sources: null,
-    //             MinPrice: min_price,
-    //             MaxPrice: max_price,
-    //         };
-          
-          
-    //         const response = await this.httpAPICall(base_url, payload);
-
-    //         const availablePrices = response.Response.Results.flatMap(result =>
-    //             result.map(flight => flight.Fare.PublishedFare)
-    //         );
-
-
-    //     const minFlightPrice = Math.min(...availablePrices);
-    //     const maxFlightPrice = Math.max(...availablePrices);
-          
-    //         //return response;
-    //         return {
-    //             message: "Flight list fetched successfully",
-    //             data: {
-    //                 minFlightPrice,
-    //                 maxFlightPrice,
-    //                 flights: response.Response.Results
-    //             }
-    //         }
     
-    //     } catch (error) {
-    //         console.error("Error in searchFlightAPI function:", error);
-    //         throw (error.message || "Failed to fetch flight data in search flight api service");
-    //     }
-    // }
 
     async searchFlightAPI(
         token: any,
@@ -215,6 +148,15 @@ export class HTTPSTboAPIService {
         }
     }
 
+    async ssr(base_url_ssr: string, payload:IFareRule){
+        try {
+            let result = await this.httpAPICall(base_url_ssr, payload);
+            return result;
+        } catch (error) {
+            throw error
+        }
+    }
+
     async FlightSeatDetails(base_url:string, payload:IFareRule) {
         try {
             let result = await this.httpAPICall(base_url, payload);
@@ -224,6 +166,72 @@ export class HTTPSTboAPIService {
             throw error
         }
     }
+    
+    async flightBooking(baseURL: string, payload: object) {
+        try {
+            let result = await this.httpAPICall(baseURL, payload);
+            if (result && result.Response && result.Response.Error && result.Response.Error.ErrorMessage) { 
+                throw { message: result.Response.Error.ErrorMessage, statusCode: ERROR_CODES.BAD_REQUEST };
+            }
+
+            // Remove the 'Error' object from the response
+            if (result && result.Response && result.Response.Error) {
+                let data  = result.Response;
+                delete data.Error;
+                result = data;
+            }
+            return result;
+        } catch (error) {
+            console.log("Error in AXIOS api call", error);
+            throw error;
+        }
+    }
+
+
+    async flightFormat(response: any) {
+        try {
+            // Check if the response contains an error message
+            
+            if (response && response.Response && response.Response.Error && response.Response.Error.ErrorMessage) {
+                throw { message: response.Response.Error.ErrorMessage, statusCode: ERROR_CODES.BAD_REQUEST };
+            }
+            
+            // Remove the 'Error' object from the response
+            if (response && response.Response && response.Response.Error) {
+                let data  = response.Response;
+                delete data.Error;
+                response = data;
+            }
+    
+            return response;
+        } catch (error) {
+            console.log("error >", error);
+            throw error;
+        }
+    }
+
+    async flightBookingTicket(base_url: string, payload: any) {
+        try {
+            
+            let result = await this.httpAPICall(base_url, payload);
+            if (result && result.Response && result.Response.Error && result.Response.Error.ErrorMessage) { 
+                throw { message: result.Response.Error.ErrorMessage, statusCode: ERROR_CODES.BAD_REQUEST };
+            }
+
+            // Remove the 'Error' object from the response
+            if (result && result.Response && result.Response.Error) {
+                let data  = result.Response;
+                delete data.Error;
+                result = data;
+            }
+            
+            return result;
+        } catch (error) {
+            console.error("After Booking getting error of ticket:", error.message);
+            throw error;
+        }
+    }
+    
 
     async BookingFlightForNonLCC(baseurl: string, body: any) {
         try {
