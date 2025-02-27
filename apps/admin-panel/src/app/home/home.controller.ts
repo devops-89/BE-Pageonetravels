@@ -160,7 +160,7 @@ async getBanner(@Res() res:Response){
 )
 async updateBanner(@Body() body:UpdateBannerDto,@UploadedFiles() files, @Req() req: Request,@Res() res:Response){
     try{
-      const payload: JWTPayload=req['userPayload'];
+      const payload: JWTPayload=req['userPayload']; 
       const result = await this.bannerService.updateBanner(payload,body,files);
       return this.responseHandler.sendSuccessResponse(res,result);
     }catch(error){

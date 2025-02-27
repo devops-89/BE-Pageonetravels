@@ -1,8 +1,19 @@
-import { IsString, IsEmail, IsNotEmpty, IsNumber, IsOptional, MinLength } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, IsNumber, IsOptional, MinLength, IsEnum } from 'class-validator';
+import { USER_TYPE } from 'libs/constants/autenticationConstants/userContants';
 
 export class ForgotPasswordDto {
   @IsEmail({}, { message: 'Invalid email format' })
   email: string;
+}
+
+export class SignupLoginDTO{
+  @IsEmail({},  {message: 'Invalid email format'} )
+  email: string;
+  
+  @IsOptional() 
+  @IsEnum(USER_TYPE)
+  user_type: USER_TYPE; 
+
 }
 
 export class ResetPasswordDto {

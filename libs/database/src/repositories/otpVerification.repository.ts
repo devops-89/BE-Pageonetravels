@@ -46,17 +46,18 @@ export class OtpVerificationService {
 
 
 async addOtpVerificationRequest(input: OtpVerificationI.VerifyOtpRequest): Promise<number> {
-    try {
+    try {    
       const { otp, expiry_time, otp_type, email_or_phone, send_on, country_code, user: user_id } = input;
 
-      const user = await this.userRepository.findOne({ where: { id: String(user_id) } });
+      const userRef = new User();
+      userRef.id = user_id;
 
       const updateValue: any = {
         otp,
         expiry_time,
         email_or_phone,
         otp_type,
-        user,
+        user: userRef,
         send_on,
       };
 

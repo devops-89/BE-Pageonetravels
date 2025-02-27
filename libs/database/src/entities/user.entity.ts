@@ -7,6 +7,7 @@ import { IsDefined } from "class-validator";
 import { USER_ACCOUNT_STATUS, USER_TYPE, USER_VERIFY_STATUS } from "../../../constants/autenticationConstants/userContants";
 import { Passenger } from "./passenger.entity";
 import { Booking } from "./booking.entity";
+import { Order } from "./order.entity";
 import { TransactionDetail } from "./transaction.entity";
 
 @Entity('user')
@@ -115,6 +116,8 @@ export class User {
   @JoinColumn({ name: 'booking_id' })
   booking: Booking[]
 
+  @OneToMany(() => Order, (order)=>order.user, {cascade: true})
+  orders:Order[]
 
   @OneToOne(() => Passenger, p => p.id, { cascade: true, nullable: true })
   @JoinColumn({ name: 'passenger_id' })

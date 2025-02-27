@@ -1,6 +1,7 @@
 import { LOGO } from '../constants/commonConstants'; // Adjust path as needed
 
-export const otpVerificationTemplate = function (name: string, otp?:string) {
+export const otpVerificationTemplate = function (otp?:string) {
+    
     const html = `
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -23,8 +24,8 @@ export const otpVerificationTemplate = function (name: string, otp?:string) {
                   <tr>
                     <td style="padding: 40px 0px 0px;">
                       <div style="text-align: center;">
-                        <div style="padding-bottom: 20px;"><img
-                            src="" alt="Page1Travels" style="width: 100px;">
+                        <div style="padding-bottom: 20px;">
+                        <img src="${LOGO}" alt="Page1Travels" style="width: 100px;">
                         </div>
                       </div>
                       <div style="padding: 20px; background-color: rgb(255, 255, 255);">

@@ -7,7 +7,7 @@ import { AdminLoginDto } from '../../../../../libs/dtos/authentication/admin.dto
 import { ResponseHandlerService } from '../../../../../libs/response-handler/response-handler.service';
 import { ChangePasswordDto, LoginDto, LoginOrRegisterDto, RegisterDto, VerifyDto } from '../../../../../libs/dtos/authentication/user.dto';
 import {  TokenValidationGuard } from '../../../../../libs/middlewares/authMiddleware.guard';
-import { ResetPasswordDto, ForgotPasswordDto } from '../../../../../libs/dtos/authentication/forgotPassword.dto'
+import { ResetPasswordDto, ForgotPasswordDto, SignupLoginDTO } from '../../../../../libs/dtos/authentication/forgotPassword.dto'
 
 @Controller('auth')
 export class AuthController {
@@ -158,4 +158,15 @@ export class AuthController {
             return this.ResponseHandler.sendErrorResponse(res, error);
         }
     }
+
+    @Post('/signup_login_via_email')
+    async emailSent(@Req() req:Request,@Res() res:Response,@Body(new ValidationPipe()) body: SignupLoginDTO){
+        try{
+            const result = await this.authService.loginWithEmail(body);
+            return this.ResponseHandler.sendSuccessResponse(res,result);
+        }catch(error){
+            return this.ResponseHandler.sendErrorResponse(res,error);
+        }
+    }
+
 }

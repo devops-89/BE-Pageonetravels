@@ -11,10 +11,11 @@ import {
     CommissionRepositoryService,
     SettingRepositoryService,
     SearchRepositoryService,
-    BookingRepositoryService
+    BookingRepositoryService,
+    OrderRepositoryService
  
 } from './';
-import { User, OtpVerification, LoginSession, Address, Setting,Commission, Airport,Booking, TransactionDetail, Passenger, Hotel} from './';
+import { User, OtpVerification, LoginSession, Address, Setting,Commission, Airport,Booking, TransactionDetail, Passenger, Hotel,Order} from './';
 import { TransactionManager } from './repositories/utils';
 import { DataSource } from 'typeorm';
 
@@ -40,7 +41,8 @@ export class DBModule {
                 Booking,
                 TransactionDetail,
                 Passenger,
-                Hotel
+                Hotel,
+                Order,
                 
             ],
             synchronize: true,
@@ -88,7 +90,8 @@ export class DBModule {
                     Booking,
                     TransactionDetail,
                     Passenger,
-                    Hotel
+                    Hotel,
+                    Order,
                 ]),
             ],
             controllers: [],
@@ -101,6 +104,7 @@ export class DBModule {
                 SettingRepositoryService,
                 SearchRepositoryService,
                 BookingRepositoryService,
+                OrderRepositoryService,
                 {
                     provide: TransactionManager, // Register TransactionManager
                     useFactory: (dataSource: DataSource) => new TransactionManager(dataSource),
@@ -117,7 +121,8 @@ export class DBModule {
                 CommissionRepositoryService,
                 SettingRepositoryService,
                 SearchRepositoryService,
-                BookingRepositoryService
+                BookingRepositoryService,
+                OrderRepositoryService
             ],
         };
     }

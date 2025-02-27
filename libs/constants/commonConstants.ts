@@ -68,5 +68,5 @@ export enum DEVICE_TYPE {
 }
 export const FILE_SIZE_IN_BYTES = 50 * 1024 * 1024;  //50mb
 
-export const LOGO = ""
+export const LOGO = "https://www.page1travels.com/uploads/1673871307.png"
 export const LOGO_WHITTEBG = ""

@@ -271,59 +271,59 @@ export class TicketDto {
 
 
 
-class MealDetailDto {
-    @IsString()
-    AirlineCode: string;
+// class MealDetailDto {
+//     @IsString()
+//     AirlineCode: string;
   
-    @IsString()
-    FlightNumber: string;
+//     @IsString()
+//     FlightNumber: string;
   
-    @IsNumber()
-    WayType: number;
+//     @IsNumber()
+//     WayType: number;
   
-    @IsString()
-    Code: string;
+//     @IsString()
+//     Code: string;
   
-    @IsNumber()
-    Description: number;
+//     @IsNumber()
+//     Description: number;
   
-    @IsString()
-    AirlineDescription: string;
+//     @IsString()
+//     AirlineDescription: string;
   
-    @IsNumber()
-    Quantity: number;
+//     @IsNumber()
+//     Quantity: number;
   
-    @IsString()
-    Currency: string;
+//     @IsString()
+//     Currency: string;
   
-    @IsNumber()
-    Price: number;
+//     @IsNumber()
+//     Price: number;
   
-    @IsString()
-    Origin: string;
+//     @IsString()
+//     Origin: string;
   
-    @IsString()
-    Destination: string;
-  }
+//     @IsString()
+//     Destination: string;
+//   }
   
-  class MealTypeDto {
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => MealDetailDto)
-    adult: MealDetailDto[];
+//   class MealTypeDto {
+//     @IsArray()
+//     @ValidateNested({ each: true })
+//     @Type(() => MealDetailDto)
+//     adult: MealDetailDto[];
   
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => MealDetailDto)
-    @IsOptional()
-    child?: MealDetailDto[];
+//     @IsArray()
+//     @ValidateNested({ each: true })
+//     @Type(() => MealDetailDto)
+//     @IsOptional()
+//     child?: MealDetailDto[];
   
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => MealDetailDto)
-    @IsOptional()
-    infant?: MealDetailDto[];
-  }
+//     @IsArray()
+//     @ValidateNested({ each: true })
+//     @Type(() => MealDetailDto)
+//     @IsOptional()
+//     infant?: MealDetailDto[];
+//   }
   
 
 
@@ -409,10 +409,10 @@ export class BookingDto{
     fareBreakdown: FareBreakdownDto[];
 
     
-    @ValidateNested()
-    @Type(() => MealTypeDto)
-    @IsOptional()
-    meals: MealTypeDto;
+    // @ValidateNested()
+    // @Type(() => MealTypeDto)
+    // @IsOptional()
+    // meals: MealTypeDto;
    
 }
 

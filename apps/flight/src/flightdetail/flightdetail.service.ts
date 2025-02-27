@@ -5,7 +5,7 @@ import { FlightDetailRequestDto, FlightRuleDto } from '../../../../libs/dtos/fli
 import { GenerateTokenService } from '../search-flight/generateToken.service';
 import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 import { JOURNEYTYPE,JOURNEY} from '../../../../libs/constants/flightConstant'
-import { ERROR_CODES } from 'libs/constants/commonConstants';
+import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 
 
 @Injectable()
@@ -142,6 +142,23 @@ export class FlightDetailService {
         }
     }
 
+
+    // async addImage(response:any){
+    //     try{
+    //         let segment = response.Results.Segments[0];
+    //         if (segment.length === 1) {
+    //             segment[0].AccumulatedDuration = segment[0].Duration;
+    //         }
+            
+    //         for (const data of segment) {
+    //             data.AirlineLogo = `https://dev.page1travels.com/flight/AirlineLogo/${data.Airline.AirlineCode}.gif`;
+    //         }
+    //         return response;
+    //     }catch(error){ 
+    //         throw error;
+    //     }
+    // }
+
     async FetchSeatMealBaggaeDetails(body: FlightDetailRequestDto) {
         try {
             const guest_token = "1ABCD"
@@ -169,20 +186,38 @@ export class FlightDetailService {
         }
     }
 
-    async addImage(response:any){
-        try{
-            let segment = response.Results.Segments[0];
+    addImage(response: any) {
+        
+        const seglength = response.Results.Segments;
+        
+        if(seglength.length === 1){
+
+            const segment = response.Results.Segments[0];
             if (segment.length === 1) {
                 segment[0].AccumulatedDuration = segment[0].Duration;
             }
-            
             for (const data of segment) {
                 data.AirlineLogo = `https://dev.page1travels.com/flight/AirlineLogo/${data.Airline.AirlineCode}.gif`;
             }
-            return response;
-        }catch(error){ 
-            throw error;
+        }else if(seglength.length === 2){
+
+            for (let i = 0; i < 2; i++) {
+                const segment = response.Results.Segments[i];
+        
+                if (segment.length === 1) {
+                    segment[0].AccumulatedDuration = segment[0].Duration;
+                }
+        
+                for (const data of segment) {
+                    data.AirlineLogo = `https://dev.page1travels.com/flight/AirlineLogo/${data.Airline.AirlineCode}.gif`;
+                }
+            }
         }
+
+
+        return response;
     }
+
+    
 
 }

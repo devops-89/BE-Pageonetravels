@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { FlightBookingController } from './flight-booking.controller';
 import { FlightBookingService } from './flight-booking.service';
-import { Booking, BookingRepositoryService, DBModule, User, UserRepositoryService } from '../../../../libs/database/src';
+import { Booking, BookingRepositoryService, DBModule, Order, OrderRepositoryService, User, UserRepositoryService } from '../../../../libs/database/src';
 import { ConfigModule } from '../../../../libs/config/config.module';
 import { SearchFlightModule } from '../search-flight/search-flight.module';
 import { ResponseHandlerModule } from '../../../../libs/response-handler/response-handler.module';
@@ -13,16 +13,19 @@ import { RazorpayModule } from '../../../../libs/paymentgateway/razorpay.module'
 import { RazorpayService } from "../../../../libs/paymentgateway/razorpay.service";
 import { TypeOrmModule } from '@nestjs/typeorm/dist/typeorm.module';
 import { TransactionManager } from '../../../../libs/database/src/repositories/utils';
+import { JwtService } from 'libs/jwt-service/jwt.service';
+import { TokenValidationMiddleware } from 'libs/middlewares/authMiddleware';
 
 @Module({
     imports: [
         DBModule.forRoot(),
         TypeOrmModule.forFeature([
              BookingRepositoryService,
+             OrderRepositoryService,
              Booking,
+             Order,
              User,
              TransactionManager,
-             User,
              UserRepositoryService
         ]),
         ConfigModule,
@@ -33,6 +36,6 @@ import { TransactionManager } from '../../../../libs/database/src/repositories/u
         TBOConfigModule.register(),    
     ],
     controllers: [FlightBookingController],
-    providers: [FlightBookingService, GenerateTokenService,Booking,TransactionManager, HTTPSTboAPIService, RazorpayService,BookingRepositoryService,UserRepositoryService],
+    providers: [FlightBookingService, GenerateTokenService, Booking, Order, OrderRepositoryService, TransactionManager, HTTPSTboAPIService, RazorpayService,BookingRepositoryService,UserRepositoryService, JwtService, TokenValidationMiddleware],
 })
-export class FlightBookingModule {}
+export class FlightBookingModule {} 

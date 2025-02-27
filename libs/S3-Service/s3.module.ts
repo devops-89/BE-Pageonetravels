@@ -16,7 +16,6 @@ export class S3Module {
         config.update({
             accessKeyId: access_key_id,
             secretAccessKey: secret_access_key,
-
             region:region,
           });
     }

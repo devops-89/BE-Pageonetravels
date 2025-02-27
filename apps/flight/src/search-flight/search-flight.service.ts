@@ -250,11 +250,21 @@ export class SearchFlightService {
 
   async handleFlightListingSegmentsForMulticity(searchflight) {
   try {
-    
-    const flightData = []
-    const uniqueFlight = this.extractUniqueFlightNumber(searchflight);
-    for (const segment of uniqueFlight) {
-        const data = {
+
+    const flightData = [] 
+    const uniqueFlight = this.extractUniqueFlightNumber(searchflight);  
+    for (const segment of uniqueFlight) { 
+        const seg = segment.Segments; 
+        for(const img of seg){  
+          for(let i = 0; i < img.length; i++){ 
+            if(img.length === 1){
+              img[0].AccumulatedDuration = img[0].Duration;
+            }
+            img[i].AirlineLogo = `https://dev.page1travels.com/flight/AirlineLogo/${img[i].Airline.AirlineCode}.gif`; 
+          } 
+        } 
+        
+        const data = { 
           ResultIndex: segment.ResultIndex,
           TotalFare:segment.Fare.PublishedFare,
           Tax:segment.Fare.Tax,
@@ -264,14 +274,14 @@ export class SearchFlightService {
           IsRefundable:segment.IsRefundable,
           GSTAllowed:segment.GSTAllowed,
           IsGSTMandatory:segment.IsGSTMandatory,
-          AirlineLogo:`https://dev.page1travels.com/flight/AirlineLogo/${segment.AirlineCode}.gif`,
+          // AirlineLogo:`https://dev.page1travels.com/flight/AirlineLogo/${segment.AirlineCode}.gif`,
           departure:segment.Segments
-        }
+        } 
         
-        flightData.push(data);
-      }
+        flightData.push(data); 
+      } 
       
-    return { flightData };
+    return { flightData }; 
 
   } catch (error) {
     console.log("Error in getDepartureAndArrivalFlights", error);

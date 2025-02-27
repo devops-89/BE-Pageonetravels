@@ -1,18 +1,31 @@
-import { Body, Controller, Post,  Res } from '@nestjs/common';
+import { Body, Controller, Post,  Req,  Res, UseGuards } from '@nestjs/common';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { FlightBookingService } from './flight-booking.service';
 import { BookingDto, BookingNonLccDto, TicketDto } from '../../../../libs/dtos/flight/booking-flight.dto';
+// import { JWTPayload } from '../../../../libs/interfaces/authentication/jwtPayload.interface';
+import { UserRepositoryService } from '../../../../libs/database/src';
+import {TokenValidationGuard} from '../../../../libs/middlewares/authMiddleware.guard';
 
 @Controller('flight-booking')
 export class FlightBookingController {
     constructor(
         private readonly responsehandlderservice:ResponseHandlerService,
-        private readonly flightBookingService:FlightBookingService
+        private readonly flightBookingService:FlightBookingService,
+        private readonly userRepositoryService: UserRepositoryService,
     ){}
 
+
+
     @Post("/booking") 
-    async bookFlightForLCC(@Res() res : Response, @Body() body: BookingDto) {
+    @UseGuards(TokenValidationGuard)
+    async bookFlightForLCC(@Req() req:Request,@Res() res : Response, @Body() body: BookingDto) {
         try { 
+            const payload = req['userPayload'];
+            const {reference_id}= payload;
+            const refData = await this.userRepositoryService.getUserByUserId(reference_id);
+            if(!refData){
+                throw (`An error occurred while fetching the user. Please try again later.`);
+            }
             // Initialize optional arrays if they are not provided
             if (!body.passenger_details.child) {
                 body.passenger_details.child = [];
@@ -21,7 +34,8 @@ export class FlightBookingController {
                 body.passenger_details.infant = [];
             }
             
-            const result = await this.flightBookingService.bookFlight(body);
+            const result = await this.flightBookingService.bookFlight(reference_id,body);
+         
             return  this.responsehandlderservice.sendSuccessResponse(res, result);
         } catch(err) {
             console.log(err);
@@ -32,8 +46,15 @@ export class FlightBookingController {
     
 
     @Post('/non_LCC_booking')
-    async bookFlightForNonLCC(@Res() res: Response, @Body() body: BookingNonLccDto) {
-        try {
+    @UseGuards(TokenValidationGuard)
+    async bookFlightForNonLCC(@Req() req:Request, @Res() res: Response, @Body() body: BookingNonLccDto) {
+        try { 
+            const payload = req['userPayload'];
+            const {reference_id}= payload;
+            const refData = await this.userRepositoryService.getUserByUserId(reference_id);
+            if(!refData){
+                throw (`An error occurred while fetching the user. Please try again later.`);
+            }
             // Initialize optional arrays if they are not provided
             if (!body.passenger_details.child) {
                 body.passenger_details.child = [];
@@ -42,7 +63,7 @@ export class FlightBookingController {
                 body.passenger_details.infant = [];
             }
 
-            const result = await this.flightBookingService.bookFlightForNonLCC(body);
+            const result = await this.flightBookingService.bookFlightForNonLCC(reference_id,body);
             return this.responsehandlderservice.sendSuccessResponse(res, result);
         } catch (err) {
             console.log(err);

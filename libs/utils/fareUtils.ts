@@ -1,0 +1,66 @@
+// Function to calculate per-passenger fare
+export const calculateFare = (passengerType: number, fareBreakdown: any[], fare: any[]) => {
+    const breakdown = fareBreakdown.find(item => item.PassengerType === passengerType);
+    if (!breakdown) return null;
+
+    const baseFare = breakdown.BaseFare / breakdown.PassengerCount;
+    const tax = breakdown.Tax / breakdown.PassengerCount;
+    const fareDetails = fare[0]; // Assuming first fare object is used
+
+    return {
+        Currency: fareDetails.Currency,
+        BaseFare: baseFare,
+        Tax: tax,
+        YQTax: fareDetails.YQTax,
+        AdditionalTxnFeePub: fareDetails.AdditionalTxnFeePub,
+        AdditionalTxnFeeOfrd: fareDetails.AdditionalTxnFeeOfrd,
+        OtherCharges: fareDetails.OtherCharges,
+        Discount: fareDetails.Discount,
+        PublishedFare: fareDetails.PublishedFare,
+        OfferedFare: fareDetails.OfferedFare,
+        TdsOnCommission: fareDetails.TdsOnCommission,
+        TdsOnPLB: fareDetails.TdsOnPLB,
+        TdsOnIncentive: fareDetails.TdsOnIncentive,
+        ServiceFee: fareDetails.ServiceFee
+    };
+};
+
+// Function to process passengers
+export const processPassengers = (
+    passengerList: any[], 
+    paxType: number, 
+    fareBreakdown: any[], 
+    fare: any[], 
+    additionalInfo: any
+) => {
+    const calculatedFare = calculateFare(paxType, fareBreakdown, fare);
+    if (!calculatedFare) return [];
+
+    return passengerList.map(passenger => ({
+        Title: passenger.title,
+        FirstName: passenger.first_name,
+        LastName: passenger.last_name,
+        PaxType: paxType,
+        DateOfBirth: `${passenger.date_of_birth}T00:00:00`,
+        Gender: passenger.gender === "Male" ? 1 : 2,
+        PassportNo: passenger.passport_no || "",
+        PassportExpiry: passenger.passport_expiry ? `${passenger.passport_expiry}T00:00:00` : "",
+        AddressLine1: `${additionalInfo.house_number}, ${additionalInfo.street}`,
+        AddressLine2: "",
+        Fare: calculatedFare,
+        City: additionalInfo.city,
+        CountryCode: additionalInfo.country_code,
+        CellCountryCode: additionalInfo.cell_country_code,
+        ContactNo: passenger.contact_no,
+        Nationality: additionalInfo.nationality,
+        Email: passenger.email,
+        IsLeadPax: passenger.is_lead_pax,
+        FFAirlineCode: passenger.ff_airline_code || null,
+        FFNumber: passenger.ff_number || "",
+        GSTCompanyAddress: additionalInfo.gst_company_address || "",
+        GSTCompanyContactNumber: additionalInfo.gst_company_contact_number || "",
+        GSTCompanyName: additionalInfo.gst_company_name || "",
+        GSTNumber: additionalInfo.gst_number || "",
+        GSTCompanyEmail: additionalInfo.gst_company_email || ""
+    }));
+};

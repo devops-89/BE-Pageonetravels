@@ -27,6 +27,7 @@ import { AdminLoginDto } from '../../../../../../libs/dtos/authentication/admin.
 
 
 
+
 @Injectable()
 export class AuthService {
 
@@ -244,6 +245,7 @@ export class AuthService {
                     // ...permissionObj
                 } as UserI.AddOrUpdateUser
 
+
                 let insertedId = await this.UserModel.addOrUpdateUser(userObj);
                 if (!insertedId) {
                     throw { message: COMMON_MSG.INVALID_REQUEST, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
@@ -266,7 +268,6 @@ export class AuthService {
 
             const currentTime = Date.now();
             const OTP = getOTP();
-
             const otpObj: OtpVerificationI.VerifyOtpRequest = {
                 otp: OTP,
                 otp_type,
@@ -281,9 +282,10 @@ export class AuthService {
 
             // await this.EmailService.sendEmail(email, 'Account Verification', emailTemplate.html);
             // send email
-
+            
             const otpEmail = otpVerificationTemplate(OTP);
-            await this.EmailService.sendEmail(email, 'Your OTP Code', otpEmail.html);
+            
+            //await this.EmailService.sendEmail(email, 'Your OTP Code', otpEmail.html);
 
             return { message: `${OTP_VERIFY_MSG.OTP_SEND} ${email}`, data: { reference_id: otpId, OTP } };
 
@@ -338,7 +340,7 @@ export class AuthService {
             }
             const password_hash = await generatePasswordHash(password);
 
-            const user: UserI.InsertUserByEmail = {
+            const user: UserI.InsertUserByEmail = { 
                 password: password_hash,
                 email: email.toLowerCase().trim(),
                 status: USER_ACCOUNT_STATUS.ACTIVE,
@@ -374,8 +376,8 @@ export class AuthService {
             };
 
             const otpId = await this.OtpVerificationModel.addOtpVerificationRequest(otpObj);
-            // console.log(">>>>>>>>>>", full_name, OTP)
-            const emailTemplate = otpVerificationTemplate(full_name, OTP);
+            
+            const emailTemplate = otpVerificationTemplate(OTP);
             await this.EmailService.sendEmail(email, 'Email Verification', emailTemplate.html);
 
             return { message: `${OTP_VERIFY_MSG.OTP_SEND} ${email}`, data: { reference_id: otpId, OTP, full_name } };
@@ -717,5 +719,32 @@ export class AuthService {
         throw error;
     }
   }
-    
+  
+//   async sendEmail(input:MailSendDto){
+//     try{
+//         const { email } = input;
+
+//         const currentTime = Date.now();
+//         const OTP = getOTP();
+//         const otpObject : OtpVerificationI.VerifyOtpRequest = {
+//             otp:OTP,
+//             otp_type: OTP_TYPE.REGISTER_OTP,
+
+//             send_on: OTP_SEND_ON.EMAIL,
+//             resendData: {
+//                 blockedTill: -1,
+//                 isBlocked: false,
+//                 retryLeft: OTP_REQUEST_LIMITS.RESEND_OTP,
+//                 totalRetry: OTP_REQUEST_LIMITS.RESEND_OTP
+//             },
+//             email_or_phone: email,
+//             expiry_time: currentTime + 900000 // 15min
+
+//         }
+//     }catch(error){
+//         console.log(error);
+//         // throw  error;
+//     }
+//   }
+
 }
