@@ -198,6 +198,7 @@ export class HTTPSTboAPIService {
             
             // Remove the 'Error' object from the response
             if (response && response.Response && response.Response.Error) {
+                
                 let data  = response.Response;
                 delete data.Error;
                 response = data;

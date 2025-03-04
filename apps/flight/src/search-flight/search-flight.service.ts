@@ -11,6 +11,7 @@ import { FlightValidator } from './search-utility';
 import { AirportType } from '../../../../libs/interfaces/flight/search.interface';
 import path from 'path';
 import * as fs from 'fs';
+import { arrayUnique } from 'class-validator';
 
 @Injectable()
 export class SearchFlightService {
@@ -204,7 +205,30 @@ export class SearchFlightService {
     if (journey_type === 1) {
 
       const segments = await this.handleFlightListingSegments(result);
-      return { segments, origin, destination, trace_id };
+
+
+      let type = "";
+      let country = [];
+        for (const flight of result) {
+          const fightSeg = flight.Segments; 
+          for(const data of fightSeg){
+            for(let i = 0; i < data.length; i++){
+              country.push(data[i].Origin.Airport.CountryCode);
+              country.push(data[i].Destination.Airport.CountryCode);             
+            }
+          }
+        }
+
+        const allDomestic = country.every(value => value === 'IN');
+        const hasInternational = country.some(value => value !== 'IN' );
+        if (allDomestic) {
+          type = "DOMESTIC";
+        } else if (hasInternational) {
+          type = "INTERNATIONAL";
+        }
+
+       
+        return { segments, origin, destination, trace_id,type };
     }
 
     //RoundTrip
@@ -238,7 +262,26 @@ export class SearchFlightService {
     // Multicity
     if (journey_type === 3) {
       const segment = await this.handleFlightListingSegmentsForMulticity(result);
-      return { flight_list: segment, origin, destination, trace_id };
+      let type = '';
+      let country = [];
+        for (const flight of result) {
+          const flightSeg = flight.Segments;
+          for(const data of flightSeg){
+            // console.log(">>>>>>>>>>>",data.length);
+            for(let i = 0; i < data.length; i++){
+              country.push(data[i].Origin.Airport.CountryCode);
+              country.push(data[i].Destination.Airport.CountryCode);
+            }
+          }
+        }
+        const allDomestic = country.every(value => value === 'IN');
+        const hasInternational = country.some(value => value !== 'IN' );
+        if (allDomestic) {
+          type = "DOMESTIC";
+        } else if (hasInternational) {
+          type = "INTERNATIONAL";
+        }
+      return { flight_list: segment, origin, destination, trace_id,type };
     }
 
     throw result
@@ -324,11 +367,13 @@ export class SearchFlightService {
   try {
 
     const flightData = [];
+    
     const uniqueFlight = this.extractUniqueFlightNumber(searchflight);
     for (const flight of uniqueFlight) {
       const departure = flight.Segments && flight.Segments.length > 0 ? flight.Segments[0] : [];
       const arrival = flight.Segments && flight.Segments.length > 1 ? flight.Segments[1] : [];
-   
+      
+
       const flightJson = {
         ResultIndex: flight.ResultIndex,
         TotalFare: flight.Fare.PublishedFare,
@@ -348,7 +393,7 @@ export class SearchFlightService {
 
       flightData.push(flightJson)
     }
-
+    // console.log(">>>>>>>>>>",);
     return { flightData };
 
   } catch (error) {

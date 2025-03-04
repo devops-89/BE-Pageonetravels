@@ -11,8 +11,9 @@ export class CommissionService {
     
     async addCommissionData(commissionDto: AddCommissionDto) {
         try { 
-            const { type, percentage, status } = commissionDto;           
-            const commission = await this.commissionRepositoryService.insertCommission({ type, percentage, status });
+            const { type,commission_type, percentage, status } = commissionDto;  
+            
+            const commission = await this.commissionRepositoryService.insertCommission({ type,commission_type, percentage, status });
             return { message: 'Successfully Inserted Commission', commission: commission }; 
         } catch (error) { 
             console.log('Adding Commission', error);
@@ -33,7 +34,8 @@ export class CommissionService {
 
     async updateCommissionData(updateDto: UpdateCommissionDto):Promise<ApiResponse.ApiOK>{
         try{
-            const { commission_id, type,percentage,status} = updateDto;
+            const { commission_id, type, commission_type, percentage, status} = updateDto;
+            
             // check if brand Exists
             const existingCommission = await this.commissionRepositoryService.getCommissionbyId(commission_id);
             if (!existingCommission) {
@@ -42,11 +44,12 @@ export class CommissionService {
 
             const updateCommission = await this.commissionRepositoryService.updateCommission({commission_id,
                 type: type ?? existingCommission.type,
+                commission_type: commission_type ?? existingCommission.commission_type,
                 percentage : percentage ?? existingCommission.percentage,
                 status: status ?? existingCommission.status
             });
 
-            return { message: 'Successfully updated Brand', data: updateCommission }; ;
+            return { message: 'Successfully updated Brand', data: updateCommission }; 
 
         }catch(error){
             console.log('Commission Update Error:', error);

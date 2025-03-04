@@ -5,7 +5,9 @@ import { FlightDetailRequestDto, FlightRuleDto } from '../../../../libs/dtos/fli
 import { GenerateTokenService } from '../search-flight/generateToken.service';
 import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 import { JOURNEYTYPE,JOURNEY} from '../../../../libs/constants/flightConstant'
-import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
+import { CommissionRepositoryService } from '../../../../libs/database/src';
+import { COMMISSION_TYPE } from '../../../../libs/constants/autenticationConstants/userContants';
+// import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 
 
 @Injectable()
@@ -14,7 +16,8 @@ export class FlightDetailService {
         private readonly httptboapiservice: HTTPSTboAPIService,
         private readonly tboConfigService: TBO_CredentialsService,
         private readonly generateTokenService: GenerateTokenService,
-        private readonly redisCacheService: RedisCacheService
+        private readonly redisCacheService: RedisCacheService,
+        private readonly commissionRepositoryService:CommissionRepositoryService
 
     ) { }
 
@@ -50,6 +53,7 @@ export class FlightDetailService {
         try {
             const guest_token = "1ABCD"; // Frontend will provide this
             const { ip_address, trace_id, result_index, journey_type, journey, result_index_ib } = body;
+            
 
             // Validate journey type
             if (!Object.values(JOURNEYTYPE).includes(journey_type)) {
@@ -66,7 +70,17 @@ export class FlightDetailService {
             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
             const base_url_ssr = tbo_credentials.FLIGHT_SSR;
             const base_url = tbo_credentials.FLIGHT_FAREQUOTE;
-            
+
+            const flightType = `FLIGHT_${journey_type}_${journey}` as COMMISSION_TYPE;
+
+            if (Object.values(COMMISSION_TYPE).includes(flightType)) {
+                const commissionType = await this.commissionRepositoryService.getCommissionbytype(flightType);
+                console.log(commissionType);
+            } else {
+                console.error("Invalid commission type:", flightType);
+            }
+ 
+            const commissiontype =  await this.commissionRepositoryService.getCommissionbytype(flightType);
             let response;
             let ssrResponse;
 
@@ -113,7 +127,7 @@ export class FlightDetailService {
                 let response_ob = [respons_ob, ssr_ob];
                 let  response_ib = [respons_ib, ssr_ib];
 
-                response = [response_ob, response_ib];
+                response = [response_ob, response_ib, commissiontype];
             } else {
                 const payload_request = {
                     "EndUserIp": ip_address,
@@ -126,14 +140,14 @@ export class FlightDetailService {
                 response = await this.httptboapiservice.flightFormat(response);
                 await this.addImage(response);
 
-                ssrResponse = await this.httptboapiservice.ssr(base_url_ssr, payload_request);
-                ssrResponse = await this.httptboapiservice.flightFormat(ssrResponse);
-                response = [response, ssrResponse]; 
+                ssrResponse = await this.httptboapiservice.ssr(base_url_ssr, payload_request); 
+                // ssrResponse = await this.httptboapiservice.flightFormat(ssrResponse); 
+                response = [response, ssrResponse,commissiontype];   
             }
 
             // Cache the response
             await this.redisCacheService.setCache(`FlightDetail${guest_token}`, JSON.stringify(response), 3600);
-
+            
             return { message: "Fare Details fetched successfully", data: response };
 
         } catch (error) {
@@ -189,7 +203,6 @@ export class FlightDetailService {
     addImage(response: any) {
         
         const seglength = response.Results.Segments;
-        
         if(seglength.length === 1){
 
             const segment = response.Results.Segments[0];
@@ -214,6 +227,14 @@ export class FlightDetailService {
             }
         }
 
+
+        if(seglength.length > 2){
+            for(const data of seglength){
+                for(let i = 0; i < data.length; i++){
+                    data[i].AirlineLogo = `https://dev.page1travels.com/flight/AirlineLogo/${data[i].Airline.AirlineCode}.gif`;
+                }
+            }
+        }
 
         return response;
     }

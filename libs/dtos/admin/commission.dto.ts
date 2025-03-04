@@ -1,15 +1,23 @@
-import { IsString, IsNotEmpty, IsNumber, IsBoolean, IsOptional,IsUUID } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsBoolean, IsOptional,IsUUID, IsEnum, IsDecimal } from 'class-validator';
 import { COMMISSION } from 'libs/constants/adminConstants';
+import { COMMISSION_TYPE,  TYPE_COMMISSION } from '../../../libs/constants/autenticationConstants/userContants';
 
 export class AddCommissionDto{
 
-@IsString()
-@IsNotEmpty()
-type: COMMISSION
 
-@IsNumber()
+@IsEnum(COMMISSION_TYPE, { 
+    message: `type must be one of the following: ${Object.values(COMMISSION_TYPE).join(', ')}` 
+})
 @IsNotEmpty()
-percentage: number
+type: COMMISSION_TYPE;
+
+@IsEnum(TYPE_COMMISSION, { message: 'type must be FIXED or PERCENTAGE' })
+@IsNotEmpty()
+commission_type: TYPE_COMMISSION;
+
+@IsNotEmpty()
+@IsDecimal({ decimal_digits: '0,2' }, { message: 'Percentage must have up to two decimal places' })
+percentage: string;
 
 @IsBoolean()
 @IsNotEmpty()
@@ -26,15 +34,25 @@ export class UpdateCommissionDto{
     commission_id: string 
 
 
-    @IsString()
+    @IsEnum(COMMISSION_TYPE, { 
+        message: `type must be one of the following: ${Object.values(COMMISSION_TYPE).join(', ')}` 
+    })
     @IsNotEmpty()
-    type: COMMISSION
+    type: COMMISSION_TYPE;
+    
+    @IsEnum(TYPE_COMMISSION, { message: 'type must be FIXED or PERCENTAGE' })
+    @IsNotEmpty()
+    commission_type: TYPE_COMMISSION;
 
-    @IsNumber()
+
     @IsNotEmpty()
-    percentage: number
+    @IsDecimal({ decimal_digits: '0,2' }, { message: 'Percentage must have up to two decimal places' })
+    percentage: string;
 
     @IsBoolean()
     @IsNotEmpty()
     status: boolean
 } 
+
+
+

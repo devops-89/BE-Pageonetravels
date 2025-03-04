@@ -13,7 +13,7 @@ export class FlightBookingController {
         private readonly flightBookingService:FlightBookingService,
         private readonly userRepositoryService: UserRepositoryService,
     ){}
-
+ 
 
 
     @Post("/booking") 
@@ -21,6 +21,7 @@ export class FlightBookingController {
     async bookFlightForLCC(@Req() req:Request,@Res() res : Response, @Body() body: BookingDto) {
         try { 
             const payload = req['userPayload'];
+            console.log(payload);
             const {reference_id}= payload;
             const refData = await this.userRepositoryService.getUserByUserId(reference_id);
             if(!refData){

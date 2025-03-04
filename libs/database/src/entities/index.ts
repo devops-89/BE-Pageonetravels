@@ -23,3 +23,4 @@ export * from './testimonial.entity';
 export * from './social.entity';
 export * from './footer.entity';
 export * from './order.entity';
+export * from './payment.entity';

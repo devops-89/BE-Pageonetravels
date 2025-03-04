@@ -1,9 +1,10 @@
 import "reflect-metadata";
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ORDER_STATUS } from '../../../../libs/constants/bookingContant';
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, JoinColumn, ManyToMany, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, JoinColumn, ManyToMany, ManyToOne, OneToOne } from 'typeorm';
 import { User } from './user.entity';
 import { float } from "aws-sdk/clients/cloudfront";
+import { Payment } from "./payment.entity";
 
 @Entity('order')
 export class Order {
@@ -55,5 +56,9 @@ export class Order {
 
     @UpdateDateColumn()
     updated_at: Date;
+
+    // Add OneToOne relation to Payment entity
+    @OneToOne(() => Payment, (payment) => payment.orderId)
+    payment: Payment;  
 
 }

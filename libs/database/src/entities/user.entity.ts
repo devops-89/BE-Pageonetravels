@@ -9,6 +9,7 @@ import { Passenger } from "./passenger.entity";
 import { Booking } from "./booking.entity";
 import { Order } from "./order.entity";
 import { TransactionDetail } from "./transaction.entity";
+import { Payment } from "./payment.entity";
 
 @Entity('user')
 export class User {
@@ -119,11 +120,15 @@ export class User {
   @OneToMany(() => Order, (order)=>order.user, {cascade: true})
   orders:Order[]
 
+
+  @OneToMany(() => Payment, (payment)=>payment.payment_id, {cascade: true})
+  payment:Payment[]
+
   @OneToOne(() => Passenger, p => p.id, { cascade: true, nullable: true })
   @JoinColumn({ name: 'passenger_id' })
-  passenger: Passenger
+  passenger: Passenger 
 
-
+  
   @OneToMany(() => LoginSession, session => session.user)
   login_sessions: LoginSession[];
 

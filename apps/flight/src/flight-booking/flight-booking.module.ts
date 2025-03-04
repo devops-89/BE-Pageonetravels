@@ -13,8 +13,9 @@ import { RazorpayModule } from '../../../../libs/paymentgateway/razorpay.module'
 import { RazorpayService } from "../../../../libs/paymentgateway/razorpay.service";
 import { TypeOrmModule } from '@nestjs/typeorm/dist/typeorm.module';
 import { TransactionManager } from '../../../../libs/database/src/repositories/utils';
-import { JwtService } from 'libs/jwt-service/jwt.service';
-import { TokenValidationMiddleware } from 'libs/middlewares/authMiddleware';
+import { JwtService } from '../../../../libs/jwt-service/jwt.service';
+import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMiddleware';
+
 
 @Module({
     imports: [
@@ -38,4 +39,6 @@ import { TokenValidationMiddleware } from 'libs/middlewares/authMiddleware';
     controllers: [FlightBookingController],
     providers: [FlightBookingService, GenerateTokenService, Booking, Order, OrderRepositoryService, TransactionManager, HTTPSTboAPIService, RazorpayService,BookingRepositoryService,UserRepositoryService, JwtService, TokenValidationMiddleware],
 })
+
+
 export class FlightBookingModule {} 

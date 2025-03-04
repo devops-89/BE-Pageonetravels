@@ -9,6 +9,7 @@ export * from './search.repository';
 export * from './guest.user.repository';
 export * from './booking.repository';      
 export * from './order.repository';      
+export * from './flightticket.repository';      
 
 
 export * from './header.repository';

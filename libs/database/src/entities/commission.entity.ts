@@ -1,4 +1,5 @@
 import { COMMISSION } from 'libs/constants/adminConstants';
+import { COMMISSION_TYPE, TYPE_COMMISSION } from '../../../../libs/constants/autenticationConstants/userContants';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 
@@ -8,11 +9,22 @@ export class Commission {
     @PrimaryGeneratedColumn("uuid")
     commission_id: string;
 
-    @Column({ nullable: false}) 
-    type: string;
+    @Column({
+        type: 'enum',
+        enum: COMMISSION_TYPE,
+    })
+    type: COMMISSION_TYPE;
 
-    @Column({ type: 'float', nullable: false, default: 0 })
-    percentage: number;
+    @Column({
+        type: 'enum',
+        enum: TYPE_COMMISSION
+    })
+    commission_type:TYPE_COMMISSION
+
+    
+
+    @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false, default: 0 })
+    percentage: string;
 
     @Column({ default: false })
     status: boolean;

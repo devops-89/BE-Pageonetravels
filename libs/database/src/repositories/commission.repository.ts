@@ -6,6 +6,8 @@ import { Icommission } from '../../../../libs/interfaces/commonTypes/commission.
 import { Ucommission } from '../../../../libs/interfaces/commonTypes/commission.interface';
 import { retry } from 'rxjs';
 import { COMMISSION } from 'libs/constants/adminConstants';
+import { COMMISSION_TYPE, TYPE_COMMISSION } from 'libs/constants/autenticationConstants/userContants';
+import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 
 @Injectable()
 export class CommissionRepositoryService {
@@ -21,13 +23,20 @@ export class CommissionRepositoryService {
      */
     async insertCommission(input: Icommission): Promise<Commission> {
         try {
-            const { type, percentage, status } = input;
+            const { type,commission_type, percentage, status } = input;
 
-            const percent = parseFloat(percentage.toFixed(2));
-            // Create a new commission entity
+            if(commission_type === TYPE_COMMISSION.PERCENTAGE){
+                const numericPercentage = parseFloat(percentage);
+                if (isNaN(numericPercentage) || numericPercentage < 1 || numericPercentage > 100) {
+                    throw { message: "The percentage value is not between 1 and 100.", statusCode: ERROR_CODES.BAD_REQUEST };
+                }
+            }
+
+          
             const newCommission = this.commissionRepository.create({
                 type,
-                percentage: percent,
+                commission_type,
+                percentage,
                 status,
             });
 
@@ -36,7 +45,7 @@ export class CommissionRepositoryService {
             return result;  
         } catch (error) {  
             console.error('Error inserting commission:', error); 
-            throw `Failed to insert commission. Please try again later. ${error.message}`; 
+            throw error; 
         } 
     } 
 
@@ -70,6 +79,16 @@ export class CommissionRepositoryService {
         }
     }
 
+
+    async getCommissionbytype(type:COMMISSION_TYPE):Promise<Commission>{
+        try{
+            const commission = await this.commissionRepository.findOne({ where: { type: type } });
+            return commission;
+        }catch(error){
+            throw error;
+        }
+    }
+
     async updateCommission(input: Ucommission){
         try{
             const { commission_id } = input;
@@ -79,8 +98,12 @@ export class CommissionRepositoryService {
                 throw `Commission not found with ID: ${commission_id}`;
             }
             
-            const comm_percent = parseFloat((input.percentage).toFixed(2));
-            input.percentage = comm_percent;
+            if(input.commission_type === TYPE_COMMISSION.PERCENTAGE){
+                const numericPercentage = parseFloat(input.percentage);
+                if (isNaN(numericPercentage) || numericPercentage < 1 || numericPercentage > 100) {
+                    throw { message: "The percentage value is not between 1 and 100.", statusCode: ERROR_CODES.BAD_REQUEST };
+                }
+            }
             
             // Assign new values to the existing commission entity
             Object.assign(existingCommission, input);
@@ -89,7 +112,7 @@ export class CommissionRepositoryService {
             return updatedCommission;
         }catch(error){ 
             console.log(`Failed to update commission: ${error.message}`);
-            throw (`Failed to update commission: ${error.message}`);
+            throw error;
         }
     }
 

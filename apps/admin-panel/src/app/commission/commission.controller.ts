@@ -16,7 +16,7 @@ export class CommissionController {
 
     @Post('add-commission')
     // @UseGuards(TokenValidationGuard,CheckIfAdminGuard)
-    async addCommisson(@Body() body:AddCommissionDto, @Req() req: Request, @Res() res:Response ){
+    async addCommisson(@Body() body:AddCommissionDto,  @Req() req: Request, @Res() res:Response ){
         try{  
             const result = await this.commissionService.addCommissionData(body);
             return this.responseHandler.sendSuccessResponse(res, result);
