@@ -57,6 +57,7 @@ export class RazorpayService {
             if (razorpaySignature === generatedSignature) {
                 return { success: true, message: "Payment has been verified" };
             } else {
+                //return { success: true, message: "Payment has been verified" };
                 throw { message:  "Payment verification failed" , statusCode: ERROR_CODES.BAD_REQUEST };
             }
         } catch (error) {
