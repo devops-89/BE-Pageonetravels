@@ -7,6 +7,7 @@ import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-ca
 import { JOURNEYTYPE,JOURNEY} from '../../../../libs/constants/flightConstant'
 import { CommissionRepositoryService } from '../../../../libs/database/src';
 import { COMMISSION_TYPE } from '../../../../libs/constants/autenticationConstants/userContants';
+import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 // import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 
 
@@ -49,7 +50,10 @@ export class FlightDetailService {
             throw error;
         }
     }
-        async FlightDetail(body: FlightDetailRequestDto) {
+
+
+
+    async FlightDetail(body: FlightDetailRequestDto) {
         try {
             const guest_token = "1ABCD"; // Frontend will provide this
             const { ip_address, trace_id, result_index, journey_type, journey, result_index_ib } = body;
@@ -57,12 +61,12 @@ export class FlightDetailService {
 
             // Validate journey type
             if (!Object.values(JOURNEYTYPE).includes(journey_type)) {
-                throw new Error("Invalid journey type provided. Accepted values are: ONEWAY, ROUNDTRIP, MULTICITY.");
+                throw { message: "Invalid journey type provided. Accepted values are: ONEWAY, ROUNDTRIP, MULTICITY.", statusCode: ERROR_CODES.BAD_REQUEST };
             }
 
             // Validate journey category
             if (!Object.values(JOURNEY).includes(journey)) {
-                throw new Error("Invalid journey category provided. Accepted values are: DOMESTIC, INTERNATIONAL.");
+                throw { message: "Invalid journey category provided. Accepted values are: DOMESTIC, INTERNATIONAL.", statusCode: ERROR_CODES.BAD_REQUEST };
             }
 
             // Generate token and get TBO credentials
@@ -77,7 +81,7 @@ export class FlightDetailService {
                 const commissionType = await this.commissionRepositoryService.getCommissionbytype(flightType);
                 console.log(commissionType);
             } else {
-                console.error("Invalid commission type:", flightType);
+                throw { message: "Invalid commission type", statusCode: ERROR_CODES.BAD_REQUEST };
             }
  
             const commissiontype =  await this.commissionRepositoryService.getCommissionbytype(flightType);
@@ -87,7 +91,7 @@ export class FlightDetailService {
             if (journey_type === JOURNEYTYPE.ROUNDTRIP && journey === JOURNEY.DOMESTIC) {
                 // Validate result_index_ib for round trip domestic journey
                 if (!result_index_ib) {
-                    throw new Error("Missing required parameter: Result Index for Inbound journey.");
+                    throw { message: "Missing required parameter: Result Index for Inbound journey.", statusCode: ERROR_CODES.BAD_REQUEST };
                 }
 
                 const payload_request_OB = {
@@ -127,7 +131,7 @@ export class FlightDetailService {
                 let response_ob = [respons_ob, ssr_ob];
                 let  response_ib = [respons_ib, ssr_ib];
 
-                response = [response_ob, response_ib, commissiontype];
+                response = [response_ob, response_ib, commissiontype, { journey_type: journey_type, journey: journey }];
             } else {
                 const payload_request = {
                     "EndUserIp": ip_address,
@@ -141,37 +145,22 @@ export class FlightDetailService {
                 await this.addImage(response);
 
                 ssrResponse = await this.httptboapiservice.ssr(base_url_ssr, payload_request); 
-                // ssrResponse = await this.httptboapiservice.flightFormat(ssrResponse); 
-                response = [response, ssrResponse,commissiontype];   
+                if(journey_type === "ONEWAY"){
+                  ssrResponse = await this.httptboapiservice.flightFormat(ssrResponse); 
+                }
+                response = [response, ssrResponse,commissiontype, { journey_type: journey_type, journey: journey }];   
             }
 
             // Cache the response
             await this.redisCacheService.setCache(`FlightDetail${guest_token}`, JSON.stringify(response), 3600);
             
             return { message: "Fare Details fetched successfully", data: response };
-
         } catch (error) {
             console.error("Error in the fare Details function", error);
             throw error;
         }
     }
 
-
-    // async addImage(response:any){
-    //     try{
-    //         let segment = response.Results.Segments[0];
-    //         if (segment.length === 1) {
-    //             segment[0].AccumulatedDuration = segment[0].Duration;
-    //         }
-            
-    //         for (const data of segment) {
-    //             data.AirlineLogo = `https://dev.page1travels.com/flight/AirlineLogo/${data.Airline.AirlineCode}.gif`;
-    //         }
-    //         return response;
-    //     }catch(error){ 
-    //         throw error;
-    //     }
-    // }
 
     async FetchSeatMealBaggaeDetails(body: FlightDetailRequestDto) {
         try {

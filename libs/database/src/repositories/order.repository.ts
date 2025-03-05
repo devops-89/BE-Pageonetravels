@@ -14,11 +14,16 @@ export class OrderRepositoryService {
         private readonly orderRepository: Repository<Order>,
     ){}
 
-    async insertBooking(reference_id,payload,amount):Promise<Order | null>{
+    async insertBooking(reference_id,payload,amount,is_LCC,journey,journey_type,commtype,commpercentage):Promise<Order | null>{
         try{
             
             // Create order instance
             const newOrder = this.orderRepository.create({
+                commission_type: commtype,
+                commission: commpercentage,
+                journey_type : journey_type,
+                journey: journey,
+                isLCC: is_LCC,
                 trace_id:payload.TraceId,
                 order_request: payload,
                 user: { id: reference_id },  // Correct way to assign a relation

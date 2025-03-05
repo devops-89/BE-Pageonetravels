@@ -50,7 +50,7 @@ export class FlightTicketService {
             }
             
             const verifyResponse = await this.razorpayservice.verifyOrder(razorpay_order_id,razorpay_payment_id,razorpay_signature);
-            // if(verifyResponse){
+            // if(verifyResponse.success){
 
             // }
             return { message: "Payment verified successfully", data: verifyResponse };

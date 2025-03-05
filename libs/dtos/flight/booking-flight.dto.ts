@@ -10,9 +10,11 @@ import {
     IsNotEmpty,
     ArrayMinSize,
     MinLength,
-    IsInt
+    IsInt,
+    IsEnum
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { JOURNEY, JOURNEYTYPE } from 'libs/constants/flightConstant';
 
 
 
@@ -70,11 +72,22 @@ export class PassengerDto {
     @IsString()
     ff_number?: string | null;
 
+    // Optional baggage, meal, and seat details
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => BaggageDto)
+    baggage?: BaggageDto[];
+
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => MealDynamicDto)
+    mealDynamic?: MealDynamicDto[];
+
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => SeatDynamicDto)
+    seatDynamic?: SeatDynamicDto[];
 }
-
-
-
-
 
 
 export class PassengerDetailsDto {
@@ -95,6 +108,7 @@ export class PassengerDetailsDto {
     @ValidateNested({ each: true })
     @Type(() => PassengerDto)
     infant: PassengerDto[] = []; // Default empty array
+
 }
 
 
@@ -178,6 +192,28 @@ export class BookingNonLccDto {
 
     @IsString()
     cell_country_code: string;
+
+    @IsEnum(JOURNEYTYPE, { 
+        message: `type must be one of the following: ${Object.values(JOURNEYTYPE).join(', ')}` 
+    })
+    @IsNotEmpty()
+    journey_type: JOURNEYTYPE;
+    
+    
+    @IsEnum(JOURNEY, { 
+      message: `type must be one of the following: ${Object.values(JOURNEY).join(', ')}` 
+    })
+    @IsNotEmpty()
+    journey: JOURNEY;
+
+    @IsBoolean()
+    @IsNotEmpty()
+    is_LCC: boolean;
+
+    @IsBoolean()
+    @IsOptional()
+    is_LCC_round ?: boolean;    
+
 
     @IsString()
     country_code: string;
@@ -338,6 +374,24 @@ export class BookingDto{
     @IsString()
     cell_country_code: string;
 
+    @IsEnum(JOURNEYTYPE, { 
+        message: `type must be one of the following: ${Object.values(JOURNEYTYPE).join(', ')}` 
+    })
+    @IsNotEmpty()
+    journey_type: JOURNEYTYPE;
+    
+    
+    @IsEnum(JOURNEY, { 
+      message: `type must be one of the following: ${Object.values(JOURNEY).join(', ')}` 
+    })
+    @IsNotEmpty()
+    journey: JOURNEY;
+
+    @IsBoolean()
+    @IsNotEmpty()
+    is_LCC: boolean;
+
+
     @IsString()
     country_code: string;
 
@@ -419,3 +473,157 @@ export class BookingDto{
 
 
 
+//seat meal baggage
+export class BaggageDto {
+    @IsString()
+    @IsOptional()
+    AirlineCode?: string;
+
+    @IsString()
+    @IsOptional()
+    FlightNumber?: string;
+
+    @IsNumber()
+    @IsOptional()
+    WayType?: number;
+
+    @IsString()
+    @IsOptional()
+    Code?: string;
+
+    @IsString()
+    @IsOptional()
+    Description?: string;
+
+    @IsNumber()
+    @IsOptional()
+    Weight?: number;
+
+    @IsString()
+    @IsOptional()
+    Currency?: string;
+
+    @IsNumber()
+    @IsOptional()
+    Price?: number;
+
+    @IsString()
+    @IsOptional()
+    Origin?: string;
+
+    @IsString()
+    @IsOptional()
+    Destination?: string;
+}
+
+export class MealDynamicDto {
+    @IsString()
+    @IsOptional()
+    AirlineCode?: string;
+
+    @IsString()
+    @IsOptional()
+    FlightNumber?: string;
+
+    @IsNumber()
+    @IsOptional()
+    WayType?: number;
+
+    @IsString()
+    @IsOptional()
+    Code?: string;
+
+    @IsString()
+    @IsOptional()
+    Description?: string;
+
+    @IsString()
+    @IsOptional()
+    AirlineDescription?: string;
+
+    @IsNumber()
+    @IsOptional()
+    Quantity?: number;
+
+    @IsString()
+    @IsOptional()
+    Currency?: string;
+
+    @IsNumber()
+    @IsOptional()
+    Price?: number;
+
+    @IsString()
+    @IsOptional()
+    Origin?: string;
+
+    @IsString()
+    @IsOptional()
+    Destination?: string;
+}
+
+export class SeatDynamicDto {
+    @IsString()
+    @IsOptional()
+    AirlineCode?: string;
+
+    @IsString()
+    @IsOptional()
+    FlightNumber?: string;
+
+    @IsString()
+    @IsOptional()
+    CraftType?: string;
+
+    @IsString()
+    @IsOptional()
+    Origin?: string;
+
+    @IsString()
+    @IsOptional()
+    Destination?: string;
+
+    @IsNumber()
+    @IsOptional()
+    AvailablityType?: number;
+
+    @IsString()
+    @IsOptional()
+    Description?: string;
+
+    @IsString()
+    @IsOptional()
+    Code?: string;
+
+    @IsString()
+    @IsOptional()
+    RowNo?: string;
+
+    @IsString()
+    @IsOptional()
+    SeatNo?: string;
+
+    @IsNumber()
+    @IsOptional()
+    SeatType?: number;
+
+    @IsNumber()
+    @IsOptional()
+    SeatWayType?: number;
+
+    @IsNumber()
+    @IsOptional()
+    Compartment?: number;
+
+    @IsNumber()
+    @IsOptional()
+    Deck?: number;
+
+    @IsString()
+    @IsOptional()
+    Currency?: string;
+
+    @IsNumber()
+    @IsOptional()
+    Price?: number;
+}

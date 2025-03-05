@@ -34,7 +34,6 @@ export class FlightTicketController {
             console.log(error);
             return this.responsehandlderservice.sendErrorResponse(res, error);
         }
-
     }
 
     @Post('/ticket/verify')
@@ -47,6 +46,7 @@ export class FlightTicketController {
             if(!refData){
                 throw (`An error occurred while fetching the user. Please try again later.`);
             }
+            
             const result = await this.flightTicketService.verifyTicket(body);
            
             return this.responsehandlderservice.sendSuccessResponse(res,result);

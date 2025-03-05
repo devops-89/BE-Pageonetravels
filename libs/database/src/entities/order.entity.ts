@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ORDER_STATUS } from '../../../../libs/constants/bookingContant';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, JoinColumn, ManyToMany, ManyToOne, OneToOne } from 'typeorm';
 import { User } from './user.entity';
@@ -11,15 +11,37 @@ export class Order {
     @PrimaryGeneratedColumn("uuid")
     order_id: string;
 
+
     @ManyToOne(() => User, (u) => u.orders)
     @JoinColumn({ name: "user_id" })
     user: User; 
 
+    @Column()
     @IsString()
-    order_type:string;
+    commission_type: string;
 
+    @Column()
+    @IsString()
+    commission: string;
+
+    @Column()
+    @IsString()
+    journey_type: string;
+
+
+    @Column()
+    @IsString()
+    journey: string;
+
+    @Column({ type: 'boolean' })
     @IsBoolean()
-    is_domestic:string;
+    @IsNotEmpty()
+    isLCC: boolean; 
+
+    @Column({ type: 'boolean', nullable: true })
+    @IsBoolean()
+    @IsOptional()
+    is_LCC_round: boolean; 
 
     @IsString()
     @IsOptional()

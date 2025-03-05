@@ -1,4 +1,4 @@
-import { IsIP, IsUUID, IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsIP, IsUUID, IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
 import { JOURNEY, JOURNEYTYPE } from '../../../libs/constants/flightConstant';
 
 
@@ -28,13 +28,19 @@ export class FlightDetailRequestDto {
   @IsNotEmpty()
   result_index: string;
 
-  @IsString()
-  @IsNotEmpty()
-  journey_type: JOURNEYTYPE;
+@IsEnum(JOURNEYTYPE, { 
+    message: `type must be one of the following: ${Object.values(JOURNEYTYPE).join(', ')}` 
+})
+@IsNotEmpty()
+journey_type: JOURNEYTYPE;
 
-  @IsString()
-  @IsNotEmpty()
-  journey: JOURNEY;
+
+@IsEnum(JOURNEY, { 
+  message: `type must be one of the following: ${Object.values(JOURNEY).join(', ')}` 
+})
+@IsNotEmpty()
+journey: JOURNEY;
+
 
   // IB 
 
