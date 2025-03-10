@@ -20,6 +20,10 @@ import { JOURNEY, JOURNEYTYPE } from 'libs/constants/flightConstant';
 
 
 
+
+
+
+
 export class PassengerDto {
     @IsString()
     @IsNotEmpty()
@@ -108,7 +112,6 @@ export class PassengerDetailsDto {
     @ValidateNested({ each: true })
     @Type(() => PassengerDto)
     infant: PassengerDto[] = []; // Default empty array
-
 }
 
 
@@ -182,6 +185,8 @@ export class FareBreakdownDto {
     @IsNumber()
     AdditionalTxnFeePub: number;
 }
+
+
 
 export class BookingNonLccDto {
     @IsString()
@@ -307,59 +312,6 @@ export class TicketDto {
 
 
 
-// class MealDetailDto {
-//     @IsString()
-//     AirlineCode: string;
-  
-//     @IsString()
-//     FlightNumber: string;
-  
-//     @IsNumber()
-//     WayType: number;
-  
-//     @IsString()
-//     Code: string;
-  
-//     @IsNumber()
-//     Description: number;
-  
-//     @IsString()
-//     AirlineDescription: string;
-  
-//     @IsNumber()
-//     Quantity: number;
-  
-//     @IsString()
-//     Currency: string;
-  
-//     @IsNumber()
-//     Price: number;
-  
-//     @IsString()
-//     Origin: string;
-  
-//     @IsString()
-//     Destination: string;
-//   }
-  
-//   class MealTypeDto {
-//     @IsArray()
-//     @ValidateNested({ each: true })
-//     @Type(() => MealDetailDto)
-//     adult: MealDetailDto[];
-  
-//     @IsArray()
-//     @ValidateNested({ each: true })
-//     @Type(() => MealDetailDto)
-//     @IsOptional()
-//     child?: MealDetailDto[];
-  
-//     @IsArray()
-//     @ValidateNested({ each: true })
-//     @Type(() => MealDetailDto)
-//     @IsOptional()
-//     infant?: MealDetailDto[];
-//   }
   
 
 
@@ -471,9 +423,9 @@ export class BookingDto{
 }
 
 
-
-
 //seat meal baggage
+
+
 export class BaggageDto {
     @IsString()
     @IsOptional()

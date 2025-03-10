@@ -11,7 +11,7 @@ import { FlightValidator } from './search-utility';
 import { AirportType } from '../../../../libs/interfaces/flight/search.interface';
 import path from 'path';
 import * as fs from 'fs';
-import { arrayUnique } from 'class-validator';
+// import { arrayUnique } from 'class-validator';
 
 @Injectable()
 export class SearchFlightService {
