@@ -2,7 +2,7 @@ import { Body, Controller, Post,  Req,  Res, UseGuards } from '@nestjs/common';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { FlightBookingService } from './flight-booking.service';
 import { BookingDto, BookingNonLccDto, TicketDto } from '../../../../libs/dtos/flight/booking-flight.dto';
-// import { JWTPayload } from '../../../../libs/interfaces/authentication/jwtPayload.interface';
+import { RoundDto} from '../../../../libs/dtos/flight/round-flight.dto';
 import { UserRepositoryService } from '../../../../libs/database/src';
 import {TokenValidationGuard} from '../../../../libs/middlewares/authMiddleware.guard';
 
@@ -74,12 +74,36 @@ export class FlightBookingController {
     }
 
 
+    
+
     @Post('/ticket')
     async flighticketAfterBooking(@Res() res: Response, @Body() body: TicketDto) {
         try {
             const result = await this.flightBookingService.bookTicket(body);
             return this.responsehandlderservice.sendSuccessResponse(res, result);
         } catch (error) {
+            console.error("Ticket Error:", error);
+            return this.responsehandlderservice.sendErrorResponse(res, error);
+        }
+    }
+
+
+    // Handle Round Trip Flight
+    @Post('/round-trip')
+    @UseGuards(TokenValidationGuard)
+    async flightRoundBooking(@Req() req:Request,@Res() res: Response, @Body() body: RoundDto){
+        try{
+            
+            const payload = req['userPayload'];
+            const {reference_id}= payload;
+            const refData = await this.userRepositoryService.getUserByUserId(reference_id);
+            if(!refData){
+                throw (`An error occurred while fetching the user. Please try again later.`);
+            }
+            
+            const result = await this.flightBookingService.roundFlightBook(reference_id,body);
+            return this.responsehandlderservice.sendSuccessResponse(res,result);
+        }catch(error){
             console.error("Ticket Error:", error);
             return this.responsehandlderservice.sendErrorResponse(res, error);
         }

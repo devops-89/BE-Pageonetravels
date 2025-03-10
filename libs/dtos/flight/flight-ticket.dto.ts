@@ -28,7 +28,7 @@ export class LccTicketDto {
 
     @IsString()
     @IsNotEmpty()
-    receipt: string;
+    custom_order_id: string;
 }
 
 export class VerifyDto{

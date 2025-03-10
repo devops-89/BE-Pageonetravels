@@ -11,6 +11,7 @@ import {  processPassengers,procesPassengers } from '../../../../libs/utils/fare
 import {  calculateTotalPrice } from '../../../../libs/utils/passengerUtils';
 import { COMMISSION_TYPE } from "../../../../libs/constants/autenticationConstants/userContants";
 import { ERROR_CODES } from "../../../../libs/constants/commonConstants";
+import { RoundDto } from "../../../../libs/dtos/flight/round-flight.dto";
 
 
 @Injectable()
@@ -61,7 +62,7 @@ export class FlightBookingService {
             } = body;
 
             if(!body.journey_type || !body.journey || !body.is_LCC){
-                throw { message: "Amount not matched", statusCode: ERROR_CODES.BAD_REQUEST };
+                throw { message: "Journey Details missing like journey_type,journey, flight type", statusCode: ERROR_CODES.BAD_REQUEST };
             }
 
             // Store additional data in a single object to pass easily
@@ -80,7 +81,7 @@ export class FlightBookingService {
             };
 
 
-            // Generate the passenger list using the reusable function
+        // Generate the passenger list using the reusable function
         const passengers = [
                 ...procesPassengers(passenger_details.adult || [], 1, fareBreakdown, fare, additionalData),
                 ...procesPassengers(passenger_details.child || [], 2, fareBreakdown, fare, additionalData),
@@ -198,7 +199,8 @@ export class FlightBookingService {
                 TokenId: token,
                 TraceId: trace_id
             };
-            let amount = fare[0].BaseFare + fare[0].Tax;
+            const extraAmount = calculateTotalPrice(passenger_details);
+            let amount = fare[0].BaseFare + fare[0].Tax + + extraAmount;
             const is_LCC = body.is_LCC;
             const journey = body.journey;
             const journey_type = body.journey_type;
@@ -326,9 +328,232 @@ export class FlightBookingService {
     // }
     
 
-    
+    async roundFlightBook(reference_id,body:RoundDto){
+        try{
+            const {ob,ib} = body;
+            
+            
+            if(ob.is_LCC === true && ib.is_LCC === true){
+                const obData =    await  this.handleLCC(ob);
+                const ibData =    await  this.handleLCC(ib);
+                const firstPayload = obData.payload;
+                const firstAmount = obData.amount;
+                const firstType = obData.is_LCC;
+                const firstCommission  = obData.commissionType;
+                const firstCommType = firstCommission.commission_type;
+                const firstPerType = firstCommission.percentage;
+                const journeyType = obData.journey_type;
+                const journey = obData.journey;
+                const secondPayload = ibData.payload;
+                const secondType = ibData.is_LCC;
+                const secondAmount = ibData.amount;
+                const amount = firstAmount + secondAmount;
+                
+                const response = await this.orderRepository.roundinsertBooking(reference_id,firstPayload,amount,firstType,journey,journeyType,firstCommType,firstPerType,secondPayload,secondType)
+                return { message: 'Successfully Created Order.', response: response };
+                
+            }else if(ob.is_LCC === false && ib.is_LCC === false){
+                const obData =    await  this.handleNonLCC(ob);
+                const ibData =    await  this.handleNonLCC(ib);
+                const firstPayload = obData.payload;
+                const firstAmount = obData.amount;
+                const firstType = obData.is_LCC;
+                const firstCommission  = obData.commissionType;
+                const firstCommType = firstCommission.commission_type;
+                const firstPerType = firstCommission.percentage;
+                const journeyType = obData.journey_type;
+                const journey = obData.journey;
+                const secondPayload = ibData.payload;
+                const secondType = ibData.is_LCC;
+                const secondAmount = ibData.amount;
+                const amount = firstAmount + secondAmount;
+                
+                const response = await this.orderRepository.roundinsertBooking(reference_id,firstPayload,amount,firstType,journey,journeyType,firstCommType,firstPerType,secondPayload,secondType)
+                return { message: 'Successfully Created Order.', response: response };
+                
+            }else if(ob.is_LCC === false && ib.is_LCC === true){
+                const obData =    await  this.handleLCC(ob);
+                const ibData =    await this.handleLCC(ib);
+                const firstPayload = obData.payload;
+                const firstAmount = obData.amount;
+                const firstType = obData.is_LCC;
+                const firstCommission  = obData.commissionType;
+                const firstCommType = firstCommission.commission_type;
+                const firstPerType = firstCommission.percentage;
+                const journeyType = obData.journey_type;
+                const journey = obData.journey;
+                const secondPayload = ibData.payload;
+                const secondType = ibData.is_LCC;
+                const secondAmount = ibData.amount;
+                const amount = firstAmount + secondAmount;
+                
+                const response = await this.orderRepository.roundinsertBooking(reference_id,firstPayload,amount,firstType,journey,journeyType,firstCommType,firstPerType,secondPayload,secondType)
+                return { message: 'Successfully Created Order.', response: response };
+                
+                
+            }else if(ob.is_LCC === true && ib.is_LCC === false){
+                const obData =    await this.handleLCC(ob);
+                const ibData =     await this.handleNonLCC(ib);
+                const firstPayload = obData.payload;
+                const firstAmount = obData.amount;
+                const firstType = obData.is_LCC;
+                const firstCommission  = obData.commissionType;
+                const firstCommType = firstCommission.commission_type;
+                const firstPerType = firstCommission.percentage;
+                const journeyType = obData.journey_type;
+                const journey = obData.journey;
+                const secondPayload = ibData.payload;
+                const secondType = ibData.is_LCC;
+                const secondAmount = ibData.amount;
+                const amount = firstAmount + secondAmount;
+                
+                const response = await this.orderRepository.roundinsertBooking(reference_id,firstPayload,amount,firstType,journey,journeyType,firstCommType,firstPerType,secondPayload,secondType)
+                return { message: 'Successfully Created Order.', response: response };
+                
+            }
+            
+        }catch(error){
+            console.log("########## Round booking flight",error.message);
+            throw error;
+        }
+    }
 
+    async handleLCC(flight: any) {
+        if(!flight.journey_type || !flight.journey || !flight.is_LCC){
+            throw { message: "Journey Details missing like journey_type,journey, flight type", statusCode: ERROR_CODES.BAD_REQUEST };
+        }
+            
+        const {house_number,street,city,country_code,cell_country_code,nationality,gst_company_address,gst_company_contact_number,gst_company_email,gst_company_name,gst_number} = flight;
+
+        // Store additional data in a single object to pass easily
+        const additionalData = {
+            house_number,
+            street,
+            city,
+            country_code,
+            cell_country_code,
+            nationality,
+            gst_company_address,
+            gst_company_contact_number,
+            gst_company_email,
+            gst_company_name,
+            gst_number
+            };
+
+
+        // Generate the passenger list using the reusable function
+        const passengers = [
+                ...procesPassengers(flight.passenger_details.adult || [], 1, flight.fareBreakdown, flight.fare, additionalData),
+                ...procesPassengers(flight.passenger_details.child || [], 2, flight.fareBreakdown, flight.fare, additionalData),
+                ...procesPassengers(flight.passenger_details.infant || [], 3, flight.fareBreakdown, flight.fare, additionalData)
+            ];
+        
+        // console.log(">>>>>>>>>> >>>>>>> >>>> >",passengers);
+        const { token, TBO_data } = await this.generateTokenService.getToken(flight.ip_address);
+        
+        const payload = {
+            "PreferredCurrency": "INR",
+            "AgentReferenceNo": "Page1Travels",
+            "Passengers": passengers,
+            "EndUserIp": flight.ip_address,
+            "TokenId": token,
+            "TraceId": flight.trace_id,
+            "ResultIndex": flight.result_index
+        } 
+        const extraAmount = calculateTotalPrice(flight.passenger_details);
+        
+        let amount = flight.fare[0].BaseFare + flight.fare[0].Tax + extraAmount;
+        
+        const is_LCC = flight.is_LCC;
+        const journey = flight.journey;
+        const journey_type = flight.journey_type;
+        const flightType = `FLIGHT_${journey_type}_${journey}` as COMMISSION_TYPE;
+        let data ;
+        let commissionType ;
+        if (Object.values(COMMISSION_TYPE).includes(flightType)) {
+                commissionType = await this.commissionRepositoryService.getCommissionbytype(flightType); 
+                if(commissionType.commission_type === "FIXED"){
+                  data = parseFloat(commissionType.percentage);
+                }else if(commissionType.commission_type === "PERCENTAGE"){
+                    const percentValue = parseFloat(commissionType.percentage);
+                    const farePrice = flight.fare[0].BaseFare * percentValue;
+                    data = farePrice/100;
+                }
+        } else {
+                throw { message: "Invalid commission type", statusCode: ERROR_CODES.BAD_REQUEST };
+        }
+        
+        amount = amount + data;
+
+        const response = {payload, amount, is_LCC, journey,journey_type, commissionType};
+        return response;
+    }
     
+    async handleNonLCC(flight: any) {
+        if(!flight.journey_type || !flight.journey || !flight.is_LCC){
+            throw { message: "Journey Details missing like journey_type,journey, flight type", statusCode: ERROR_CODES.BAD_REQUEST };
+        }
+
+        const {house_number,street,city,country_code,cell_country_code,nationality,gst_company_address,gst_company_contact_number,gst_company_email,gst_company_name,gst_number,ip_address,result_index,trace_id,passenger_details,fareBreakdown,fare} = flight;
+
+        // Common additional details for passenger processing
+        const additionalInfo = {
+            house_number,
+            street,
+            city,
+            country_code,
+            cell_country_code,
+            nationality,
+            gst_company_address,
+            gst_company_contact_number,
+            gst_company_email,
+            gst_company_name,
+            gst_number
+        };
+
+        // Generate the passenger list
+        const passengers = [
+            ...processPassengers(passenger_details.adult || [], 1, fareBreakdown, fare, additionalInfo),
+            ...processPassengers(passenger_details.child || [], 2, fareBreakdown, fare, additionalInfo),
+            ...processPassengers(passenger_details.infant || [], 3, fareBreakdown, fare, additionalInfo)
+        ];
+
+        
+        const { token, TBO_data } = await this.generateTokenService.getToken(ip_address);
+        // Construct final response
+        const payload = {
+            ResultIndex: result_index,
+            Passengers: passengers,
+            EndUserIp: ip_address,
+            TokenId: token,
+            TraceId: trace_id
+        };
+        const extraAmount = calculateTotalPrice(passenger_details);
+        let amount = fare[0].BaseFare + fare[0].Tax + + extraAmount;
+        const is_LCC = flight.is_LCC;
+        const journey = flight.journey;
+        const journey_type = flight.journey_type;
+        const flightType = `FLIGHT_${journey_type}_${journey}` as COMMISSION_TYPE;
+        let data ;
+        let commissionType ;
+        if (Object.values(COMMISSION_TYPE).includes(flightType)) {
+                commissionType = await this.commissionRepositoryService.getCommissionbytype(flightType); 
+                if(commissionType.commission_type === "FIXED"){
+                  data = parseFloat(commissionType.percentage);
+                }else if(commissionType.commission_type === "PERCENTAGE"){
+                    const percentValue = parseFloat(commissionType.percentage);
+                    const farePrice = fare[0].BaseFare * percentValue;
+                    data = farePrice/100;
+                }
+        } else {
+                throw { message: "Invalid commission type", statusCode: ERROR_CODES.BAD_REQUEST };
+        }
+        
+        amount = amount + data;
+
+        const response = {payload, amount, is_LCC, journey,journey_type, commissionType};
+        return response;
+    }
    
     
     

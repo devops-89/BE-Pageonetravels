@@ -627,3 +627,4 @@ export class SeatDynamicDto {
     @IsOptional()
     Price?: number;
 }
+

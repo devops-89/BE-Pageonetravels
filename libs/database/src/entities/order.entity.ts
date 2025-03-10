@@ -11,6 +11,10 @@ export class Order {
     @PrimaryGeneratedColumn("uuid")
     order_id: string;
 
+    @Column()
+    @IsString()
+    custom_order_id:string;
+
 
     @ManyToOne(() => User, (u) => u.orders)
     @JoinColumn({ name: "user_id" })
@@ -50,6 +54,9 @@ export class Order {
 
     @Column({type:'text',nullable:true})
     order_request: string;
+
+    @Column({type:'text',nullable:true})
+    order_request_second: string;
 
 
     @Column({type:'text',nullable:true})

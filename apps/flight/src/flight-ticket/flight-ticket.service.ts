@@ -24,14 +24,14 @@ export class FlightTicketService {
     async directTicket(reference_id,input: LccTicketDto){
         try{
             const amountData = Math.round(parseFloat(input.amount) * 100);
-            const { currency, receipt } = input;
+            const { currency, custom_order_id } = input;
             const amount = amountData;
-            const orderdetails = await this.orderRepository.findOne(receipt);
+            const orderdetails = await this.orderRepository.findOne(custom_order_id);
             const orderAmount =  Math.round(parseFloat(orderdetails.amount) * 100);
             if(amount !==  orderAmount){
                 throw { message: "Amount not matched", statusCode: ERROR_CODES.BAD_REQUEST };
             }
-            const paymentInput = { amount, currency, receipt };
+            const paymentInput = { amount, currency, custom_order_id };
             const data = await this.razorpayservice.createPayment(paymentInput);
             const orderSave  = await this.flightTicketService.insertOrder(data, {order_id: orderdetails.order_id , user :reference_id});
             return { message: "Order Created successfully", data: orderSave };

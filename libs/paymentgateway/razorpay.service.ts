@@ -3,6 +3,7 @@ import { ConfigService } from '../config/config.service';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import { ERROR_CODES } from '../../libs/constants/commonConstants';
+import { log } from 'console';
 // import { FlightTicketRepositoryService } from '//database/repositories/flightticket.repository';
 
 @Injectable()
@@ -26,14 +27,14 @@ export class RazorpayService {
         
     }
 
-    async createPayment(input: { amount: number; currency: string; receipt: string }): Promise<any> {
+    async createPayment(input: { amount: number; currency: string; custom_order_id: string }): Promise<any> {
         try { 
-            const { amount, currency, receipt } = input;
+            const { amount, currency, custom_order_id } = input;
 
             const orderOptions = {
                 amount: amount, // Razorpay expects the amount in paise 
                 currency: currency, 
-                receipt: receipt,
+                receipt: custom_order_id,
                 payment_capture: 1, // auto-capture after payment 
             }; 
 
@@ -41,8 +42,14 @@ export class RazorpayService {
             
             return response;
         } catch (error) {
-            console.error("Error creating payment:", error);
-            throw error;
+            console.log(">>>>>> >>>> >",error);
+            if (error.statusCode === 400 && error.error.code === 'BAD_REQUEST_ERROR') {
+                throw { message: "The amount exceeds the maximum limit allowed. Please adjust the amount and try again.", statusCode: ERROR_CODES.BAD_REQUEST };
+            }else{
+                throw error;
+            }
+            
+            
         }
     }
 
