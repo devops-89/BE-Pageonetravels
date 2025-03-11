@@ -11,17 +11,15 @@ export class Order {
     @PrimaryGeneratedColumn("uuid")
     order_id: string;
 
-    @Column()
-    @IsString()
-    custom_order_id:string;
+    @Column({ nullable: true })
+    custom_order_id: string;
 
 
     @ManyToOne(() => User, (u) => u.orders)
     @JoinColumn({ name: "user_id" })
     user: User; 
 
-    @Column()
-    @IsString()
+    @Column({ nullable: true })
     commission_type: string;
 
     @Column()
