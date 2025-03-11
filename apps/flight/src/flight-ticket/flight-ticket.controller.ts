@@ -21,6 +21,7 @@ export class FlightTicketController {
     @UseGuards(TokenValidationGuard)
     async ticketLCC(@Body() body: LccTicketDto, @Req() req:Request, @Res() res:Response){
         try{
+            
             const payload = req['userPayload'];
             const {reference_id}= payload;
             const refData = await this.userRepositoryService.getUserByUserId(reference_id);

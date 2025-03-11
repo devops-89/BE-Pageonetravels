@@ -12,13 +12,14 @@ export class Payment {
     @PrimaryGeneratedColumn("uuid")
     payment_id: string;  
 
-    @OneToOne(() => Order, o => o.order_id, { cascade: true, nullable: true })
-    @JoinColumn({ name: 'order_id' })
-    orderId:Order;
 
-    @ManyToOne(() => User, (u) => u.payment)
+    @OneToOne(() => Order, (order) => order.payment)
+    @JoinColumn({ name: 'order_id' })
+    order: Order;
+
+    @ManyToOne(() => User, (user) => user.payments)
     @JoinColumn({ name: "user_id" })
-    user: User; 
+    user: User;
 
     @IsString()
     @IsOptional()

@@ -30,7 +30,7 @@ export class FlightTicketRepositoryService {
                     const newPaymentOrder = await this.paymentRepository.insert(this.paymentRepository.create({
                         gateway_order_response: JSON.stringify(data),
                         user: userRef,
-                        orderId: orderRef,
+                        order: orderRef,
                         razorpay_order_id: data.id,
                         payment_gateway: "Razorpay",
                         payment_status: data.status,

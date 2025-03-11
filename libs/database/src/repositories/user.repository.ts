@@ -81,9 +81,9 @@ export class UserRepositoryService {
                 is_phone_verified: true,
                 is_email_verified: true
             };
-
+            
             const user = await this.userRepository.findOne({ where: { email }, select: selectFields, loadRelationIds: true });
-
+            console.log("########",selectFields);
             if (user && user.password && !getPassword) {
                 user.password = '';
             }

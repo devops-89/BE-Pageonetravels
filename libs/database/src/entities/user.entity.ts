@@ -109,8 +109,7 @@ export class User {
   
 
   @OneToMany(() => TransactionDetail, transaction => transaction.user, { cascade: true, nullable: true })
-  @JoinColumn({ name: 'transaction_id' })
-  transaction: TransactionDetail[]
+  transaction: TransactionDetail[];
 
 
   @OneToMany(() => Booking, booking => booking.user, { cascade: true, nullable: true })
@@ -121,8 +120,8 @@ export class User {
   orders:Order[]
 
 
-  @OneToMany(() => Payment, (payment)=>payment.payment_id, {cascade: true})
-  payment:Payment[]
+  @OneToMany(() => Payment, (payment) => payment.user, { cascade: true })
+  payments: Payment[];
 
   @OneToOne(() => Passenger, p => p.id, { cascade: true, nullable: true })
   @JoinColumn({ name: 'passenger_id' })

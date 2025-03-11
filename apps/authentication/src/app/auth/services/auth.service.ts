@@ -229,8 +229,9 @@ export class AuthService {
             const { email, user_type } = input;
             let user_id: string;
             let otp_type = OTP_TYPE.LOGIN_OTP;
-
+            
             const user = await this.UserModel.getUnverifiedUserByEmail(email);
+            
             if ((user && user.verify_status== USER_VERIFY_STATUS.UNVERIFIED) || !user) {
                 //const permission = await this.PermissionModel.getPermissionByRoleName({ group });
                 // const permissionObj: UserI.PermissionObj = {}

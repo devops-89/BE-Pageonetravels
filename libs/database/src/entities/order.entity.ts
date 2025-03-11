@@ -87,7 +87,10 @@ export class Order {
     updated_at: Date;
 
     // Add OneToOne relation to Payment entity
-    @OneToOne(() => Payment, (payment) => payment.orderId)
-    payment: Payment;  
+    @OneToOne(() => Payment, (payment) => payment.order)
+    payment: Payment;
+ 
 
 }
+
+
