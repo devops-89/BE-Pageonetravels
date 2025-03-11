@@ -22,7 +22,9 @@ export const DEFAULT_CONFIG: ConfigData = {
         flight: 3001,
         userManagement: 3002,
         authentication: 3000,
-        hotel: 3003
+        hotel: 3003,
+        package_service:3007,
+        hotel_management:3008,
     },
     S3_bucket: { access_key_id: '', bucket_name: '', region: '', secret_access_key: '' },
     SMTP: { HOST: '', PASSWORD: '', PORT: 587, SENDER: '', SERVICE: 'gmail', SMTP_TLS: '', USERNAME: '' },

@@ -31,7 +31,9 @@ export interface ServicesPort {
   flight: number;
   userManagement: number;
   adminpanel: number;
-  hotel: number
+  hotel: number;
+  package_service:number;
+  hotel_management:number;
 
 }
 

@@ -71,6 +71,8 @@ export class ConfigService {
       userManagement: parseInt(env.USER_MANAGEMENT) || defaultConfig.userManagement,
       adminpanel: parseInt(env.ADMIN_PANEL) || defaultConfig.adminpanel,
       hotel: parseInt(env.HOTEL_PORT) || defaultConfig.hotel,
+      package_service: parseInt(env.PACKAGE_PORT) || defaultConfig.package_service,
+      hotel_management: parseInt(env.HOTEL_MANAGEMENT_PORT) || defaultConfig.hotel_management,
     };
   }
 
