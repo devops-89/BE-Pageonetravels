@@ -63,7 +63,7 @@ export class AuthController {
 
     @Post('/admin-login')
     // @UseGuards(TokenValidationGuard,CheckIfAdminGuard)
-    async adminLogin(@Body() body:AdminLoginDto,@Req() req:Request,@Res() res:Response){
+    async adminLogin(@Body() body:AdminLoginDto, @Req() req:Request, @Res() res:Response){
         try{
             const device_type = req.headers['devicetype'];
             const result = await this.authService.adminLoginDetails(device_type,body);
@@ -90,11 +90,10 @@ export class AuthController {
     // @UseGuards(OptionalTokenValidationAndGuestUserGuard)
     async register(@Res() res: Response, @Req() req: Request, @Body() body: RegisterDto) {
         try {
-            
             const result = await this.authService.registerWithEmailPassword(body);
-            this.ResponseHandler.sendSuccessResponse(res, result);
+            return this.ResponseHandler.sendSuccessResponse(res, result);
         } catch (error) {
-            this.ResponseHandler.sendErrorResponse(res, error);
+           return this.ResponseHandler.sendErrorResponse(res, error);
         }
     }
 

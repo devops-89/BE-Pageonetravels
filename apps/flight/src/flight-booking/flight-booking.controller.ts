@@ -20,7 +20,7 @@ export class FlightBookingController {
     @UseGuards(TokenValidationGuard)
     async bookFlightForLCC(@Req() req:Request,@Res() res : Response, @Body() body: BookingDto) {
         try { 
-            console.log(">>>>>>new data",body.passenger_details);
+            
             const payload = req['userPayload'];
             console.log(payload);
             const {reference_id}= payload;

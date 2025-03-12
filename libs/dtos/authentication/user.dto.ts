@@ -1,6 +1,7 @@
 import { IsString, IsEmail, IsNumber, Min, Max, Matches, IsOptional, IsNotEmpty, MinLength, IsEnum, isEmail, IsInt } from 'class-validator';
 import { LOGIN_BY, USER_ACCOUNT_STATUS, USER_TYPE } from '../../constants/autenticationConstants/userContants';
 import { DEVICE_TYPE } from '../../constants/commonConstants';
+import { Transform } from 'class-transformer';
 
 export class LoginDto {
   @IsNotEmpty()
@@ -222,6 +223,7 @@ export class RegisterWithEmailPasswordDto {
 
 export class RegisterDto {
   @IsEmail()
+  @Transform(({ value }) => ("" + value).toLowerCase())
   email: string;
 
   @IsNotEmpty()

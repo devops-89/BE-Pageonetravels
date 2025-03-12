@@ -23,6 +23,7 @@ import { loginPasswordTemplate } from '../../../../../../libs/templates/loginPas
 import { ForgotPasswardI } from '../../../../../../libs/interfaces/authentication/forgotPassword.interface';
 import { resetPassword } from '../../../../../../libs/templates/resetPasswordTemplate';
 import { AdminLoginDto } from '../../../../../../libs/dtos/authentication/admin.dto';
+import { throwError } from 'rxjs';
 
 
 
@@ -136,12 +137,13 @@ export class AuthService {
                 identity = identity.toLowerCase()
                 const emailResult = await this.loginWithEmail({ email: identity, user_type });
                 return emailResult;
-            } else {
-                if (country_code && validPhoneNo(`${country_code}${identity}`)) {
-                    const phoneResult = await this.loginWithPhone({ country_code, phone_number: identity, user_type });
-                    return phoneResult;
-                }
-            }
+            } 
+            // else {
+            //     if (country_code && validPhoneNo(`${country_code}${identity}`)) {
+            //         const phoneResult = await this.loginWithPhone({ country_code, phone_number: identity, user_type });
+            //         return phoneResult;
+            //     }
+           // }
 
             throw { status_code: ERROR_CODES.ACCESS_DENIED, message: "Please provide a valid email or phone number" };
 
@@ -279,14 +281,12 @@ export class AuthService {
             };
 
             const otpId = await this.OtpVerificationModel.addOtpVerificationRequest(otpObj);
-            // const emailTemplate = otpVerification(OTP);
 
-            // await this.EmailService.sendEmail(email, 'Account Verification', emailTemplate.html);
             // send email
             
             const otpEmail = otpVerificationTemplate(OTP);
             
-            //await this.EmailService.sendEmail(email, 'Your OTP Code', otpEmail.html);
+            await this.EmailService.sendEmail(email, 'Your OTP Code', otpEmail.html);
 
             return { message: `${OTP_VERIFY_MSG.OTP_SEND} ${email}`, data: { reference_id: otpId, OTP } };
 
@@ -316,6 +316,7 @@ export class AuthService {
         try {
             input.email = input.email.toLowerCase();
             const { email, password, full_name, user_type, phone_number, country_code } = input;
+            let user_id: string;
 
             if (!user_type) {
                 input.user_type = USER_TYPE.USER;
@@ -324,64 +325,60 @@ export class AuthService {
             if (!validateEmail(email)) {
                 throw { message: COMMON_MSG.INVALID_EMAIL, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
             }
-
-            const checkIfExist = await this.UserModel.checkUserEmailExist(email);
-            if (checkIfExist)   {
-                throw ({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: COMMON_MSG.EMAIL_ALREADY_EXIST });
+            // my code start
+            const user = await this.UserModel.getUnverifiedUserByEmail(email);
+            if(user && user.verify_status == USER_VERIFY_STATUS.VERIFIED){
+                throw { message: "Email Already Exist.", statusCode: COMMON_MSG.EMAIL_ALREADY_EXIST };
             }
-
-            if (phone_number) {
-                const isPhoneExist = await this.UserModel.checkPhoneNumberExist(phone_number);
-                if (isPhoneExist) {
-                    throw {
-                        status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER,
-                        message: COMMON_MSG.PHONE_ALREADY_EXIST,
-                    };
+            if ((user && user.verify_status== USER_VERIFY_STATUS.UNVERIFIED) || !user) {
+                const password_hash = await generatePasswordHash(password.trim());
+                const userObj: UserI.AddOrUpdateUser = {
+                    email,
+                    password:password_hash,
+                    status: USER_ACCOUNT_STATUS.INACTIVE,
+                    verify_status: USER_VERIFY_STATUS.UNVERIFIED,
+                    loginSource: USER_LOGIN_SOURCE.LOCAL,
+                    user_type: user_type,
+                    phone_number:phone_number,
+                    country_code:country_code,
+                    id: (user && user.verify_status == USER_VERIFY_STATUS.UNVERIFIED) ? user.id:undefined,
+                   
+                } as UserI.AddOrUpdateUser
+                let insertedId = await this.UserModel.addOrUpdateUser(userObj);
+                if (!insertedId) {
+                    throw { message: COMMON_MSG.INVALID_REQUEST, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
                 }
+
+                user_id = insertedId;
             }
-            const password_hash = await generatePasswordHash(password);
 
-            const user: UserI.InsertUserByEmail = { 
-                password: password_hash,
-                email: email.toLowerCase().trim(),
-                status: USER_ACCOUNT_STATUS.ACTIVE,
-                verify_status: USER_VERIFY_STATUS.UNVERIFIED,
-                loginSource: USER_LOGIN_SOURCE.LOCAL,
-                full_name,
-                user_type,
-                phone_number,
-                country_code,
-            };
+                const currentTime = Date.now();
 
-            const userData = await this.UserModel.addOrUpdateByEmail(user);
+                const OTP = getOTP();
 
+                const otpObj: OtpVerificationI.VerifyOtpRequest = {
+                    otp: OTP,
+                    otp_type: OTP_TYPE.REGISTER_OTP,
+                    
+                    user: user_id,
+                    send_on: OTP_SEND_ON.EMAIL,
+                    resendData: {
+                        blockedTill: -1,
+                        isBlocked: false,
+                        retryLeft: OTP_REQUEST_LIMITS.RESEND_OTP,
+                        totalRetry: OTP_REQUEST_LIMITS.RESEND_OTP
+                    },
+                    email_or_phone: email,
+                    expiry_time: currentTime + 900000 // 15 min
+                };
 
-            const currentTime = Date.now();
-
-            const OTP = getOTP();
-
-            const otpObj: OtpVerificationI.VerifyOtpRequest = {
-                otp: OTP,
-                otp_type: OTP_TYPE.REGISTER_OTP,
+                const otpId = await this.OtpVerificationModel.addOtpVerificationRequest(otpObj);
                 
-                user: userData.id,
-                send_on: OTP_SEND_ON.EMAIL,
-                resendData: {
-                    blockedTill: -1,
-                    isBlocked: false,
-                    retryLeft: OTP_REQUEST_LIMITS.RESEND_OTP,
-                    totalRetry: OTP_REQUEST_LIMITS.RESEND_OTP
-                },
-                email_or_phone: email,
-                expiry_time: currentTime + 900000 // 15 min
-            };
+                const emailTemplate = otpVerificationTemplate(OTP);
+                await this.EmailService.sendEmail(email, 'Email Verification', emailTemplate.html);
 
-            const otpId = await this.OtpVerificationModel.addOtpVerificationRequest(otpObj);
-            
-            const emailTemplate = otpVerificationTemplate(OTP);
-            await this.EmailService.sendEmail(email, 'Email Verification', emailTemplate.html);
+                return { message: `${OTP_VERIFY_MSG.OTP_SEND} ${email}`, data: { reference_id: otpId, OTP, full_name } };
 
-            return { message: `${OTP_VERIFY_MSG.OTP_SEND} ${email}`, data: { reference_id: otpId, OTP, full_name } };
         } catch (error) {
             console.error("Error registering with email & password:", error);
             throw error;
@@ -396,13 +393,14 @@ export class AuthService {
             if (validateEmail(identity)) {
                 
                 const user = await this.UserModel.getUserByEmail(identity);
+                
                 if (!user) {
                 throw {
                         message: LOGIN_MSG.INVALID_EMAIL_PASSWORD,
                         status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER
                     };
                 }
-    
+                
                 return await this.loginWithPasswordHandler(user, identity, password, LOGIN_BY.EMAIL);
     
             } else {
@@ -430,7 +428,7 @@ export class AuthService {
         }
     }
 
-    async loginWithPasswordHandler(
+    async loginWithPasswordHandler(   
         user: User,
         identity: string,
         password: string,
@@ -438,8 +436,8 @@ export class AuthService {
     ): Promise<ApiResponse.ApiOK> {
         try {
            
-            if(![USER_TYPE.USER, USER_TYPE.USER, USER_TYPE.ADMIN, USER_TYPE.HOTEL].includes(user.user_type)) {
-                throw { 
+            if(![USER_TYPE.USER, USER_TYPE.HOTEL].includes(user.user_type)) {
+                throw {  
                     message: "You are not authorized to access the website.", 
                     status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
                 };
@@ -460,9 +458,12 @@ export class AuthService {
                 };
             }
 
-    
+            console.log(">>>> >> >",password);
+            console.log(">>>>",user.password)
             const isPasswordCorrect = await checkPasswordHash(password, user.password);
-            if (!isPasswordCorrect) {
+            console.log(isPasswordCorrect);
+            if (!isPasswordCorrect) { 
+                console.log("###444###>>>>>>???");
                 throw { 
                     message: LOGIN_MSG.INVALID_CREDENTIALS, 
                     status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
@@ -477,7 +478,7 @@ export class AuthService {
                 user_type: user.user_type
             };
             const { jwt_token, refresh_token } = await this.LoginService.getLoginToken(token_data);
-    
+            console.log("###444###>>>>>>Mafia");
             const data = {
                 access_token: jwt_token,
                 refresh_token,

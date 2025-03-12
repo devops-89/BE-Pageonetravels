@@ -201,6 +201,11 @@ export class HTTPSTboAPIService {
                 
                 let data  = response.Response;
                 delete data.Error;
+
+                if(data.Meal){
+                    data.MealDyanamic = data.Meal
+                    delete data.Meal
+                }
                 response = data;
             }
     

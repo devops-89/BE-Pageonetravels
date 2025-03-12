@@ -11,9 +11,12 @@ export const generatePasswordHash = async (password: string) => {
 }
 
 export const checkPasswordHash = async (password: string, hash: string) => {
-    try {
+    try 
+    { 
         return await bcrypt.compare(password, hash);
-    } catch (err) {
+    } 
+    catch (err) {
+        console.log(" becrypt error check password error",err);
         return false;
     }
 }

@@ -104,6 +104,17 @@ export class UserRepositoryService {
         }
     }
 
+    
+    async emailIsExistsOrNot(email: string): Promise<boolean> {
+        try {
+            const doc = await this.userRepository.count({ where: { email: email} });
+            return doc > 0;
+        } catch (error) {
+            console.log('User Not Found', error);
+            throw error;
+        }
+    }
+
     async checkAdminEmail(email:string):Promise<User>{
         try{
             const checkAdmin = await this.userRepository.findOne({
