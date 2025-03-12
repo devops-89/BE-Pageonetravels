@@ -143,11 +143,11 @@ export class FlightDetailService {
                 response = await this.httptboapiservice.fareRule(base_url, payload_request);
                 response = await this.httptboapiservice.flightFormat(response);
                 await this.addImage(response);
-
-                ssrResponse = await this.httptboapiservice.ssr(base_url_ssr, payload_request); 
+                
+                ssrResponse = await this.httptboapiservice.ssr(base_url_ssr, payload_request);                 
                 if(journey_type === "ONEWAY"){
                   ssrResponse = await this.httptboapiservice.flightFormat(ssrResponse); 
-                }
+                } 
                 response = [response, ssrResponse,commissiontype, { journey_type: journey_type, journey: journey }];   
             }
 
