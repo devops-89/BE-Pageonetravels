@@ -17,7 +17,7 @@ export class FlightTicketController {
             private readonly  flightTicketService:FlightTicketService
         ){}
 
-    @Post('/ticket')
+    @Post('/payment-init')
     @UseGuards(TokenValidationGuard)
     async ticketLCC(@Body() body: LccTicketDto, @Req() req:Request, @Res() res:Response){
         try{

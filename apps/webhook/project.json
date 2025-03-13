@@ -1,0 +1,57 @@
+{
+    "name": "webhook",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/webhook/src",
+    "projectType": "application",
+    "targets": {
+        "build": {
+            "executor": "@nx/webpack:webpack",
+            "outputs": ["{options.outputPath}"],
+            "defaultConfiguration": "production",
+            "options": {
+                "target": "node",
+                "compiler": "tsc",
+                "outputPath": "dist/apps/webhook",
+                "main": "apps/webhook/src/main.ts",
+                "tsConfig": "apps/webhook/tsconfig.app.json",
+                "assets": ["apps/webhook/src/assets"],
+                "isolatedConfig": true,
+                "webpackConfig": "apps/webhook/webpack.config.js"
+            },
+            "configurations": {
+                "development": {},
+                "production": {}
+            }
+        },
+        "serve": {
+            "executor": "@nx/js:node",
+            "defaultConfiguration": "development",
+            "options": {
+                "buildTarget": "webhook:build"
+            },
+            "configurations": {
+                "development": {
+                    "buildTarget": "webhook:build:development"
+                },
+                "production": {
+                    "buildTarget": "webhook:build:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["apps/webhook/**/*.ts"]
+            }
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+            "options": {
+                "jestConfig": "apps/webhook/jest.config.ts"
+            }
+        }
+    },
+    "tags": []
+}

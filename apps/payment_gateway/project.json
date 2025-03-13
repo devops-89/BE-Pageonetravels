@@ -1,0 +1,57 @@
+{
+    "name": "payment_gateway",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/payment_gateway/src",
+    "projectType": "application",
+    "targets": {
+        "build": {
+            "executor": "@nx/webpack:webpack",
+            "outputs": ["{options.outputPath}"],
+            "defaultConfiguration": "production",
+            "options": {
+                "target": "node",
+                "compiler": "tsc",
+                "outputPath": "dist/apps/payment_gateway",
+                "main": "apps/payment_gateway/src/main.ts",
+                "tsConfig": "apps/payment_gateway/tsconfig.app.json",
+                "assets": ["apps/payment_gateway/src/assets"],
+                "isolatedConfig": true,
+                "webpackConfig": "apps/payment_gateway/webpack.config.js"
+            },
+            "configurations": {
+                "development": {},
+                "production": {}
+            }
+        },
+        "serve": {
+            "executor": "@nx/js:node",
+            "defaultConfiguration": "development",
+            "options": {
+                "buildTarget": "payment_gateway:build"
+            },
+            "configurations": {
+                "development": {
+                    "buildTarget": "payment_gateway:build:development"
+                },
+                "production": {
+                    "buildTarget": "payment_gateway:build:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["apps/payment_gateway/**/*.ts"]
+            }
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+            "options": {
+                "jestConfig": "apps/payment_gateway/jest.config.ts"
+            }
+        }
+    },
+    "tags": []
+}

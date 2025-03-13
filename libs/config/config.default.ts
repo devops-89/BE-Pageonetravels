@@ -25,6 +25,8 @@ export const DEFAULT_CONFIG: ConfigData = {
         hotel: 3003,
         package_service:3007,
         hotel_management:3008,
+        payment_service:3009,
+        webhook_service:3004,
     },
     S3_bucket: { access_key_id: '', bucket_name: '', region: '', secret_access_key: '' },
     SMTP: { HOST: '', PASSWORD: '', PORT: 587, SENDER: '', SERVICE: 'gmail', SMTP_TLS: '', USERNAME: '' },

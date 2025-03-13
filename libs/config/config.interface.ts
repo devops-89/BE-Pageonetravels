@@ -34,6 +34,8 @@ export interface ServicesPort {
   hotel: number;
   package_service:number;
   hotel_management:number;
+  payment_service:number;
+  webhook_service:number;
 
 }
 
