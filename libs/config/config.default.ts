@@ -19,8 +19,8 @@ export const DEFAULT_CONFIG: ConfigData = {
     AUTH_KEY: '',
     servicePorts: {
         adminpanel: 3005,
-        flight: 3001,
-        userManagement: 3002,
+        flight: 3002,
+        userManagement: 3001,
         authentication: 3000,
         hotel: 3003,
         package_service:3007,

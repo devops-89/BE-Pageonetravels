@@ -49,23 +49,23 @@ export class AuthService {
             const { reference_id, otp } = input;
             const otpReq = await this.OtpVerificationModel.getVerificationOtpDataByReferenceId(reference_id);
             if (!otpReq) {
-                throw { message: 'Invalid request', status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+                throw { message: 'Invalid request', statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
             }
 
 
             if (otpReq.expiry_time < Date.now()) {
-                throw { message: 'OTP expired', status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+                throw { message: 'OTP expired', statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
             }
 
 
             if (otpReq.otp !== otp) {
-                throw { message: 'Incorrect OTP', status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+                throw { message: 'Incorrect OTP', statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
             }
 
 
             const user = await this.UserModel.getUnverifiedUserById(otpReq.user);
             if (!user) {
-                throw { message: 'User does not exist', status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+                throw { message: 'User does not exist', statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
             }
 
 
@@ -145,7 +145,7 @@ export class AuthService {
             //     }
            // }
 
-            throw { status_code: ERROR_CODES.ACCESS_DENIED, message: "Please provide a valid email or phone number" };
+            throw { statusCode: ERROR_CODES.ACCESS_DENIED, message: "Please provide a valid email or phone number" };
 
         } catch (error) {
             console.error("Error in login with email or phone:", error);
@@ -161,7 +161,7 @@ export class AuthService {
                 let otp_type = OTP_TYPE.LOGIN_OTP;
                 // const user_type = USER_GROUP.USER;
                 if ((phone_number && !country_code) || (country_code && !phone_number)) {
-                    reject({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: COMMON_MSG.PHONE_WTH_COUNTRY_CODE });
+                    reject({ statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: COMMON_MSG.PHONE_WTH_COUNTRY_CODE });
                     return;
                 }
                 const user = await this.UserModel.getUserIdByPhoneNo(phone_number);
@@ -179,7 +179,7 @@ export class AuthService {
                     }
                     let insertedId = await this.UserModel.addOrUpdateUser(userObj);
                     if (!insertedId) {
-                        reject({ message: COMMON_MSG.INVALID_REQUEST, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
+                        reject({ message: COMMON_MSG.INVALID_REQUEST, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
                         return;
                     }
                     user_id = insertedId
@@ -187,15 +187,15 @@ export class AuthService {
                 }
                 // else if(user.user_type == USER_TYPE.USER || user.user_type == USER_TYPE.HOTEL)
                 // {
-                //     reject({ message: "You are not authorised to access the website.", status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
+                //     reject({ message: "You are not authorised to access the website.", statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
                 //     return;
                 // }
                 else if (user.status == USER_ACCOUNT_STATUS.BLOCKED) {
-                    reject({ message: COMMON_MSG.BLOCKED_USER, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
+                    reject({ message: COMMON_MSG.BLOCKED_USER, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
                     return;
                 }
                 else if (user.status != USER_ACCOUNT_STATUS.ACTIVE) {
-                    reject({ message: LOGIN_MSG.INACTIVE_ACCOUNT, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
+                    reject({ message: LOGIN_MSG.INACTIVE_ACCOUNT, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
                     return;
                 }
                 else {
@@ -251,20 +251,20 @@ export class AuthService {
 
                 let insertedId = await this.UserModel.addOrUpdateUser(userObj);
                 if (!insertedId) {
-                    throw { message: COMMON_MSG.INVALID_REQUEST, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+                    throw { message: COMMON_MSG.INVALID_REQUEST, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
                 }
                 user_id = insertedId;
                 otp_type = OTP_TYPE.REGISTER_OTP;
 
                 // else if(user.group == USER_GROUP.ADMIN)
                 // {
-                //     reject({ message: "You are not authorised to access the website.", status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
+                //     reject({ message: "You are not authorised to access the website.", statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER });
                 //     return;
                 // }
             } else if (user.status == USER_ACCOUNT_STATUS.BLOCKED) {
-                throw { message: COMMON_MSG.BLOCKED_USER, status_code: ERROR_CODES.BLOCKED_USER };
+                throw { message: COMMON_MSG.BLOCKED_USER, statusCode: ERROR_CODES.BLOCKED_USER };
             } else if (user.status != USER_ACCOUNT_STATUS.ACTIVE) {
-                throw { message: LOGIN_MSG.INACTIVE_ACCOUNT, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+                throw { message: LOGIN_MSG.INACTIVE_ACCOUNT, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
             } else {
                 user_id = user.id;
             }
@@ -323,7 +323,7 @@ export class AuthService {
             }
 
             if (!validateEmail(email)) {
-                throw { message: COMMON_MSG.INVALID_EMAIL, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+                throw { message: COMMON_MSG.INVALID_EMAIL, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
             }
             // my code start
             const user = await this.UserModel.getUnverifiedUserByEmail(email);
@@ -346,7 +346,7 @@ export class AuthService {
                 } as UserI.AddOrUpdateUser
                 let insertedId = await this.UserModel.addOrUpdateUser(userObj);
                 if (!insertedId) {
-                    throw { message: COMMON_MSG.INVALID_REQUEST, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+                    throw { message: COMMON_MSG.INVALID_REQUEST, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
                 }
 
                 user_id = insertedId;
@@ -393,12 +393,8 @@ export class AuthService {
             if (validateEmail(identity)) {
                 
                 const user = await this.UserModel.getUserByEmail(identity);
-                
                 if (!user) {
-                throw {
-                        message: LOGIN_MSG.INVALID_EMAIL_PASSWORD,
-                        status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER
-                    };
+                throw {  message: LOGIN_MSG.INVALID_EMAIL_PASSWORD,  statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER  };
                 }
                 
                 return await this.loginWithPasswordHandler(user, identity, password, LOGIN_BY.EMAIL);
@@ -406,7 +402,7 @@ export class AuthService {
             } else {
                 if ((identity && !country_code) || (country_code && !identity)) {
                     throw {
-                        status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER,
+                        statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER,
                         message: COMMON_MSG.PHONE_WTH_COUNTRY_CODE
                     };
                 }
@@ -416,7 +412,7 @@ export class AuthService {
                 if (!user) {
                     throw {
                         message: LOGIN_MSG.INVALID_PHONE_PASSWORD,
-                        status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER
+                        statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER
                     };
                 }
     
@@ -439,7 +435,7 @@ export class AuthService {
             if(![USER_TYPE.USER, USER_TYPE.HOTEL].includes(user.user_type)) {
                 throw {  
                     message: "You are not authorized to access the website.", 
-                    status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
+                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
                 };
             }
 
@@ -447,26 +443,25 @@ export class AuthService {
             if (user.status === USER_ACCOUNT_STATUS.BLOCKED) {
                 throw { 
                     message: COMMON_MSG.BLOCKED_USER,
-                    status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
+                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
                 };
             }
 
             if (user.status != USER_ACCOUNT_STATUS.ACTIVE) {
                 throw { 
                     message: LOGIN_MSG.INACTIVE_ACCOUNT, 
-                    status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
+                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
                 };
             }
 
-            console.log(">>>> >> >",password);
-            console.log(">>>>",user.password)
+            
             const isPasswordCorrect = await checkPasswordHash(password, user.password);
-            console.log(isPasswordCorrect);
+            
             if (!isPasswordCorrect) { 
-                console.log("###444###>>>>>>???");
+                
                 throw { 
                     message: LOGIN_MSG.INVALID_CREDENTIALS, 
-                    status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
+                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
                 };
             }
 
@@ -478,7 +473,7 @@ export class AuthService {
                 user_type: user.user_type
             };
             const { jwt_token, refresh_token } = await this.LoginService.getLoginToken(token_data);
-            console.log("###444###>>>>>>Mafia");
+            
             const data = {
                 access_token: jwt_token,
                 refresh_token,
@@ -508,7 +503,7 @@ export class AuthService {
             if (!access_token || !refresh_token) {
                 throw {
                     message: "Invalid request",
-                    status_code: ERROR_CODES.JWT_TOKEN_INVALID,
+                    statusCode: ERROR_CODES.JWT_TOKEN_INVALID,
                     extraError: "access_token or refresh_token not found"
                 };
             }
@@ -526,7 +521,7 @@ export class AuthService {
                 if (!expPayload) {
                     throw {
                         message: "Invalid token payload",
-                        status_code: ERROR_CODES.JWT_TOKEN_INVALID
+                        statusCode: ERROR_CODES.JWT_TOKEN_INVALID
                     };
                 }
 
@@ -537,7 +532,7 @@ export class AuthService {
                     if (refresh_token !== session.refresh_token || session.refreshTokenExpiry < Date.now()) {
                         throw {
                             message: "Login session expired, Please login again",
-                            status_code: ERROR_CODES.JWT_TOKEN_INVALID
+                            statusCode: ERROR_CODES.JWT_TOKEN_INVALID
                         };
                     }
 
@@ -557,13 +552,13 @@ export class AuthService {
                 } else {
                     throw {
                         message: "User is logged out",
-                        status_code: ERROR_CODES.JWT_TOKEN_INVALID
+                        statusCode: ERROR_CODES.JWT_TOKEN_INVALID
                     };
                 }
             } else if (error_code === ERROR_CODES.JWT_TOKEN_INVALID) {
                 throw {
                     message: "User is logged out",
-                    status_code: ERROR_CODES.JWT_TOKEN_INVALID
+                    statusCode: ERROR_CODES.JWT_TOKEN_INVALID
                 };
             }
 
@@ -581,13 +576,13 @@ export class AuthService {
 
             let user = await this.UserModel.getUserByUserId(payload.reference_id, true);
             if (!user) {
-                throw { status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: "No such user found" };
+                throw { statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: "No such user found" };
             }
 
         
             const isPasswordCorrect = await checkPasswordHash(old_password, user.password);
             if (!isPasswordCorrect) {
-                throw { message: "Old password is incorrect", status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+                throw { message: "Old password is incorrect", statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
             }
 
            
@@ -625,12 +620,12 @@ export class AuthService {
         const lowercasedEmail = email.toLowerCase();
 
         if (!validateEmail(lowercasedEmail)) {
-            throw { message: COMMON_MSG.INVALID_EMAIL, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+            throw { message: COMMON_MSG.INVALID_EMAIL, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
         }
 
         const user = await this.UserModel.getUserByEmail(lowercasedEmail);
         if (!user) {
-            throw { status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: "User not found" };
+            throw { statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: "User not found" };
         }
 
         const currentTime = Date.now();
@@ -665,15 +660,15 @@ export class AuthService {
 
         const otpReq = await this.OtpVerificationModel.getVerificationOtpDataByReferenceId(String(reference_id));
         if (!otpReq) {
-            throw { message: OTP_VERIFY_MSG.INVALID_REQUEST, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+            throw { message: OTP_VERIFY_MSG.INVALID_REQUEST, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
         }
 
         if (otpReq.expiry_time < Date.now()) {
-            throw { message: OTP_VERIFY_MSG.OTP_EXPIRE, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+            throw { message: OTP_VERIFY_MSG.OTP_EXPIRE, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
         }
 
         if (otpReq.otp !== otp) {
-            throw { message: OTP_VERIFY_MSG.INCORRECT_OTP, status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+            throw { message: OTP_VERIFY_MSG.INCORRECT_OTP, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
         }
 
         if (otpReq.otp_type === OTP_TYPE.FORGOT_PASSWORD_OTP) {
@@ -697,17 +692,17 @@ export class AuthService {
                 console.log("email data",email);
                 const checkIfEmailExist = await this.UserModel.checkAdminEmail(email);
                 if(!checkIfEmailExist){
-                    throw ({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: 'Admin Email Not Exist.' });
+                    throw ({ statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: 'Admin Email Not Exist.' });
                 }
                 // const password_hash = await generatePasswordHash(password);
                 const isPasswordCorrect = await checkPasswordHash(password, checkIfEmailExist.password);
                 console.log(isPasswordCorrect);
                 return null;
             }else{
-                throw ({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: COMMON_MSG.ADMIN_EXIST });
+                throw ({ statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: COMMON_MSG.ADMIN_EXIST });
             }
         }else{
-            throw ({ status_code: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: COMMON_MSG.ADMIN_NOT_EXIST });
+            throw ({ statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: COMMON_MSG.ADMIN_NOT_EXIST });
         }
 
         // const emailCheck = validateEmail(email) ? email.toLowerCase() : undefined;

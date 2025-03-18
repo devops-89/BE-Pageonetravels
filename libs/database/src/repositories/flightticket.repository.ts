@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { OrderRepositoryService } from './order.repository';
 import { PAYMENT_STATUS } from '../../../../libs/constants/bookingContant';
 import {RazorpayOrderData} from '../../../../libs/interfaces/commonTypes/payment.interface'
+import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 
 @Injectable()
 export class FlightTicketRepositoryService { 
@@ -43,6 +44,28 @@ export class FlightTicketRepositoryService {
                 } catch (error) {
                     console.error("Error while saving the payment order:", error);
                     throw new Error("Failed to save payment order. Please try again later.");
+                }
+            }
+
+
+            async findOne(order_id:string){
+                try{
+                    const orderRef = new Order();
+                    orderRef.order_id = order_id
+
+                    const data = await this.paymentRepository.findOne({
+                        where: {
+                            order: orderRef,
+                        },
+                        // loadRelationIds:true,
+                      });
+                    
+        
+                    return data;
+                    
+                }catch(error){
+                    console.log(">>>>>>>>>>>>>",error.message);
+                    throw error;
                 }
             }
             
