@@ -72,6 +72,8 @@ export interface RAZORPAY
 {
   RAZORPAY_KEY: string;
   RAZORPAY_KEY_SECRET: string;
+  RAZORPAY_WEBHOOK_SECRET: string;
+  CREATE_PAYMENT_LINK: string;
 }
 
 /**

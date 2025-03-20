@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { ConfigService } from '../config/config.service';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import { ERROR_CODES } from '../../libs/constants/commonConstants';
 import { log } from 'console';
+import axios from 'axios';
+
 // import { FlightTicketRepositoryService } from '//database/repositories/flightticket.repository';
 
 @Injectable()
@@ -11,6 +13,7 @@ export class RazorpayService {
     private razorpay: Razorpay;
     private key:string;
     private secret : string;
+    private url : string;
     constructor(
         private readonly configService: ConfigService,
         // private readonly flightTicketService:FlightTicketRepositoryService,
@@ -18,6 +21,7 @@ export class RazorpayService {
 
         this.key = this.configService.get().RAZORPAY_CREDENTIAL.RAZORPAY_KEY;
         this.secret = this.configService.get().RAZORPAY_CREDENTIAL.RAZORPAY_KEY_SECRET;
+        this.url = this.configService.get().RAZORPAY_CREDENTIAL.CREATE_PAYMENT_LINK;
         
 
         this.razorpay = new Razorpay({
@@ -27,6 +31,49 @@ export class RazorpayService {
         
     }
 
+    async createPaymentLink(input: {
+        amount: number;
+        currency: string;
+        description: string;
+        reference_id: string;
+        customer: {
+          email: string;
+        };
+        callback_url: string;
+      }): Promise<any> {
+        try {
+          const { amount, currency, description,reference_id, customer, callback_url } = input;
+      
+        // Convert amount to paise (smallest currency unit for INR)
+      
+          const paymentLinkData = {
+            amount: amount, 
+            currency: currency,
+            description: description,
+            reference_id: reference_id,
+            customer: {
+              email: customer.email,
+            },
+            notify: {
+              sms: true, 
+              email: true, 
+            },
+            callback_url: callback_url, 
+            callback_method: 'get', 
+          };
+          
+          // Make the API request to create the payment link
+          console.log(">>>>",paymentLinkData);
+          const response = await this.razorpay.paymentLink.create(paymentLinkData);
+          
+          return response; // The response will contain a URL that can be shared with the customer
+        } catch (error) {
+          throw { message: error.error.description, statusCode: error.statusCode };
+        }
+      }
+
+      
+    
     async createPayment(input: { amount: number; currency: string; custom_order_id: string }): Promise<any> {
         try { 
             const { amount, currency, custom_order_id } = input;
@@ -42,7 +89,7 @@ export class RazorpayService {
             
             return response;
         } catch (error) {
-            console.log(">>>>>> >>>> >",error);
+            
             if (error.statusCode === 400 && error.error.code === 'BAD_REQUEST_ERROR') {
                 throw { message: "The amount exceeds the maximum limit allowed. Please adjust the amount and try again.", statusCode: ERROR_CODES.BAD_REQUEST };
             }else{

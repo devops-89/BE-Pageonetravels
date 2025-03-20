@@ -79,8 +79,8 @@ export class AuthService {
 
                 if (otpReq.send_on === OTP_SEND_ON.EMAIL) {
                     userStatus.is_email_verified = true;
-
-                    if (!user.passwordExist) {
+                    console.log(user.password);
+                    if (!user.password) {
                         const password = getRandomString(8, true, false);
                         const password_hash = await generatePasswordHash(password);
                         const loginCred = loginPasswordTemplate(password, user.email);
@@ -328,9 +328,9 @@ export class AuthService {
             // my code start
             const user = await this.UserModel.getUnverifiedUserByEmail(email);
             if(user && user.verify_status == USER_VERIFY_STATUS.VERIFIED){
-                throw { message: "Email Already Exist.", statusCode: COMMON_MSG.EMAIL_ALREADY_EXIST };
+                throw { message: "Email Already Exist.", statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
             }
-            if ((user && user.verify_status== USER_VERIFY_STATUS.UNVERIFIED) || !user) {
+            if ((user && user.verify_status == USER_VERIFY_STATUS.UNVERIFIED) || !user) {
                 const password_hash = await generatePasswordHash(password.trim());
                 const userObj: UserI.AddOrUpdateUser = {
                     email,
@@ -359,7 +359,6 @@ export class AuthService {
                 const otpObj: OtpVerificationI.VerifyOtpRequest = {
                     otp: OTP,
                     otp_type: OTP_TYPE.REGISTER_OTP,
-                    
                     user: user_id,
                     send_on: OTP_SEND_ON.EMAIL,
                     resendData: {

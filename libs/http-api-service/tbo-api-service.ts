@@ -150,6 +150,7 @@ export class HTTPSTboAPIService {
 
     async ssr(base_url_ssr: string, payload:IFareRule){
         try {
+            
             let result = await this.httpAPICall(base_url_ssr, payload);
             return result;
         } catch (error) {
@@ -203,7 +204,7 @@ export class HTTPSTboAPIService {
                 delete data.Error;
 
                 if(data.Meal){
-                    data.MealDyanamic = data.Meal
+                    data.MealDynamic = data.Meal
                     delete data.Meal
                 }
                 response = data;

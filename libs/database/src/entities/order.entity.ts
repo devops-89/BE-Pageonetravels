@@ -54,14 +54,19 @@ export class Order {
     order_request: string;
 
     @Column({type:'text',nullable:true})
+    order_response: string;
+
+    @Column({type:'text',nullable:true})
     order_request_second: string;
 
+    @Column({type:'text',nullable:true})
+    order_response_second: string;
 
     @Column({type:'text',nullable:true})
     order_details: string;
 
     @Column({type:'text',nullable:true})
-    passenger_details: string;
+    payment_response: string;
 
     @Column({type:'text',nullable:true})
     ticket_details: string;

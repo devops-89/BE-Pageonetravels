@@ -63,10 +63,10 @@ export class Payment {
 
 
     @Column({type:'text',nullable:true})
-    gateway_order_response:string;
+    razorpay_link_response:string;
      
     @Column({type:'text',nullable:true})
-    gateway_response:string;
+    razorpay_webhook_response:string;
 
 
     @IsString()

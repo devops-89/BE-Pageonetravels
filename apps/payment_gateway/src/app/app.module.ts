@@ -11,14 +11,6 @@ import { RazorpayModule } from '../razorpay/razorpay.module';
     providers: [AppService],
 })
 
-// @Module({
-//     imports: [
-        
-        
-//         RazorpayModule,
-//     ],
-//     controllers: [AppController],
-//     providers: [AppService],
-// })
+
 
 export class AppModule {}

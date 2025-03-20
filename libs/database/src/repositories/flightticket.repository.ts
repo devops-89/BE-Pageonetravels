@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderRepositoryService } from './order.repository';
 import { PAYMENT_STATUS } from '../../../../libs/constants/bookingContant';
-import {RazorpayOrderData} from '../../../../libs/interfaces/commonTypes/payment.interface'
+// import {RazorpayOrderData} from '../../../../libs/interfaces/commonTypes/payment.interface'
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class FlightTicketRepositoryService {
             ){}
         
 
-        async insertOrder(data: RazorpayOrderData, orderDetails: { order_id: string, user: string }) {
+        async insertOrder(data: any, orderDetails: { order_id: string, user: string }) {
                 try {
                         
                     const {order_id,user} =  orderDetails
@@ -32,7 +32,7 @@ export class FlightTicketRepositoryService {
                         gateway_order_response: JSON.stringify(data),
                         user: userRef,
                         order: orderRef,
-                        razorpay_order_id: data.id,
+                        // razorpay_order_id: data.id,
                         payment_gateway: "Razorpay",
                         payment_status: data.status,
                         status: PAYMENT_STATUS.IN_PROGRESS, // Ensure PAYMENT_STATUS is defined elsewhere

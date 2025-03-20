@@ -108,7 +108,9 @@ export class ConfigService {
   private parseRazorpayConfig(env: NodeJS.ProcessEnv): RAZORPAY {
     return {
       RAZORPAY_KEY:env.RAZORPAY_KEY,
-      RAZORPAY_KEY_SECRET: env.RAZORPAY_KEY_SECRET
+      RAZORPAY_KEY_SECRET: env.RAZORPAY_KEY_SECRET,
+      RAZORPAY_WEBHOOK_SECRET: env.RAZORPAY_WEBHOOK_SECRET,
+      CREATE_PAYMENT_LINK: env.CREATE_PAYMENT_LINK
     };
   }
 

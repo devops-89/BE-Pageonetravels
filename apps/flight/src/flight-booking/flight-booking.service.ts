@@ -61,9 +61,9 @@ export class FlightBookingService {
                 fare
             } = body;
 
-            if(!body.journey_type || !body.journey || !body.is_LCC){
-                throw { message: "Journey Details missing like journey_type,journey, flight type", statusCode: ERROR_CODES.BAD_REQUEST };
-            }
+            // if(!body.journey_type || !body.journey || !body.is_LCC){
+            //     throw { message: "Journey Details missing like journey_type,journey, flight type", statusCode: ERROR_CODES.BAD_REQUEST };
+            // }
             
 
             // Store additional data in a single object to pass easily
@@ -348,9 +348,9 @@ export class FlightBookingService {
     }
 
     async handleLCC(flight: any) {
-        if(!flight.journey_type || !flight.journey || !flight.is_LCC){
-            throw { message: "Journey Details missing like journey_type,journey, flight type", statusCode: ERROR_CODES.BAD_REQUEST };
-        }
+        // if(!flight.journey_type || !flight.journey || !flight.is_LCC){
+        //     throw { message: "Journey Details missing like journey_type,journey, flight type", statusCode: ERROR_CODES.BAD_REQUEST };
+        // }
             
         const {house_number,street,city,country_code,cell_country_code,nationality,gst_company_address,gst_company_contact_number,gst_company_email,gst_company_name,gst_number} = flight;
 
