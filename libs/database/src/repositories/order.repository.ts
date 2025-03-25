@@ -102,13 +102,124 @@ export class OrderRepositoryService {
               });
 
             if(!data){
-                throw { message: "Order details not Found", statusCode: ERROR_CODES.BAD_REQUEST };
+                throw { message: "", statusCode: ERROR_CODES.BAD_REQUEST };
             }
 
             return data;
         }catch(error){
             console.log(">>>>>>>>>>>>>",error.message);
             throw error;
+        }
+    }
+
+    // update order 
+    async updateOrder(orderId:string,body:any){
+       try{
+           
+        // Optionally, fetch the updated record and return
+        const updatedOrder = await this.orderRepository.findOne({
+            where: { custom_order_id: orderId },
+            loadRelationIds: true,
+        });
+            
+        // Check if the order exists
+        if (!updatedOrder) {
+            throw { 
+                message: `Order with custom_order_id ${orderId} not found.`,
+                statusCode: ERROR_CODES.BAD_REQUEST 
+            };
+        }
+
+        // Update the payment response
+        updatedOrder.payment_response = body;
+        updatedOrder.status = ORDER_STATUS.COMPLETED;
+
+        // Save the updated order to the database 
+        await this.orderRepository.save(updatedOrder);
+
+        console.log('Order updated:', updatedOrder.order_id);
+            return updatedOrder.order_id;
+        }catch(error){
+            console.log(">>>>>>>>>>>>>",error.message);
+            throw error;
+        }
+    }
+
+
+    // update payment 
+    async updatePaymentFail(order_id,flightresposne){
+        try{
+            const updatedOrder = await this.orderRepository.findOne({
+                where: { order_id: order_id },
+                loadRelationIds: true,
+            });
+
+            if (!updatedOrder) {
+                throw { 
+                    message: `Order with order_id : ${order_id} not found.`,
+                    statusCode: ERROR_CODES.BAD_REQUEST 
+                };
+            } 
+    
+            updatedOrder.fail_response = flightresposne;
+
+            // Save the updated order to the database 
+            await this.orderRepository.save(updatedOrder);
+
+            return updatedOrder.fail_response;
+        }catch(error){
+            console.log(error);
+        }
+    }
+
+    async updatePaymentSuccess(order_id,flightresposne){
+        try{
+            const updatedOrder = await this.orderRepository.findOne({
+                where: { order_id: order_id },
+                loadRelationIds: true,
+            });
+
+            if (!updatedOrder) {
+                throw { 
+                    message: `Order with order_id : ${order_id} not found.`,
+                    statusCode: ERROR_CODES.BAD_REQUEST 
+                };
+            } 
+    
+            updatedOrder.success_response = flightresposne;
+
+            // Save the updated order to the database 
+            await this.orderRepository.save(updatedOrder);
+
+            return updatedOrder.success_response;
+        }catch(error){
+            console.log(error);
+        }
+    }
+
+    // save success booking
+    async updatePaymentBooking(order_id,flightresposne){
+        try{
+            const updatedOrder = await this.orderRepository.findOne({
+                where: { order_id: order_id },
+                loadRelationIds: true,
+            });
+
+            if (!updatedOrder) {
+                throw { 
+                    message: `Order with order_id : ${order_id} not found.`,
+                    statusCode: ERROR_CODES.BAD_REQUEST 
+                };
+            } 
+    
+            updatedOrder.order_response = flightresposne;
+
+            // Save the updated order to the database 
+            await this.orderRepository.save(updatedOrder);
+
+            return updatedOrder.order_response;
+        }catch(error){
+            console.log(error);
         }
     }
 

@@ -29,7 +29,7 @@ export class FlightTicketRepositoryService {
                     console.log(10);
                     // Create the new payment order object
                     const newPaymentOrder = await this.paymentRepository.insert(this.paymentRepository.create({
-                        gateway_order_response: JSON.stringify(data),
+                        razorpay_link_response: JSON.stringify(data),
                         user: userRef,
                         order: orderRef,
                         // razorpay_order_id: data.id,
@@ -69,5 +69,40 @@ export class FlightTicketRepositoryService {
                 }
             }
             
+
+        // Update order
+        async findAndUpdate(modifyOrder:string,body:any){
+            try{
+                const orderRef = new Order();
+                orderRef.order_id = modifyOrder
+
+                const updatedOrder = await this.paymentRepository.findOne({
+                    where: { order: orderRef },
+                    loadRelationIds: true,
+                });
+
+                if (!updatedOrder) { 
+                    throw { 
+                        message: `Payment with order_id ${modifyOrder} not found.`, 
+                        statusCode: ERROR_CODES.BAD_REQUEST 
+                    };
+                }
         
+                updatedOrder.razorpay_webhook_response = body;
+                updatedOrder.status = PAYMENT_STATUS.SUCCESS;
+                updatedOrder.payment_mode = "razorpay";
+                updatedOrder.currency = "INR";
+                updatedOrder.transaction_id = body.payload.payment.entity.id;
+                updatedOrder.razorpay_order_id = body.payload.payment.entity.order_id;
+                updatedOrder.amount = body.payload.payment.entity.amount;
+                
+                // Save the updated order to the database 
+                await this.paymentRepository.save(updatedOrder);
+
+                return updatedOrder;
+            }catch(error){
+                console.log(">>>>>>>>>>>>>",error.message);
+                throw error;
+            }
+        }
 }

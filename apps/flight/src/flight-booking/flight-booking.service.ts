@@ -208,9 +208,9 @@ export class FlightBookingService {
             const flightType = `FLIGHT_${journey_type}_${journey}` as COMMISSION_TYPE;
             let data ;
             let commissionType ;
-            if (Object.values(COMMISSION_TYPE).includes(flightType)) {
+            if (Object.values(COMMISSION_TYPE).includes(flightType)) { 
                     commissionType = await this.commissionRepositoryService.getCommissionbytype(flightType); 
-                    if(commissionType.commission_type === "FIXED"){
+                    if(commissionType.commission_type === "FIXED"){ 
                       data = parseFloat(commissionType.percentage);
                     }else if(commissionType.commission_type === "PERCENTAGE"){
                         const percentValue = parseFloat(commissionType.percentage);
@@ -218,7 +218,7 @@ export class FlightBookingService {
                         data = farePrice/100;
                     }
             } else {
-                    throw { message: "Invalid commission type", statusCode: ERROR_CODES.BAD_REQUEST };
+                    throw { message: "Invalid commission type", statusCode: ERROR_CODES.BAD_REQUEST }; 
             }
             
             amount = amount + data;
@@ -260,11 +260,12 @@ export class FlightBookingService {
     async roundFlightBook(reference_id,body:RoundDto){
         try{
             const {ob,ib} = body;
-            
+            console.log(body);
             
             if(ob.is_LCC === true && ib.is_LCC === true){
                 const obData =    await  this.handleLCC(ob);
                 const ibData =    await  this.handleLCC(ib);
+               
                 const firstPayload = obData.payload;
                 const firstAmount = obData.amount;
                 const firstType = obData.is_LCC;
@@ -419,9 +420,9 @@ export class FlightBookingService {
     }
     
     async handleNonLCC(flight: any) {
-        if(!flight.journey_type || !flight.journey || !flight.is_LCC){
-            throw { message: "Journey Details missing like journey_type,journey, flight type", statusCode: ERROR_CODES.BAD_REQUEST };
-        }
+        // if(!flight.journey_type || !flight.journey || !flight.is_LCC){
+        //     throw { message: "Journey Details missing like journey_type,journey, flight type", statusCode: ERROR_CODES.BAD_REQUEST };
+        // }
 
         const {house_number,street,city,country_code,cell_country_code,nationality,gst_company_address,gst_company_contact_number,gst_company_email,gst_company_name,gst_number,ip_address,result_index,trace_id,passenger_details,fareBreakdown,fare} = flight;
 
@@ -440,7 +441,7 @@ export class FlightBookingService {
             gst_number
         };
 
-        // Generate the passenger list
+        // Generate the passenger list 
         const passengers = [
             ...processPassengers(passenger_details.adult || [], 1, fareBreakdown, fare, additionalInfo),
             ...processPassengers(passenger_details.child || [], 2, fareBreakdown, fare, additionalInfo),

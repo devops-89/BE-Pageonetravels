@@ -50,7 +50,7 @@ export class RazorpayService {
             amount: amount, 
             currency: currency,
             description: description,
-            reference_id: reference_id,
+            reference_id: reference_id.trim(),
             customer: {
               email: customer.email,
             },
@@ -63,7 +63,7 @@ export class RazorpayService {
           };
           
           // Make the API request to create the payment link
-          console.log(">>>>",paymentLinkData);
+          // console.log(">>>>",paymentLinkData);
           const response = await this.razorpay.paymentLink.create(paymentLinkData);
           
           return response; // The response will contain a URL that can be shared with the customer

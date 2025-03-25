@@ -41,11 +41,12 @@ export class RazorpayService {
                 amount: amount,
                 currency: currency,
                 description: "Payment for flight Ticket",
-                reference_id: custom_order_id,
+                reference_id: custom_order_id.trim(),
                 customer: {
                   email: email,
                 },
-                callback_url: 'https://dev.page1travels.com/webhook/api/webhook/test',
+                callback_url: 'http://localhost:3000/payment/success',
+                // callback_url: 'https://dev.page1travels.com/webhook/api/webhook/test',
                 // callback_url: 'https://dev.page1travels.com/payment/api/razorpay/payment/verify',
               }
               

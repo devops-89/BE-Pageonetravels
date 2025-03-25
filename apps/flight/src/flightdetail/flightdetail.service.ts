@@ -4,7 +4,7 @@ import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-c
 import { FlightDetailRequestDto, FlightRuleDto } from '../../../../libs/dtos/flight/flight-detail.dto'
 import { GenerateTokenService } from '../search-flight/generateToken.service';
 import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
-import { JOURNEYTYPE,JOURNEY} from '../../../../libs/constants/flightConstant'
+import { JOURNEYTYPE,JOURNEY} from '../../../../libs/constants/flightConstant';
 import { CommissionRepositoryService } from '../../../../libs/database/src';
 import { COMMISSION_TYPE } from '../../../../libs/constants/autenticationConstants/userContants';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
@@ -64,7 +64,7 @@ export class FlightDetailService {
                 throw { message: "Invalid journey type provided. Accepted values are: ONEWAY, ROUNDTRIP, MULTICITY.", statusCode: ERROR_CODES.BAD_REQUEST };
             }
 
-            // Validate journey category
+            // Validate journey category 
             if (!Object.values(JOURNEY).includes(journey)) {
                 throw { message: "Invalid journey category provided. Accepted values are: DOMESTIC, INTERNATIONAL.", statusCode: ERROR_CODES.BAD_REQUEST };
             }
@@ -72,6 +72,7 @@ export class FlightDetailService {
             // Generate token and get TBO credentials
             const { token } = await this.generateTokenService.getToken(ip_address);
             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
+            // console.log(">>>>>>>>>>  > >",tbo_credentials);
             const base_url_ssr = tbo_credentials.FLIGHT_SSR;
             const base_url = tbo_credentials.FLIGHT_FAREQUOTE;
 
@@ -115,6 +116,7 @@ export class FlightDetailService {
 
                 respons_ob = await this.httptboapiservice.flightFormat(respons_ob);
                 await this.addImage(respons_ob);
+                
                 respons_ib = await this.httptboapiservice.flightFormat(respons_ib);
                 await this.addImage(respons_ib);
 
@@ -123,7 +125,10 @@ export class FlightDetailService {
                     this.httptboapiservice.ssr(base_url_ssr, payload_request_OB),
                     this.httptboapiservice.ssr(base_url_ssr, payload_request_IB)
                 ]);
-
+                
+                ssr_ob.Response.isLCC = respons_ob.Results.IsLCC  
+                ssr_ib.Response.isLCC = respons_ib.Results.IsLCC 
+                
                 ssr_ob = await this.httptboapiservice.flightFormat(ssr_ob);
                 ssr_ib = await this.httptboapiservice.flightFormat(ssr_ib);
                 
@@ -141,11 +146,13 @@ export class FlightDetailService {
                 };
                 
                 response = await this.httptboapiservice.fareRule(base_url, payload_request);
-                // console.log(">>>>>>",response);
+                
                 response = await this.httptboapiservice.flightFormat(response);
                 await this.addImage(response);
                 
-                ssrResponse = await this.httptboapiservice.ssr(base_url_ssr, payload_request);                 
+                ssrResponse = await this.httptboapiservice.ssr(base_url_ssr, payload_request);
+                ssrResponse.Response.isLCC = response.Results.IsLCC     
+                          
                 if(journey_type === "ONEWAY"){
                   ssrResponse = await this.httptboapiservice.flightFormat(ssrResponse); 
                 } 

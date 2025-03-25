@@ -72,7 +72,7 @@ export class WebhookController {
         };
         const data = await this.getPayment(query.razorpay_payment_id);
         payload['razorpay_order_id'] = data.order_id
-        console.log(payload);
+        
         //cosnt orderdetails = await this.orderRepositoryService.findOne(query.razorpay_payment_link_reference_id);
         
 
@@ -80,11 +80,11 @@ export class WebhookController {
         // console.log(payload);
       // Step 2: Verify the webhook signature
       
-        //const isVerified = this.verifyRazorpaySignature(payload, query.razorpay_signature, webhookSecret);
+        const isVerified = this.verifyRazorpaySignature(payload, query.razorpay_signature, webhookSecret);
 
-        // if (!isVerified) {
-        // throw new HttpException('Invalid signature', HttpStatus.BAD_REQUEST);
-        // }
+        if (!isVerified) {
+        throw new HttpException('Invalid signature', HttpStatus.BAD_REQUEST);
+        }
   
       // Step 2: Handle the event based on the Razorpay event type
     //   const event = body.event;
@@ -104,26 +104,23 @@ export class WebhookController {
     
     private verifyRazorpaySignature(payload: any, razorpaySignature: string, secret: string): boolean {
 
-      // const generated_signature = hmac_sha256(payload.razorpay_order_id + "|" + payload.razorpay_payment_id, secret);
-      // crypto.createHash('HMAC-SHA256').update(payload.razorpay_order_id + "|" + payload.razorpay_payment_id, secret).digest("base64");
-
-      //   if (generated_signature == razorpaySignature) {
-      //   console.log("=====>>> payment is successful")
-        // }
-       
-        const payloadString = `${payload.razorpay_payment_link_reference_id}|${payload.razorpay_payment_id}`;
-        console.log("Payload String for payloadString:", payloadString);
-        console.log("Payload String for secret:", secret);
-        
+      const razorpay_payment_link_id = payload.razorpay_payment_link_id;
+      const razorpay_payment_link_reference_id = payload.razorpay_payment_link_reference_id;
+      const razorpay_payment_link_status = payload.razorpay_payment_link_status;
+      const razorpay_payment_id = payload.razorpay_payment_id;
+      
+      // Create the signature payload by concatenating the parameters with '|'
+      const signature_payload = `${razorpay_payment_link_id.trim()}|${razorpay_payment_link_reference_id.trim()}`;
+       console.log(signature_payload);
         // Generate the expected signature using HMAC with SHA256
         const expectedSignature = crypto
-            .createHmac('sha256', secret.trim())
-            .update(payloadString)  // Use the concatenated string here
+            .createHmac('sha256', secret)
+            .update(signature_payload)  // Use the concatenated string here
             .digest('hex');
         
-        // Log expected signature for debugging purposes
-       
-               
+        // Log expected signature for debugging purposes  
+        console.log(">>>>>>>>>>>> ",expectedSignature, razorpaySignature);
+            
         if (razorpaySignature === expectedSignature) {
           console.log('Signature Verified',expectedSignature,razorpaySignature);
         } else {
@@ -133,14 +130,7 @@ export class WebhookController {
         // Compare the calculated signature with the one received in the Razorpay signature
         return razorpaySignature === expectedSignature;
     }
-
-    
-
-   
-    
-    
-    
-    
+       
 
 }
 

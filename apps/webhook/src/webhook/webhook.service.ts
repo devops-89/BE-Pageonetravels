@@ -32,13 +32,17 @@ import { Injectable  } from '@nestjs/common';
 import axios from 'axios';
 import { ConfigService } from '../../../../libs/config/config.service';
 import { OrderRepositoryService } from '../../../../libs/database/src/repositories/order.repository';
+import { FlightTicketRepositoryService } from '../../../../libs/database/src/repositories/flightticket.repository';
+import { FlightService } from '../../../../libs/tickethandler/flight.service';
 
 @Injectable()
 export class WebhookService {
     private readonly apiUrl = 'https://api.razorpay.com/v1/payments/';
     constructor(
       private readonly configService: ConfigService,
-      private readonly orderRepositoryService:OrderRepositoryService
+      private readonly orderRepositoryService:OrderRepositoryService,
+      private readonly flightTicketRepositoryService:FlightTicketRepositoryService,
+      private readonly flightService:FlightService
     ){
     }
   // Handle different Razorpay events
@@ -107,9 +111,14 @@ async getPaymentDetails(paymentId: string): Promise<any> {
             const orderid = body.payload.payment.entity.order_id;
             const response =await this.getPayment(orderid);
             const orderdetails = await this.orderRepositoryService.findOne(response);
-            console.log(">>>>>>>>> >>>>>> >",orderdetails);
+            const modifyOrder = await this.orderRepositoryService.updateOrder(response,body);
+            const updatedPayment = await this.flightTicketRepositoryService.findAndUpdate(modifyOrder,body);
+            if(orderdetails){  
+              await this.flightService.flightHandler(orderdetails.order_id,orderdetails.journey_type,orderdetails.journey,orderdetails.isLCC,orderdetails.is_LCC_round,orderdetails.trace_id,orderdetails.order_request,orderdetails.order_request_second);
+            }
         } catch (error) {
             console.log("Error inside handlePaymentCaptured:", error);
+            throw error;
         }
     }
 

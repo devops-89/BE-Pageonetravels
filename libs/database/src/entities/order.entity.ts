@@ -66,6 +66,18 @@ export class Order {
     order_details: string;
 
     @Column({type:'text',nullable:true})
+    success_response: string;
+
+    @Column({type:'text',nullable:true})
+    fail_response: string;
+
+    @Column({type:'text',nullable:true})
+    flight_round_success: string;
+
+    @Column({type:'text',nullable:true})
+    flight_round_fail: string;
+
+    @Column({type:'text',nullable:true})
     payment_response: string;
 
     @Column({type:'text',nullable:true})
