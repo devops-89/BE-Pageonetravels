@@ -9,6 +9,7 @@ import   {TBO_CredentialsService} from '../../../../libs/loadtbo-db-config/tbo-c
 import { ConfigService } from "../../../../libs/config/config.service";
 import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.module';
 import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
+import { ResponseHandlerModule } from '../../../../libs/response-handler/response-handler.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-se
       FlightService,
       ConfigService
     ]),
+    ResponseHandlerModule
   ],
   controllers: [WebhookController],
   providers: [WebhookService,FlightService,TBO_CredentialsService,HTTPSTboAPIService],

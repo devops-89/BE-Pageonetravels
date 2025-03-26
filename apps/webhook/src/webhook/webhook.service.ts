@@ -101,8 +101,10 @@ async getPaymentDetails(paymentId: string): Promise<any> {
 
       return response.data; // Return the payment details
     } catch (error) {
-      console.error('Error fetching payment details:', error);
-      throw error; // Handle error
+      if(error.response){
+        throw { message: error.response.statusText, statusCode: error.response.status };
+      }
+      throw error; 
     }
   }
 

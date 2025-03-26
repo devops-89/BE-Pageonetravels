@@ -1,15 +1,18 @@
-import { Controller, Post, Req, Headers, HttpStatus, HttpException, Body, Get, Query, Param   } from '@nestjs/common';
+import { Controller, Post, Req, Headers, HttpStatus, HttpException, Body, Get, Query, Param, Res   } from '@nestjs/common';
 import { ConfigService } from '../../../../libs/config/config.service';
 import { OrderRepositoryService } from '../../../../libs/database/src/repositories/order.repository';
 import { WebhookService } from './webhook.service';
+import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import * as crypto from 'crypto';
+import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 // import { Payment } from '../../../../libs/interfaces/payment/payment.interface';
 
 @Controller('webhook')
 export class WebhookController {
+      
 
-    
     constructor(
+        private readonly responsehandlderservice:ResponseHandlerService,
         private readonly webhookService: WebhookService,
         private readonly configService: ConfigService,
         private readonly orderRepositoryService:OrderRepositoryService
@@ -19,6 +22,32 @@ export class WebhookController {
     @Get('payment/:paymentId')
     async getPayment(@Param('paymentId') paymentId: string) {
       return await this.webhookService.getPaymentDetails(paymentId);
+    }
+
+    
+    @Post('paymentDetails')
+    async payment(@Res() res: Response, @Query('paymentId') paymentId: string) {
+      
+      if(!paymentId){
+        throw {   message: "Payment Id Required.",   statusCode: ERROR_CODES.BAD_REQUEST  };
+      }
+      if(paymentId.length < 18){
+        throw { message: "Invalid payment ID format.", statusCode: ERROR_CODES.BAD_REQUEST };
+      }
+
+      const razorpayPaymentIdPattern = /^pay_[A-Za-z0-9]{14,}$/;
+      
+      if (!razorpayPaymentIdPattern.test(paymentId)) {
+        throw { message: "Invalid payment ID format.", statusCode: ERROR_CODES.BAD_REQUEST };
+      }
+
+      try{
+        const result = await this.webhookService.getPaymentDetails(paymentId);
+        return this.responsehandlderservice.sendSuccessResponse(res,result);
+      }catch(error){
+        console.log(error);
+        return this.responsehandlderservice.sendErrorResponse(res, error);
+      }
     }
 
     @Post('/test')
