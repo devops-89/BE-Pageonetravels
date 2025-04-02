@@ -1,7 +1,7 @@
 export declare namespace ApiResponse {
   interface ApiResponseType {
     data: any,
-    status_code: number,
+    statusCode: number,
     message: string,
     extraError?: any,
     extraMessage?: any,
@@ -82,7 +82,7 @@ export declare namespace ApiResponse {
   
 
   export interface ApiErrorType {
-    status_code: number;
+    statusCode: number;
     message: string;
     extraError?: any;
     stack?: string;

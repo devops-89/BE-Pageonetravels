@@ -49,7 +49,7 @@ export class SocialService {
             const social_id = updateSDto.social_id;
             const existingSocial = await this.socialRepositoryService.getSocialbyId(social_id);
             if(!existingSocial){
-                throw {status_code: ERROR_CODES.NOT_FOUND,message:`Social details not found.`}
+                throw {statusCode: ERROR_CODES.NOT_FOUND,message:`Social details not found.`}
             }
             let icon_link = updateSDto.icon_link;
             let icon_status = updateSDto.icon_status;

@@ -78,12 +78,12 @@ export class HTTPSTboAPIService {
             console.error("Error in searchFlightAPI function:", error);
             
             if (typeof error === "string") {
-                throw { message: error, status_code: 400 };
+                throw { message: error, statusCode: 400 };
             } else if (error.message) {
-                throw { message: error.message, status_code: 500 };
+                throw { message: error.message, statusCode: 500 };
             }
     
-            throw { message: "An unknown error occurred.", status_code: 500 };
+            throw { message: "An unknown error occurred.", statusCode: 500 };
         }
     }
 

@@ -50,7 +50,7 @@ export class TabService {
             let service_status = updateSDto.service_status;
             const existingService = await this.tabRepositoryService.getServiceById(service_id);
             if(!existingService){
-                throw { status_code: ERROR_CODES.NOT_FOUND,message:`Service Details Not Found.`}
+                throw { statusCode: ERROR_CODES.NOT_FOUND,message:`Service Details Not Found.`}
             }
 
             let service_image = existingService.service_image;

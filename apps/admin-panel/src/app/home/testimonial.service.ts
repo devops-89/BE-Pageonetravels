@@ -53,7 +53,7 @@ export class TestimonialService {
             const testimonial_id = updateTestimonialDto.testimonial_id;
             const existingTestimonial = await this.testimonialRepositoryService.getTestimonialById(testimonial_id);
             if(!existingTestimonial){
-                throw { status_code:ERROR_CODES.NOT_FOUND,message:`Testimonial Details Not Found.`}
+                throw { statusCode:ERROR_CODES.NOT_FOUND,message:`Testimonial Details Not Found.`}
             }
             
             let testimonial_image = existingTestimonial.testimonial_image;

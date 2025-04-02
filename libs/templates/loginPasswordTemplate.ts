@@ -23,7 +23,7 @@ export const loginPasswordTemplate = function (password: string, email: string) 
                     <td style="padding: 40px 0px 0px;">
                       <div style="text-align: center;">
                         <div style="padding-bottom: 20px;"><img
-                            src="${LOGO}" alt="EuVande" style="width: 100px;">
+                            src="${LOGO}" alt="Page1Travels" style="width: 100px;">
                         </div>
                       </div>
                       <div style="padding: 20px; background-color: rgb(255, 255, 255);">

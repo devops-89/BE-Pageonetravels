@@ -54,7 +54,7 @@ export class HeaderService {
             const headerLinks = headerDto.header_links;
             const existingHeader = await this.headerRepositoryService.getHeaderbyId(header_id);
             if (!existingHeader) {
-                throw { status_code: ERROR_CODES.NOT_FOUND, message: `Commission not found` };
+                throw { statusCode: ERROR_CODES.NOT_FOUND, message: `Commission not found` };
             }
 
 

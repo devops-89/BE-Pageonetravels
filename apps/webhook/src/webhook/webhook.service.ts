@@ -116,7 +116,7 @@ async getPaymentDetails(paymentId: string): Promise<any> {
             const modifyOrder = await this.orderRepositoryService.updateOrder(response,body);
             const updatedPayment = await this.flightTicketRepositoryService.findAndUpdate(modifyOrder,body);
             if(orderdetails){  
-              await this.flightService.flightHandler(orderdetails.order_id,orderdetails.journey_type,orderdetails.journey,orderdetails.isLCC,orderdetails.is_LCC_round,orderdetails.trace_id,orderdetails.order_request,orderdetails.order_request_second);
+              await this.flightService.flightHandler(orderdetails.order_id,orderdetails.custom_order_id,orderdetails.journey_type,orderdetails.journey,orderdetails.isLCC,orderdetails.is_LCC_round,orderdetails.trace_id,orderdetails.order_request,orderdetails.order_request_second,orderdetails.user);
             }
         } catch (error) {
             console.log("Error inside handlePaymentCaptured:", error);

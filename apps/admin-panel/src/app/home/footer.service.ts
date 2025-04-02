@@ -56,7 +56,7 @@ export class FooterService {
                 const footer_id = updateFooter.footer_id;
                 const existingFooter = await this.footerRepositoryService.getFooterbyId(footer_id);
                 if(!existingFooter){
-                    throw {status_code:ERROR_CODES.NOT_FOUND,message:`Footer details not Found.`};
+                    throw {statusCode:ERROR_CODES.NOT_FOUND,message:`Footer details not Found.`};
                 }
                 let footer_image = existingFooter.footer_image;
                 if(files && files.footer_image && files.footer_image.length){

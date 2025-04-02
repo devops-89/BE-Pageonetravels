@@ -50,7 +50,7 @@ export class OfferService {
             const offer_id = updatOffer.offer_id;
             const existingOffer = await this.offerRepositoryService.getOfferById(offer_id);
             if(!existingOffer){
-                throw {status_code:ERROR_CODES.NOT_FOUND,message:`Offer Details not Found.`};
+                throw {statusCode:ERROR_CODES.NOT_FOUND,message:`Offer Details not Found.`};
             } 
 
             let offer_title = updatOffer.offer_title;

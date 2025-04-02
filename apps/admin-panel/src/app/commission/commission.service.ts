@@ -39,7 +39,7 @@ export class CommissionService {
             // check if brand Exists
             const existingCommission = await this.commissionRepositoryService.getCommissionbyId(commission_id);
             if (!existingCommission) {
-                throw { status_code: ERROR_CODES.NOT_FOUND, message: `Commission not found` };
+                throw { statusCode: ERROR_CODES.NOT_FOUND, message: `Commission not found` };
             }
 
             const updateCommission = await this.commissionRepositoryService.updateCommission({commission_id,

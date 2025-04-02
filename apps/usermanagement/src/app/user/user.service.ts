@@ -26,7 +26,7 @@ export class UserService {
       const { reference_id } = payload;
       const existingUser = await this.userRepositoryService.getUserByUserId(reference_id);
       if (!existingUser) {
-        throw { message: "User Not Found to Update User Profile.", status_code: ERROR_CODES.NOT_FOUND }
+        throw { message: "User Not Found to Update User Profile.", statusCode: ERROR_CODES.NOT_FOUND }
       }
 
       let s3FileLocation: string = existingUser.avatar;
@@ -219,7 +219,7 @@ export class UserService {
       }
     } catch (error) {
       console.log('Error updating last login:', error);
-      throw { message: "Error In Updating Last login Details Of User", status_code: ERROR_CODES.NOT_FOUND };
+      throw { message: "Error In Updating Last login Details Of User", statusCode: ERROR_CODES.NOT_FOUND };
     }
   }
 
@@ -229,7 +229,7 @@ export class UserService {
       const user = await this.userRepositoryService.getUserByUserId(reference_id);
       
       if (!user) {
-        throw { message: "User not found", status_code: ERROR_CODES.NOT_FOUND };
+        throw { message: "User not found", statusCode: ERROR_CODES.NOT_FOUND };
       }
 
       // Return required Data, including the new fields

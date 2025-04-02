@@ -50,7 +50,7 @@ export class BannerService {
             let banner_heading = bannerDto.banner_heading;
             const existingBanner = await this.bannerRepositoryService.getBannerbyId(banner_id);
             if(!existingBanner){
-                throw { status_code: ERROR_CODES.NOT_FOUND,message:`Banner details not found.` }
+                throw { statusCode : ERROR_CODES.NOT_FOUND,message:`Banner details not found.` }
             }
 
             let banner_image = existingBanner.banner_image;

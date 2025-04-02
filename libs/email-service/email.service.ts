@@ -42,10 +42,9 @@ export class EmailService {
         };
 
         if (attachments && attachments.length) {
-
             mailOptions.attachments = attachments;
         }
-
+                  
         try {
             const info = await this.transporter.sendMail(mailOptions);
             console.log('Email sent: ', info.response);

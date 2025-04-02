@@ -22,7 +22,7 @@ export class ResponseHandlerService {
     }
 
     const body: ApiResponse.ApiResponseType = {
-      status_code: errorBody.statusCode,
+      statusCode: errorBody.statusCode,
       message: errorBody.message,
       data: undefined,
       extraError: errorBody.extraError,

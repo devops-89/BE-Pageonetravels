@@ -50,7 +50,7 @@ export class FestivalService {
 
             const existingFestival = await this.festivalRepositoryService.getFestivalById(festival_id);
             if(!existingFestival){
-                throw { status_code: ERROR_CODES.NOT_FOUND,message:`Festival Details not Found.`};
+                throw { statusCode: ERROR_CODES.NOT_FOUND,message:`Festival Details not Found.`};
             }
 
             let festival_name = updateFDto.festival_name;

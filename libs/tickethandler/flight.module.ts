@@ -7,6 +7,8 @@ import { ConfigService } from "../../libs/config/config.service";
 import { TBOConfigModule } from '../../libs/loadtbo-db-config/tbo-config.module';
 import { HTTPSTboAPIService } from '../../libs/http-api-service/tbo-api-service';
 import { OrderRepositoryService } from '../../libs/database/src/repositories/order.repository';
+import { EmailService } from '../../libs/email-service/email.service';
+import {PDFGenerateService} from '../../libs/pdf-generate/pdf-generate.service';
 
 @Module({
   imports:[ConfigModule ,
@@ -17,7 +19,9 @@ import { OrderRepositoryService } from '../../libs/database/src/repositories/ord
     ConfigService,
     TBO_CredentialsService,
     ResponseHandlerModule,
-    HTTPSTboAPIService
+    HTTPSTboAPIService,
+    PDFGenerateService,
+    EmailService
     ]
 })
 export class FlightModule { }

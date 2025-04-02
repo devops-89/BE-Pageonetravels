@@ -49,7 +49,7 @@ export class AboutService {
             const about_id = aboutDto.about_id;
             const existingAbout = await this.aboutRepositoryService.getAboutbyId(about_id);
             if(!existingAbout){
-                throw {status_code: ERROR_CODES.NOT_FOUND, message: `About details not Found.`}
+                throw {statusCode: ERROR_CODES.NOT_FOUND, message: `About details not Found.`}
             }
 
             let about_heading = aboutDto.about_heading;

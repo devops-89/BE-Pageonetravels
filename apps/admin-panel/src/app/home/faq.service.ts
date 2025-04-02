@@ -47,7 +47,7 @@ export class FaqService {
             const faq_id = faqDtoUpdate.faq_id;
             const existingFaq = await this.faqRepositoryService.getFaqbyId(faq_id);
             if(!existingFaq){
-                throw {status_code: ERROR_CODES.NOT_FOUND,message:`FAQ details not Found.`}
+                throw {statusCode: ERROR_CODES.NOT_FOUND,message:`FAQ details not Found.`}
             }
 
             let {faq_question, faq_answer, faq_status} = faqDtoUpdate;
