@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import {  IHotelSearchPayload, IFareRule } from '../../libs/interfaces/hotel/search.interface';
+import { HotelCountry } from '../../libs/interfaces/hotel/search.interface'; 
+import { HotelCityRepositoryService } from '../../libs/database/src/repositories/hotelCity.repository';
+
 
 @Injectable()
 export class HotelTBOAPIService {
-  constructor() {}
+  constructor(
+    private readonly hotelCityRepositoryService: HotelCityRepositoryService,
+  ) {}
 
   private async httpAPICall(baseURL: string, headers: object): Promise<any> {
     try {
@@ -23,12 +28,12 @@ export class HotelTBOAPIService {
   private async httpPostAPICall(baseURL: string,payload,headers: object): Promise<any> {
     try {
       const config = { headers };
-    
       const result = await axios.post(baseURL,payload, config);
-    
+      
       return result.data;
      
     } catch (error) {
+      console.error('Error in Axios API call:', error);
       console.error('Error in Axios API call:', error.message);
       if (error.response) {
         console.error('API Error Response:', error.response.data);
@@ -61,26 +66,42 @@ export class HotelTBOAPIService {
   }
   
   
-  async fetchCityList(cityListURL: string, countryCode: string): Promise<any> {
+  async fetchCityList(cityListURL: string, countryCodes: any): Promise<any> {
     try {
-     
       const username = "TBOStaticAPITest";
       const password = "Tbo@11530818";
   
       const credentials = Buffer.from(`${username}:${password}`).toString('base64');
-     
+      const responses = [];
       const headers = {
         'Authorization': `Basic ${credentials}`,
         'Content-Type': 'application/json',
       };
 
-      const payload = {
-        "CountryCode": countryCode
+     // Process each country code one by one
+      for (const country of countryCodes) {
+        const payload = {
+          "CountryCode": country.code
+        };
+      
+      try {
+        const response = await this.httpPostAPICall(cityListURL, payload, headers);
+        // if(response.Status === 200){
+        //   console.log("sdf");
+        //   await this.hotelCityRepositoryService.createCity(country.code,country.name,response.CityList);
+        // }
+        // console.log("start");
+        // const savedata = await this.hotelCityRepositoryService.createCity(country.code,country.name,response.CityList);
+        // console.log("kingsdfaaaaaaaaaaaaa",savedata);
+        responses.push(response);
+      } catch (error) {
+        console.error(`Error fetching cities for country ${country.code}:`, error.message);
+        // Continue with next country even if one fails
+        continue;
       }
-
-      const response = await this.httpPostAPICall(cityListURL, payload ,headers);
+    }
      
-      return response;
+      return responses;
 
     } catch (error) {
       console.error('Error in fetchCityList:', error.message);
@@ -130,7 +151,7 @@ export class HotelTBOAPIService {
       };
 
       const response = await this.httpAPICall(cityListURL, headers);
- 
+      
       return response;
 
     } catch (error) {
@@ -144,7 +165,6 @@ export class HotelTBOAPIService {
      
       const username = "TBOStaticAPITest";
       const password = "Tbo@11530818";
-  
       const credentials = Buffer.from(`${username}:${password}`).toString('base64');
      
       const headers = {
@@ -158,70 +178,100 @@ export class HotelTBOAPIService {
       }
 
       const response = await this.httpPostAPICall(baseurl, payload, headers);
-
+      if(response.Status.Code === 500){
+        throw { message: response.Status.Description, statusCode: response.Status.Code };
+      }
       return response;
 
     } catch (error) {
-      console.error('Error in fetchCityList:', error.message);
-      throw (error.message || 'Failed to fetch the city list.');
+      throw error
     }
   }
 
+  // old function
+  // async searchHotelFromTBO(body,base_url: string, token: string,hotelCodesinCity:any ) {
+  //   try {
 
-  async searchHotelFromTBO(body,base_url: string, token: string,
-  ) {
-    try {
-      const {
-        city,
-        check_in_date,
-        check_out_date,
-        adult_count,
-        child_count = 0,
-        roomTypes,
-        preferredHotelBrand,
-        rating,
-        ip_address,
-        preferredAmenities,
-      } = body;
-
-    
-      const payload = {
-          "CheckIn": "2024-06-20",
-          "CheckOut": "2024-06-22",
-          "HotelCodes": "1279415",
-          "GuestNationality": body.country_code,
-          "PaxRooms": [
-              {
-                  "Adults": adult_count,
-                  "Children": child_count,
-                  "ChildrenAges": null
-              }
-       
-          ],
-          "ResponseTime": 23.0,
-          "IsDetailedResponse": true,
-          "Filters": {
-              "Refundable": false,
-              "NoOfRooms": 1,
-              "MealType": 0,
-              "OrderBy": 0,
-              "StarRating": 0,
-              "HotelName": null
-          }
-      };
-
-    
-      console.log('Request Payload: inside the http tbo');
-
-
-      const response = await this.httpPostAPICall(base_url, body, {});;
-      return response;
+  //     const username = "Pageone";
+  //     const password = "Pageone@1234";
+  //     const credentials = Buffer.from(`${username}:${password}`).toString('base64');
      
+  //     const headers = {
+  //       'Authorization': `Basic ${credentials}`,
+  //       'Content-Type': 'application/json',
+  //     };
+
+  //   const hotelCodes = Array.isArray(hotelCodesinCity) && hotelCodesinCity.length > 1 ? hotelCodesinCity.join(',') : hotelCodesinCity?.[0] ?? '';
+  //     const payload = {
+  //         "CheckIn": body.CheckIn,
+  //         "CheckOut": body.CheckOut,
+  //         "HotelCodes": hotelCodes,
+  //         "GuestNationality": body.GuestNationality,
+  //         "EndUserIp": body.EndUserIp,
+  //         "PaxRooms": body.PaxRooms,
+  //         "ResponseTime": body.ResponseTime,
+  //         "IsDetailedResponse": body.IsDetailedResponse,
+  //         "Filters": body.Filters
+  //     };
+     
+
+  //     const response = await this.httpPostAPICall(base_url, body, headers);;
+  //     return response;
+     
+  //   } catch (error) {
+  //     console.error('Error in searchHotelAPI:', error.message);
+  //     throw (error.message || 'Failed to fetch hotel data.');
+  //   }
+  // }
+  async searchHotelFromTBO(body, base_url: string, token: string, hotelCodesinCity: any) {
+    try {
+      const username = "Pageone";
+      const password = "Pageone@1234";
+      const credentials = Buffer.from(`${username}:${password}`).toString('base64');
+  
+      const headers = {
+        'Authorization': `Basic ${credentials}`,
+        'Content-Type': 'application/json',
+      };
+  
+      // Ensure hotelCodesinCity is an array
+      const codesArray = Array.isArray(hotelCodesinCity) ? hotelCodesinCity : [];
+  
+      // Split into chunks of 100
+      const chunkSize = 100;
+      const chunks = [];
+      for (let i = 0; i < codesArray.length; i += chunkSize) {
+        chunks.push(codesArray.slice(i, i + chunkSize));
+      }
+  
+      const allResponses = [];
+  
+      for (const chunk of chunks) {
+        const hotelCodes = chunk.join(',');
+        const payload = {
+          CheckIn: body.CheckIn,
+          CheckOut: body.CheckOut,
+          HotelCodes: hotelCodes,
+          GuestNationality: body.GuestNationality,
+          EndUserIp: body.EndUserIp,
+          PaxRooms: body.PaxRooms,
+          ResponseTime: body.ResponseTime,
+          IsDetailedResponse: body.IsDetailedResponse,
+          Filters: body.Filters,
+        };
+  
+        const response = await this.httpPostAPICall(base_url, payload, headers);
+        allResponses.push(response);
+      }
+  
+      return allResponses;
+  
     } catch (error) {
-      console.error('Error in searchHotelAPI:', error.message);
-      throw (error.message || 'Failed to fetch hotel data.');
+      console.error('Error in searchHotelFromTBO:', error.message);
+      throw error.message || 'Failed to fetch hotel data.';
     }
   }
+  
 
 
 

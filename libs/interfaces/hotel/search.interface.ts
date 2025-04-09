@@ -9,6 +9,15 @@ export interface HotelType {
   amenities: string[];
 }
 
+export interface Country {
+  Code: string;
+  Name: string;
+}
+
+export interface HotelCountry {
+  Code: string;
+}
+
 export interface TBOHotelResponse {
   Response: {
     Results: Array<{

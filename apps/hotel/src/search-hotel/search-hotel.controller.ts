@@ -51,7 +51,6 @@ export class SearchHotelController {
   @Get('/listofhotels')
   async HotelList(@Res() res: Response) {
     try {
-  
       const result = await this.searchHotelService.HotelCityCodeList();
       return this.responseHandler.sendSuccessResponse(res, result);
     } catch (error) {
@@ -97,10 +96,9 @@ export class SearchHotelController {
   async searchHotel(@Res() res: Response, @Body() body) {
     try {
       const result = await this.searchHotelService.searchHotel(body);
-      return this.responseHandler.sendErrorResponse(res, result)
+      return this.responseHandler.sendSuccessResponse(res, result)
     } catch (error) {
-      console.error('Error in hotel search', error);
-      throw error;
+      return this.responseHandler.sendErrorResponse(res,error);
     }
   }
 }

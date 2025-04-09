@@ -34,6 +34,10 @@ export class PassengerDto {
     first_name: string;
 
     @IsString()
+    @IsOptional()
+    middle_name?: string;
+
+    @IsString()
     @IsNotEmpty()
     last_name: string;
 
@@ -215,6 +219,7 @@ export class BookingNonLccDto {
     @IsNotEmpty()
     is_LCC: boolean;
 
+
     @IsBoolean()
     @IsOptional()
     is_LCC_round ?: boolean;    
@@ -233,16 +238,8 @@ export class BookingNonLccDto {
     country: string;
 
     @IsString()
-    house_number: string;
+    address: string;
 
-    @IsString()
-    postal_code: string;
-
-    @IsString()
-    street: string;
-
-    @IsString()
-    state: string;
 
     @IsString()
     nationality: string;
@@ -316,15 +313,13 @@ export class TicketDto {
 
 
 
-export class BookingDto{
+export class BookingDto{ 
     @IsString()
     result_index: string;
 
     @IsString()
     ip_address: string;
 
-    @IsString()
-    cell_country_code: string;
 
     @IsEnum(JOURNEYTYPE, { 
         message: `type must be one of the following: ${Object.values(JOURNEYTYPE).join(', ')}` 
@@ -337,12 +332,15 @@ export class BookingDto{
       message: `type must be one of the following: ${Object.values(JOURNEY).join(', ')}` 
     })
     @IsNotEmpty()
-    journey: JOURNEY;
+    journey: JOURNEY; 
 
     @IsBoolean()
     @IsNotEmpty()
     is_LCC: boolean;
 
+    @IsString()
+    cell_country_code: string; 
+    
 
     @IsString()
     country_code: string;
@@ -357,16 +355,8 @@ export class BookingDto{
     country: string;
 
     @IsString()
-    house_number: string;
+    address: string;
 
-    @IsString()
-    postal_code: string;
-
-    @IsString()
-    street: string;
-
-    @IsString()
-    state: string;
 
     @IsString()
     nationality: string;
@@ -413,12 +403,6 @@ export class BookingDto{
     @Type(() => FareBreakdownDto)
     @IsNotEmpty()
     fareBreakdown: FareBreakdownDto[];
-
-    
-    // @ValidateNested()
-    // @Type(() => MealTypeDto)
-    // @IsOptional()
-    // meals: MealTypeDto;
    
 }
 

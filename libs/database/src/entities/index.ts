@@ -24,3 +24,5 @@ export * from './social.entity';
 export * from './footer.entity';
 export * from './order.entity';
 export * from './payment.entity';
+export * from './hotelCountry.entity';
+export * from './hotelCity.entity'

@@ -10,7 +10,8 @@ export * from './guest.user.repository';
 export * from './booking.repository';      
 export * from './order.repository';      
 export * from './flightticket.repository';      
-
+export * from './hotelCountry.repository';
+export * from './hotelCity.repository';
 
 export * from './header.repository';
 export * from './banner.repository';

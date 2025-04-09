@@ -37,18 +37,10 @@ export class FlightBookingService {
                 trace_id,
                 ip_address,
                 country_code,
-                cell_country_code,
+                address,
                 city,
-                // journey_type,
-                // journey,
-                // is_LCC,
-                // is_LCC_round,
                 contact_no,
                 country,
-                house_number,
-                postal_code,
-                street,
-                state,
                 nationality,
                 email,
                 passenger_details,
@@ -68,11 +60,12 @@ export class FlightBookingService {
 
             // Store additional data in a single object to pass easily
         const additionalData = {
-                house_number,
-                street,
+                address,
+                contact_no,
+                country,
+                email,
                 city,
                 country_code,
-                cell_country_code,
                 nationality,
                 gst_company_address,
                 gst_company_contact_number,
@@ -111,7 +104,7 @@ export class FlightBookingService {
             const flightType = `FLIGHT_${journey_type}_${journey}` as COMMISSION_TYPE;
             let data ;
             let commissionType ;
-            if (Object.values(COMMISSION_TYPE).includes(flightType)) {
+            if (Object.values(COMMISSION_TYPE).includes(flightType)) { 
                     commissionType = await this.commissionRepositoryService.getCommissionbytype(flightType); 
                     if(commissionType.commission_type === "FIXED"){
                       data = parseFloat(commissionType.percentage);
@@ -147,14 +140,7 @@ export class FlightBookingService {
                 city,
                 contact_no,
                 country,
-                house_number,
-                // journey_type,
-                // journey,
-                // is_LCC,
-                // is_LCC_round,
-                postal_code,
-                street,
-                state,
+                address,
                 nationality,
                 email,
                 passenger_details,
@@ -170,10 +156,12 @@ export class FlightBookingService {
 
             // Common additional details for passenger processing
             const additionalInfo = {
-                house_number,
-                street,
                 city,
+                address,
+                country,
                 country_code,
+                email,
+                contact_no,
                 cell_country_code,
                 nationality,
                 gst_company_address,

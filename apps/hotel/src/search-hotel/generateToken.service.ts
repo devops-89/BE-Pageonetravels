@@ -58,7 +58,7 @@ export class GenerateTokenService {
               token = await this.rediscacheservice.getCache(`tboToken:${ip_address}`);
           }
 
-          console.log('Generated token:', token);
+        //   console.log('Generated token:', token);
           
           const payload = {
               TBO_data: tbo_credentials,

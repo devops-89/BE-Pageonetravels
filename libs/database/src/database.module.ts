@@ -14,10 +14,12 @@ import {
     BookingRepositoryService,
     OrderRepositoryService,
     FlightTicketRepositoryService,
-    Payment
+    Payment,
+    HotelCountryRepositoryService,
+    HotelCityRepositoryService,
  
 } from './';
-import { User, OtpVerification, LoginSession,  Address, Setting,Commission, Airport,Booking, TransactionDetail, Passenger, Hotel,Order} from './';
+import { User, OtpVerification, LoginSession,HotelCountry , HotelCity ,Address, Setting,Commission, Airport,Booking, TransactionDetail, Passenger, Hotel,Order} from './';
 import { TransactionManager } from './repositories/utils';
 import { DataSource } from 'typeorm';
 
@@ -46,7 +48,8 @@ export class DBModule {
                 Hotel,
                 Order,
                 Payment,
-                
+                HotelCountry,
+                HotelCity,
             ],
             synchronize: true,
             logging: false,
@@ -95,7 +98,9 @@ export class DBModule {
                     Passenger,
                     Hotel,
                     Order,
-                    Payment
+                    Payment,
+                    HotelCountry,
+                    HotelCity,
                 ]),
             ],
             controllers: [],
@@ -110,6 +115,8 @@ export class DBModule {
                 BookingRepositoryService,
                 OrderRepositoryService,
                 FlightTicketRepositoryService,
+                HotelCountryRepositoryService,
+                HotelCityRepositoryService,
                 {
                     provide: TransactionManager, // Register TransactionManager
                     useFactory: (dataSource: DataSource) => new TransactionManager(dataSource),
@@ -128,7 +135,9 @@ export class DBModule {
                 SearchRepositoryService,
                 BookingRepositoryService,
                 OrderRepositoryService,
-                FlightTicketRepositoryService
+                FlightTicketRepositoryService,
+                HotelCountryRepositoryService,
+                HotelCityRepositoryService
             ],
         };
     }
