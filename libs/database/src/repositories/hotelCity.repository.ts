@@ -12,9 +12,6 @@ export class HotelCityRepositoryService {
       ) { }
     
     async createCity(countrycode:string,countryname:string,response:any){
-        console.log("abced",countrycode)
-        console.log("abced",countryname)
-        console.log("abced",response)
         const countries = response.map(item => ({
             country_code : countrycode,
             country_name : countryname,
@@ -25,5 +22,18 @@ export class HotelCityRepositoryService {
         return this.hotelCityRepository.save(countries);
 
     }
+
+    async getAllCities(): Promise<Partial<HotelCity>[]> {
+        return this.hotelCityRepository.find({
+            select: [
+                'country_code',
+                'country_name',
+                'city_name',
+                'city_code'
+            ]
+        });
+    }
+    
+
 
 }

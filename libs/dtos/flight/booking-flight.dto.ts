@@ -46,7 +46,7 @@ export class PassengerDto {
     pax_type: number; // 1: Adult, 2: Child, 3: Infant
 
     @IsDateString()
-    @IsNotEmpty()
+    @IsOptional()
     date_of_birth: string;
 
     @IsString()

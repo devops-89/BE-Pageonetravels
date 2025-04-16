@@ -17,9 +17,10 @@ import {
     Payment,
     HotelCountryRepositoryService,
     HotelCityRepositoryService,
+    HotelDetailsRepositoryService,
  
 } from './';
-import { User, OtpVerification, LoginSession,HotelCountry , HotelCity ,Address, Setting,Commission, Airport,Booking, TransactionDetail, Passenger, Hotel,Order} from './';
+import { User, OtpVerification, LoginSession,HotelCountry,HotelDetails, HotelCity ,Address, Setting,Commission, Airport,Booking, TransactionDetail, Passenger, Hotel,Order} from './';
 import { TransactionManager } from './repositories/utils';
 import { DataSource } from 'typeorm';
 
@@ -50,6 +51,7 @@ export class DBModule {
                 Payment,
                 HotelCountry,
                 HotelCity,
+                HotelDetails,
             ],
             synchronize: true,
             logging: false,
@@ -101,6 +103,7 @@ export class DBModule {
                     Payment,
                     HotelCountry,
                     HotelCity,
+                    HotelDetails,
                 ]),
             ],
             controllers: [],
@@ -117,6 +120,7 @@ export class DBModule {
                 FlightTicketRepositoryService,
                 HotelCountryRepositoryService,
                 HotelCityRepositoryService,
+                HotelDetailsRepositoryService,
                 {
                     provide: TransactionManager, // Register TransactionManager
                     useFactory: (dataSource: DataSource) => new TransactionManager(dataSource),
@@ -137,7 +141,8 @@ export class DBModule {
                 OrderRepositoryService,
                 FlightTicketRepositoryService,
                 HotelCountryRepositoryService,
-                HotelCityRepositoryService
+                HotelCityRepositoryService,
+                HotelDetailsRepositoryService
             ],
         };
     }

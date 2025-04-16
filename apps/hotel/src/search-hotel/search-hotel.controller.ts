@@ -1,9 +1,11 @@
-import { Controller, Res, Get, Post, Body } from '@nestjs/common';
+import { Controller, Res, Get, Post, Body, Req } from '@nestjs/common';
 import { SearchHotelService } from './search-hotel.service';
 // import { HotelSearchDto } from '../../../../libs/dtos/hotel/search-hotel.dto';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { GenerateTokenService } from './generateToken.service';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
+import { HotelSearchRequestDto , BookingDto } from '../../../../libs/dtos/hotel/search-hotel.dto';
+import { CreateHotelBookingDto,CreateBookingDto } from '../../../../libs/dtos/hotel/hotel-booking.dto';
 
 @Controller('/hotel') 
 export class SearchHotelController { 
@@ -65,9 +67,9 @@ export class SearchHotelController {
   @Post('/hoteldetails')
   async HotelDetails(@Body() body: string,@Res() res: Response) {
     try {
-  
       const result = await this.searchHotelService.HotelDetails(body);
-      return this.responseHandler.sendSuccessResponse(res, result);
+      console.log(result);
+      // return this.responseHandler.sendSuccessResponse(res, result);
     } catch (error) {
      
       return this.responseHandler.sendErrorResponse(res, {
@@ -92,15 +94,70 @@ export class SearchHotelController {
     }
   }
 
+  @Get('/citylist')
+  async hotelCity(@Res() res: Response){
+      try{
+        const result = await this.searchHotelService.getCitylist();
+        return this.responseHandler.sendSuccessResponse(res, result);
+      }catch(error){
+        return this.responseHandler.sendErrorResponse(res,error);
+      }
+  }
+
   @Post('/search')
-  async searchHotel(@Res() res: Response, @Body() body) {
+  async searchHotel(@Res() res: Response, @Body() body:HotelSearchRequestDto) {
     try {
       const result = await this.searchHotelService.searchHotel(body);
-      return this.responseHandler.sendSuccessResponse(res, result)
+      return this.responseHandler.sendSuccessResponse(res, result);
     } catch (error) {
       return this.responseHandler.sendErrorResponse(res,error);
     }
   }
+
+
+  @Post('/prebook')
+  async hotelPreBook(@Res() res:Response,@Req() req:Request,@Body() body:BookingDto){
+      try{
+        const result = await this.searchHotelService.preBook(body);
+        return this.responseHandler.sendSuccessResponse(res, result);
+      }catch(error){
+        return this.responseHandler.sendErrorResponse(res,error);
+      }
+  }
+
+
+  @Get('/storeDetails')
+  async hotelDetailsStore(@Res() res:Response){
+    try{
+      const result = await this.searchHotelService.fetchDetails();
+      return this.responseHandler.sendSuccessResponse(res, result);
+    }catch(error){
+      return this.responseHandler.sendErrorResponse(res,error);
+    }
+  }
+
+
+  @Post('/hotelBooking')
+  async hotelBooking(@Req() req:Request, @Res() res:Response, @Body() body:CreateHotelBookingDto){
+    try{
+      const result = await this.searchHotelService.bookingHotel(body);
+      return this.responseHandler.sendSuccessResponse(res, result);
+    }catch(error){
+      return this.responseHandler.sendErrorResponse(res,error);
+    }
+  }
+
+  @Post('/getBookingDetails')
+  async hotelBookingDetails(@Req() req:Request,@Res() res:Response,@Body() body:CreateBookingDto){
+    try{
+      console.log(body);
+      const result = await this.searchHotelService.bookingDetails(body);
+      return this.responseHandler.sendSuccessResponse(res,result);
+    }catch(error){
+      return this.responseHandler.sendErrorResponse(res,error);
+    }
+  }
+
 }
 
 

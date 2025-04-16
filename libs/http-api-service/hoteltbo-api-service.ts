@@ -3,12 +3,13 @@ import axios from 'axios';
 import {  IHotelSearchPayload, IFareRule } from '../../libs/interfaces/hotel/search.interface';
 import { HotelCountry } from '../../libs/interfaces/hotel/search.interface'; 
 import { HotelCityRepositoryService } from '../../libs/database/src/repositories/hotelCity.repository';
-
+import { HotelDetailsRepositoryService } from "../../libs/database/src/repositories/hotelDetails.repository";
 
 @Injectable()
 export class HotelTBOAPIService {
   constructor(
     private readonly hotelCityRepositoryService: HotelCityRepositoryService,
+    private readonly hotelDetailsRepositoryService: HotelDetailsRepositoryService
   ) {}
 
   private async httpAPICall(baseURL: string, headers: object): Promise<any> {
@@ -29,7 +30,7 @@ export class HotelTBOAPIService {
     try {
       const config = { headers };
       const result = await axios.post(baseURL,payload, config);
-      
+      console.log(">>>>>>>>>>",result.data);
       return result.data;
      
     } catch (error) {
@@ -126,14 +127,19 @@ export class HotelTBOAPIService {
         "Hotelcodes": hotel_city_code, 
         "Language": "EN" 
       }
-
+      
       const response = await this.httpPostAPICall(cityListURL, payload ,headers);
-
+      console.log(hotel_city_code); 
+      console.log(response.Status.Code);
+      if(response.Status.Code === 200){
+        await this.hotelDetailsRepositoryService.createDetails(response.HotelDetails[0].CountryName, response.HotelDetails[0].CountryCode, response.HotelDetails[0].CityId, response.HotelDetails);
+      }
       return response;
 
     } catch (error) {
+      console.log(">>>>>>",error);
       console.error('Error in fetchCityList:', error.message);
-      throw (error.message || 'Failed to fetch the city list.');
+      // throw (error.message || 'Failed to fetch the city list.');
     }
   }
 
@@ -156,7 +162,7 @@ export class HotelTBOAPIService {
 
     } catch (error) {
       console.error('Error in fetchCityList:', error.message);
-      throw (error.message || 'Failed to fetch the city list.');
+      // throw (error.message || 'Failed to fetch the city list.');
     }
   }
 
@@ -178,6 +184,7 @@ export class HotelTBOAPIService {
       }
 
       const response = await this.httpPostAPICall(baseurl, payload, headers);
+      console.log(">>>>>>>>> >>>>> >",response);
       if(response.Status.Code === 500){
         throw { message: response.Status.Description, statusCode: response.Status.Code };
       }
@@ -261,14 +268,88 @@ export class HotelTBOAPIService {
         };
   
         const response = await this.httpPostAPICall(base_url, payload, headers);
+        console.log(">>>>>>>>>>>>>>>data of the Array",response);
+        if(response.Status.Code == 200){
+            for(let i = 0; i < response.HotelResult.length; i++){ 
+                const hotelCode = (response.HotelResult)[i].HotelCode;
+                const hotelcityDetails = await this.hotelDetailsRepositoryService.fetchDetails(hotelCode);
+                console.log(">>>>>>>>>>>>>> >>>>>>>> >",hotelcityDetails); 
+            }
+        }
         allResponses.push(response);
       }
-  
+      console.log(">>>>>>>> hinitonso",allResponses.length);
       return allResponses;
-  
     } catch (error) {
       console.error('Error in searchHotelFromTBO:', error.message);
       throw error.message || 'Failed to fetch hotel data.';
+    }
+  }
+
+  async handlePreBook(url: string, data: string) {
+    try {
+      const username = "Pageone";
+      const password = "Pageone@1234";
+      const credentials = Buffer.from(`${username}:${password}`).toString('base64');
+  
+      const headers = {
+        'Authorization': `Basic ${credentials}`,
+        'Content-Type': 'application/json',
+      };
+      console.log(data);
+      
+      const payload = {
+        "BookingCode": data
+      };
+      
+      const response = await this.httpPostAPICall(url, payload, headers);
+      return response;
+
+    } catch(error) {
+      console.log("Error in Pre Booking API", error);
+      throw error;
+    }
+  }
+
+  async hotelBook(url:string,data:any){
+    try{
+      const username = "Pageone";
+      const password = "Pageone@1234";
+      const credentials = Buffer.from(`${username}:${password}`).toString('base64');
+  
+      const headers = {
+        'Authorization': `Basic ${credentials}`,
+        'Content-Type': 'application/json',
+      };
+
+      const payload = data;
+      
+      const response = await this.httpPostAPICall(url, payload, headers);
+      return response;
+    }catch(error){
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async hotelBookingDetails(url:string,data:any){
+    try{
+      const username = "Pageone";
+      const password = "Pageone@1234";
+      const credentials = Buffer.from(`${username}:${password}`).toString('base64');
+  
+      const headers = {
+        'Authorization': `Basic ${credentials}`,
+        'Content-Type': 'application/json',
+      };
+
+      const payload = data;
+      
+      const response = await this.httpPostAPICall(url, payload, headers);
+      return response;
+    }catch(error){
+      console.log(error);
+      throw error;
     }
   }
   

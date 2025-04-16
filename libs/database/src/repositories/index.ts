@@ -12,6 +12,7 @@ export * from './order.repository';
 export * from './flightticket.repository';      
 export * from './hotelCountry.repository';
 export * from './hotelCity.repository';
+export * from './hotelDetails.repository';
 
 export * from './header.repository';
 export * from './banner.repository';
