@@ -82,7 +82,7 @@ export class SearchHotelController {
   @Post('/cityhoteldetails')
   async CityHotelDetails(@Body() body: string,@Res() res: Response) {
     try {
-  
+      console.log(body);
       const result = await this.searchHotelService.CityHotelDetails(body);
       return this.responseHandler.sendSuccessResponse(res, result);
     } catch (error) {

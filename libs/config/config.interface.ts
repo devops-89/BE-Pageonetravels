@@ -36,7 +36,7 @@ export interface ServicesPort {
   hotel_management:number;
   payment_service:number;
   webhook_service:number;
-
+  utilityServices:number;
 }
 
 export interface SMTP  {

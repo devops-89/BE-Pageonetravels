@@ -208,7 +208,6 @@ export class SearchHotelService {
       }else if(hotelcodeArray == ""){
         throw { message: "No Hotel Found.", statusCode: ERROR_CODES.BAD_REQUEST };
       }
-      
       const hotel_search_base_url = "https://affiliate.tektravels.com/HotelAPI/Search";
       const responseFromTBO = await this.hotelTBOAPIService.searchHotelFromTBO(body, hotel_search_base_url, token,hotelCodesinCity);
       console.log(">>>>>>> ***",responseFromTBO); 
