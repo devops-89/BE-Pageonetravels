@@ -1,7 +1,7 @@
 export * from './loginSession.entity';
 export * from './otpVerification.entity';
 export * from './user.entity';
-export * from './address.entity'; 
+export * from './address.entity';
 export * from './commission.entity';
 export * from './settings.entity'
 export * from './airport.entity'
@@ -26,8 +26,8 @@ export * from './order.entity';
 export * from './payment.entity';
 export * from './hotelCountry.entity';
 export * from './hotelCity.entity';
-export * from './hotelDetails.entity'; 
+export * from './hotelDetails.entity';
 export * from './packag-details.entity';
-
+export * from './enquiry.entity';
 
 

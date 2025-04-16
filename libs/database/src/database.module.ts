@@ -4,21 +4,21 @@ import { ConfigModule } from '../../config/config.module';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigDatabase } from '../../config/config.interface';
 import {
-    LoginSessionService,
-    OtpVerificationService,
-    UserRepositoryService,
-    AddressRepositoryService,
-    CommissionRepositoryService,
-    SettingRepositoryService,
-    SearchRepositoryService,
-    BookingRepositoryService,
-    OrderRepositoryService,
-    FlightTicketRepositoryService,
-    Payment,
-    HotelCountryRepositoryService,
-    HotelCityRepositoryService,
-    HotelDetailsRepositoryService,
- 
+  LoginSessionService,
+  OtpVerificationService,
+  UserRepositoryService,
+  AddressRepositoryService,
+  CommissionRepositoryService,
+  SettingRepositoryService,
+  SearchRepositoryService,
+  BookingRepositoryService,
+  OrderRepositoryService,
+  FlightTicketRepositoryService,
+  Payment,
+  HotelCountryRepositoryService,
+  HotelCityRepositoryService,
+  HotelDetailsRepositoryService, Enquiry,
+
 } from './';
 import { User, OtpVerification, LoginSession,HotelCountry,HotelDetails, HotelCity ,Address, Setting,Commission, Airport,Booking, TransactionDetail, Passenger, Hotel,Order} from './';
 import { TransactionManager } from './repositories/utils';
@@ -52,6 +52,7 @@ export class DBModule {
                 HotelCountry,
                 HotelCity,
                 HotelDetails,
+              Enquiry
             ],
             synchronize: true,
             logging: false,
@@ -62,7 +63,8 @@ export class DBModule {
     private static getConnectionOptionsPostgres(dbData: ConfigDatabase): TypeOrmModuleOptions {
         const { database, entities, host, logging, password, port, synchronize, type, username, url } = dbData;
         // return {url, type:'postgres'}
-        
+      console.log(">>>>>>>>>>>>d", database);
+
         return {
             database,
             entities,
@@ -104,6 +106,7 @@ export class DBModule {
                     HotelCountry,
                     HotelCity,
                     HotelDetails,
+                    Enquiry
                 ]),
             ],
             controllers: [],
@@ -127,7 +130,7 @@ export class DBModule {
                     inject: [DataSource], // Inject DataSource
                   },
 
-               
+
             ],
             exports: [
                 UserRepositoryService,
