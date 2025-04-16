@@ -4,12 +4,11 @@ import {  IHotelSearchPayload, IFareRule } from '../../libs/interfaces/hotel/sea
 import { HotelCountry } from '../../libs/interfaces/hotel/search.interface'; 
 import { HotelCityRepositoryService } from '../../libs/database/src/repositories/hotelCity.repository';
 import { HotelDetailsRepositoryService } from "../../libs/database/src/repositories/hotelDetails.repository";
-import { HotelTBOAPIService  as HotelAPIService} from '../../libs/http-api-service/hoteltbo-api-service';
+
 
 @Injectable()
 export class HotelTBOAPIService {
   constructor(
-    private readonly hotelTBOAPIService: HotelAPIService,
     private readonly hotelCityRepositoryService: HotelCityRepositoryService,
     private readonly hotelDetailsRepositoryService: HotelDetailsRepositoryService
   ) {}
@@ -275,7 +274,7 @@ export class HotelTBOAPIService {
             for(let i = 0; i < response.HotelResult.length; i++){ 
                 const hotelCode = (response.HotelResult)[i].HotelCode;
                 const city_hotel_details = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/TBOHotelCodeList';
-                const hotel_details = await this.hotelTBOAPIService.fetchCityHotelDetails(city_hotel_details, hotelCode);
+                const hotel_details = await this.fetchCityHotelDetails(city_hotel_details, hotelCode);
                 console.log(">>>>>>>>>>>>>> >>>>>>>>testing >",hotel_details); 
             }
         }
