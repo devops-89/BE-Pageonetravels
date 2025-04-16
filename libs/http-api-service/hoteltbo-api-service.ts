@@ -4,7 +4,7 @@ import {  IHotelSearchPayload, IFareRule } from '../../libs/interfaces/hotel/sea
 import { HotelCountry } from '../../libs/interfaces/hotel/search.interface'; 
 import { HotelCityRepositoryService } from '../../libs/database/src/repositories/hotelCity.repository';
 import { HotelDetailsRepositoryService } from "../../libs/database/src/repositories/hotelDetails.repository";
-import { HotelTBOAPIService  as HotelAPIService} from '../../../../libs/http-api-service/hoteltbo-api-service';
+import { HotelTBOAPIService  as HotelAPIService} from '../../libs/http-api-service/hoteltbo-api-service';
 
 @Injectable()
 export class HotelTBOAPIService {

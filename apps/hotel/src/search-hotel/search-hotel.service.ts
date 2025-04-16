@@ -10,7 +10,7 @@ import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 import { CreateHotelBookingDto ,CreateBookingDto } from '../../../../libs/dtos/hotel/hotel-booking.dto';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { json } from 'stream/consumers';
+// import { json } from 'stream/consumers';
 // import { url } from 'inspector';
 
 @Injectable()
