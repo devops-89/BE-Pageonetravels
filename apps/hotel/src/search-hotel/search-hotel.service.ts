@@ -198,8 +198,7 @@ export class SearchHotelService {
       const {token} = await this.generateTokenService.getToken(body.EndUserIp);
       const city_hotel_details = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/TBOHotelCodeList';
       const hotel_details = await this.hotelTBOAPIService.fetchCityHotelDetails(city_hotel_details, body.CityCodes);
-      // const cachedCities = await this.cacheManager.get(body.CityCodes);
-      // console.log(">>>>>>>>>>>>> >>> >",cachedCities);  
+     
       const hotelcodeArray = hotel_details.Hotels;
       if(hotelcodeArray != ""){
         for (const country of hotelcodeArray) {
@@ -209,7 +208,7 @@ export class SearchHotelService {
         throw { message: "No Hotel Found.", statusCode: ERROR_CODES.BAD_REQUEST };
       }
       const hotel_search_base_url = "https://affiliate.tektravels.com/HotelAPI/Search";
-      const responseFromTBO = await this.hotelTBOAPIService.searchHotelFromTBO(body, hotel_search_base_url, token,hotelCodesinCity);
+      const responseFromTBO = await this.hotelTBOAPIService.searchHotelFromTBO(body, hotel_search_base_url, token,hotelCodesinCity,hotel_details);
       console.log(">>>>>>> ***",responseFromTBO); 
       return { message :"Hotel Search List fetched successfully", data : responseFromTBO }  
 

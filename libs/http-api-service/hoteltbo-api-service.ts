@@ -31,7 +31,7 @@ export class HotelTBOAPIService {
     try {
       const config = { headers };
       const result = await axios.post(baseURL,payload, config);
-      console.log(">>>>>>>>>>",result.data);
+      // console.log(">>>>>>>>>>",result.data);
       return result.data;
      
     } catch (error) {
@@ -231,7 +231,7 @@ export class HotelTBOAPIService {
   //     throw (error.message || 'Failed to fetch hotel data.');
   //   }
   // }
-  async searchHotelFromTBO(body, base_url: string, token: string, hotelCodesinCity: any) {
+  async searchHotelFromTBO(body, base_url: string, token: string, hotelCodesinCity: any,hotel_details:any) {
     try {
       const username = "Pageone";
       const password = "Pageone@1234";
@@ -269,15 +269,24 @@ export class HotelTBOAPIService {
         };
   
         const response = await this.httpPostAPICall(base_url, payload, headers);
-        console.log(">>>>>>>>>>>>>>>data of the Array",response);
-        if(response.Status.Code == 200){
-            for(let i = 0; i < response.HotelResult.length; i++){ 
-                const hotelCode = (response.HotelResult)[i].HotelCode;
-                const city_hotel_details = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/TBOHotelCodeList';
-                const hotel_details = await this.fetchCityHotelDetails(city_hotel_details, hotelCode);
-                console.log(">>>>>>>>>>>>>> >>>>>>>>testing >",hotel_details); 
-            }
+        if(response.Status.Code === 200){
+          const hotelResult = response.HotelResult;
+          hotelResult.forEach(function(hotelResult){
+            const hotelCodeSearch = hotelResult.HotelCode
+            const hotelDetails = hotel_details.Hotels;
+            hotelDetails.forEach(function(hotelDetails){
+              const hotelCode = hotelDetails.HotelCode;
+              
+              if(hotelCode === hotelCodeSearch){
+                console.log("Match");
+              hotelResult.HotelDetails = hotelDetails
+              }
+            })
+
+          })
+          console.log(">>>>>>>>>>>>>>>data of the Array",response.HotelResult);
         }
+        
         allResponses.push(response);
       }
       console.log(">>>>>>>> hinitonso",allResponses.length);
