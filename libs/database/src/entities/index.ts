@@ -27,6 +27,7 @@ export * from './payment.entity';
 export * from './hotelCountry.entity';
 export * from './hotelCity.entity';
 export * from './hotelDetails.entity'; 
+export * from './packag-details.entity';
 
 
 

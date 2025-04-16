@@ -8,7 +8,8 @@ tmp
 transfer.sh
 # dependencies
 node_modules
-
+.nx/
+.vscode/
 # IDEs and editors
 /.idea
 .project
