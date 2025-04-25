@@ -39,7 +39,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly LoginSessionModel: LoginSessionService,
         private readonly EmailService: EmailService,
-
+        private readonly userRepositoryService: UserRepositoryService,
 
     ) { }
     async verificationByOtp(input: VerifyDto, device_type: DEVICE_TYPE): Promise<ApiResponse.ApiOK> {
@@ -680,41 +680,55 @@ export class AuthService {
         return { message: OTP_VERIFY_MSG.PASSWORD_RESET, data: null };
     }
 
-
-
-    async adminLoginDetails(device_type:string,input:AdminLoginDto): Promise <ApiResponse.ApiOK>{
-    try{
-        const { email, password ,user_type} = input;
-        
-        if (user_type) {
-            if(input.user_type == USER_TYPE.ADMIN){
-                console.log("email data",email);
-                const checkIfEmailExist = await this.UserModel.checkAdminEmail(email);
-                if(!checkIfEmailExist){
-                    throw ({ statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: 'Admin Email Not Exist.' });
-                }
-                // const password_hash = await generatePasswordHash(password);
-                const isPasswordCorrect = await checkPasswordHash(password, checkIfEmailExist.password);
-                console.log(isPasswordCorrect);
-                return null;
-            }else{
-                throw ({ statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: COMMON_MSG.ADMIN_EXIST });
-            }
-        }else{
-            throw ({ statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: COMMON_MSG.ADMIN_NOT_EXIST });
+    async adminLoginDetails(device_type: string, input: AdminLoginDto): Promise<ApiResponse.ApiOK> {
+        try {
+          const { email, password, user_type } = input;
+      
+          // Validate user_type if provided. Only allow admins to log in
+          if (user_type !== USER_TYPE.ADMIN) {
+            throw { statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: "Invalid user type, only admins can login" };
+          }
+      
+          // Convert email to lowercase for consistency
+          const checkIfEmailExist = await this.userRepositoryService.checkAdminEmail(email.toLowerCase());
+      
+          if (!checkIfEmailExist) {
+            throw { statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: "Admin email does not exist" };
+          }
+      
+          // Verify the password against the hashed password in the database
+          const isPasswordCorrect = await checkPasswordHash(password, checkIfEmailExist.password);
+          if (!isPasswordCorrect) {
+            throw { statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: LOGIN_MSG.INVALID_CREDENTIALS };
+          }
+      
+          // Generate tokens for login (you can modify as needed)
+          const token_data = {
+            loginBy: LOGIN_BY.EMAIL,
+            login_identity: email,
+            user_id: checkIfEmailExist.id,
+            user_type: checkIfEmailExist.user_type,
+          };
+      
+          const { jwt_token, refresh_token } = await this.LoginService.getLoginToken(token_data);
+      
+          const data = {
+            access_token: jwt_token,
+            refresh_token,
+            user_type: checkIfEmailExist.user_type,
+            name: checkIfEmailExist.full_name,
+            email: checkIfEmailExist.email,
+            reference_id: checkIfEmailExist.id,
+          };
+      
+          return { message: LOGIN_MSG.LOGIN_SUCCESS, data };
+        } catch (error) {
+          console.error("Admin login error:", error);
+          throw error;
         }
-
-        // const emailCheck = validateEmail(email) ? email.toLowerCase() : undefined;
-        
-        // const password_hash = await generatePasswordHash(password);
-
-        // return password_hash;
-
-    }catch(error){ 
-        console.log('Admin Login Error : ',error);
-        throw error;
-    }
-  }
+      }
+      
+  
   
 //   async sendEmail(input:MailSendDto){
 //     try{

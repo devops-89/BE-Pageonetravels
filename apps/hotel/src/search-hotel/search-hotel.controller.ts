@@ -141,7 +141,9 @@ export class SearchHotelController {
   async hotelBooking(@Req() req:Request, @Res() res:Response, @Body() body:CreateHotelBookingDto){
     try{
       const result = await this.searchHotelService.bookingHotel(body);
-      return this.responseHandler.sendSuccessResponse(res, result);
+      console.log("??????",result);
+      
+      // return this.responseHandler.sendSuccessResponse(res, result);
     }catch(error){
       return this.responseHandler.sendErrorResponse(res,error);
     }

@@ -93,14 +93,12 @@ export class FlightBookingController {
     @UseGuards(TokenValidationGuard)
     async flightRoundBooking(@Req() req:Request,@Res() res: Response, @Body() body: RoundDto){
         try{
-            
             const payload = req['userPayload'];
             const {reference_id}= payload;
             const refData = await this.userRepositoryService.getUserByUserId(reference_id);
             if(!refData){
                 throw (`An error occurred while fetching the user. Please try again later.`);
             }
-            
             const result = await this.flightBookingService.roundFlightBook(reference_id,body);
             return this.responsehandlderservice.sendSuccessResponse(res,result);
         }catch(error){

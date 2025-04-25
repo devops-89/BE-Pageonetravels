@@ -5,6 +5,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { User } from './user.entity';
 import { float } from "aws-sdk/clients/cloudfront";
 import { Payment } from "./payment.entity";
+import { ORDER_TYPE } from "../../../../libs/constants/orderConstant";
 
 @Entity('order')
 export class Order {
@@ -25,6 +26,14 @@ export class Order {
     @Column()
     @IsString()
     commission: string;
+
+    @Column({
+        type: 'enum',
+        enum: ORDER_TYPE,
+        nullable: true,
+    })
+    order_type: ORDER_TYPE;
+    
 
     @Column()
     @IsString()

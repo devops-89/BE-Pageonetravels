@@ -4,11 +4,15 @@ import {  IHotelSearchPayload, IFareRule } from '../../libs/interfaces/hotel/sea
 import { HotelCountry } from '../../libs/interfaces/hotel/search.interface'; 
 import { HotelCityRepositoryService } from '../../libs/database/src/repositories/hotelCity.repository';
 import { HotelDetailsRepositoryService } from "../../libs/database/src/repositories/hotelDetails.repository";
+import { ERROR_CODES } from '../../libs/constants/commonConstants';
+import { CommissionRepositoryService } from "../../libs/database/src/repositories/commission.repository";
+import { COMMISSION_TYPE } from 'libs/constants/autenticationConstants/userContants';
 
 
 @Injectable()
 export class HotelTBOAPIService {
   constructor(
+    private readonly commissionRepositoryService: CommissionRepositoryService,
     private readonly hotelCityRepositoryService: HotelCityRepositoryService,
     private readonly hotelDetailsRepositoryService: HotelDetailsRepositoryService
   ) {}
@@ -185,7 +189,6 @@ export class HotelTBOAPIService {
       }
 
       const response = await this.httpPostAPICall(baseurl, payload, headers);
-      console.log(">>>>>>>>> >>>>> >",response);
       if(response.Status.Code === 500){
         throw { message: response.Status.Description, statusCode: response.Status.Code };
       }
@@ -314,6 +317,29 @@ export class HotelTBOAPIService {
       };
       
       const response = await this.httpPostAPICall(url, payload, headers);
+      if (!response?.HotelResult?.[0]?.HotelCode) {
+        throw { message: "Invalid hotel response structure - missing HotelCode.", statusCode: ERROR_CODES.BAD_REQUEST };
+      }
+      const hotel_details_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/Hoteldetails';
+      const hotel_details = await this.fetchHotelDetails(
+        hotel_details_base_url, 
+        response.HotelResult[0].HotelCode
+      );
+
+      if (!hotel_details?.HotelDetails?.[0]) {
+        throw { message: "Hotel Details Missing.", statusCode: ERROR_CODES.BAD_REQUEST };
+      }
+      const CountryCode = hotel_details.HotelDetails[0].CountryCode;
+      const commissionType = await this.commissionRepositoryService.getCommissionbytype(
+        CountryCode === "IN" ? COMMISSION_TYPE.HOTEL_DOMESTIC : COMMISSION_TYPE.HOTEL_INTERNATIONAL
+      );
+      
+      const hotelInfo = hotel_details.HotelDetails[0];
+      response.HotelResult[0].HotelName = hotelInfo.HotelName;
+      response.HotelResult[0].HotelAddress = hotelInfo.Address;
+      response.HotelResult[0].HotelHotelRating = hotelInfo.HotelRating;
+      response.COMMISSION  = commissionType;
+      console.log(">>>>",response);
       return response;
 
     } catch(error) {

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Order } from '../entities';
 import { ORDER_STATUS } from '../../../../libs/constants/bookingContant';
+import { ORDER_TYPE } from '../../../../libs/constants/orderConstant';
 import { ApiResponse } from '../../../../libs/interfaces/commonTypes/apiResponse.interface';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 
@@ -14,9 +15,11 @@ export class OrderRepositoryService {
         private readonly orderRepository: Repository<Order>,
     ){}
 
-    async insertBooking(reference_id,payload,amount,is_LCC,journey,journey_type,commtype,commpercentage):Promise<Order | null>{
+    async insertBooking(reference_id,order_type,payload,amount,is_LCC,journey,journey_type,commtype,commpercentage):Promise<Order | null>{
         try{
             
+            if(order_type === ORDER_TYPE.FLIGHT){
+                console.log(payload);
             // Create order instance
             var orderId = `${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 999)}-${Math.floor(1000 + Math.random() * 9000)}`;
             
@@ -24,6 +27,7 @@ export class OrderRepositoryService {
                 custom_order_id : orderId, 
                 commission_type: commtype,
                 commission: commpercentage,
+                order_type:order_type,
                 journey_type : journey_type,
                 journey: journey,
                 isLCC: is_LCC,
@@ -44,6 +48,7 @@ export class OrderRepositoryService {
             });
             
             return order;
+        }
         }catch(error){
             console.log("save Booking API Database into database...error",error);
             throw error;
@@ -52,9 +57,9 @@ export class OrderRepositoryService {
 
 
     // insert- Booking for round trip flight 
-    async roundinsertBooking(reference_id,payload,amount,is_LCC,journey,journey_type,commtype,commpercentage,payloadSecond,secondType):Promise<Order | null>{
+    async roundinsertBooking(reference_id,order_type,payload,amount,is_LCC,journey,journey_type,commtype,commpercentage,payloadSecond,secondType):Promise<Order | null>{
         try{
-            
+            if(order_type === ORDER_TYPE.FLIGHT){
             // Create order instance
             var orderId = `${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 999)}-${Math.floor(1000 + Math.random() * 9000)}`;
             
@@ -62,6 +67,7 @@ export class OrderRepositoryService {
                 custom_order_id : orderId, 
                 commission_type: commtype,
                 commission: commpercentage,
+                order_type:order_type,
                 journey_type : journey_type,
                 journey: journey,
                 isLCC: is_LCC,
@@ -84,6 +90,7 @@ export class OrderRepositoryService {
             });
             
             return order;
+        }
         }catch(error){
             console.log("save Booking API Database into database...error",error);
             throw error;

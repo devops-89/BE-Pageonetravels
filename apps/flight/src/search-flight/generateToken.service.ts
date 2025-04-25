@@ -57,7 +57,6 @@ export class GenerateTokenService {
             const tbo_credentials = await this.getTBOCredentials();
             if (!token) {
                 await this.generateTBOToken(ip_address);
-
                 token = await this.rediscacheservice.getCache(`tboToken:${ip_address}`);
             }
             

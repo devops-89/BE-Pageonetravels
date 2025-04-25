@@ -70,11 +70,11 @@ export function calculateTotalPrice(passengerDetails: PassengerDetails): number 
         passengers.forEach(passenger => {
             if (passenger.pax_type === 1 || passenger.pax_type === 2) { // Adult or Child
                 if (passenger.Baggage && passenger.Baggage.length > 0) {
-                    const selectedBaggage = passenger.Baggage.find(option => option.Code === "NoBaggage");
-                    if (selectedBaggage) {
-                        totalFare += selectedBaggage.Price;
-                        passenger.selectedBaggage = selectedBaggage;
-                    }
+                    const baggageValue = passenger.Baggage;
+                    baggageValue.forEach((baggage,index)=>{
+                        totalFare += baggage.Price;
+                    })
+                    
                 } else {
                     console.log(`No baggage options available for passenger: ${passenger.first_name} ${passenger.last_name}`);
                 }
@@ -87,11 +87,11 @@ export function calculateTotalPrice(passengerDetails: PassengerDetails): number 
         passengers.forEach(passenger => {
             if (passenger.pax_type === 1 || passenger.pax_type === 2) { // Adult or Child
                 if (passenger.MealDynamic && passenger.MealDynamic.length > 0) {
-                    const selectedMeal = passenger.MealDynamic.find(option => option.Code === "NoMeal");
-                    if (selectedMeal) {
-                        totalFare += selectedMeal.Price;
-                        passenger.selectedMeal = selectedMeal;
-                    }
+                    const mealValue = passenger.MealDynamic;
+                    mealValue.forEach((meal,index)=>{
+                        totalFare += meal.Price;
+                    })
+                    
                 } else {
                     console.log(`No meal options available for passenger: ${passenger.first_name} ${passenger.last_name}`);
                 }
@@ -104,11 +104,11 @@ export function calculateTotalPrice(passengerDetails: PassengerDetails): number 
         passengers.forEach(passenger => {
             if (passenger.pax_type === 1 || passenger.pax_type === 2) { // Adult or Child
                 if (passenger.SeatDynamic && passenger.SeatDynamic.length > 0) {
-                    const selectedSeat = passenger.SeatDynamic.find(option => option.Code === "NoSeat");
-                    if (selectedSeat) {
-                        totalFare += selectedSeat.Price;
-                        passenger.selectedSeat = selectedSeat;
-                    }
+                    const seatValue = passenger.SeatDynamic;
+                    seatValue.forEach((seat,index)=>{
+                        totalFare += seat.Price;
+                    })
+                    
                 } else {
                     console.log(`No seat options available for passenger: ${passenger.first_name} ${passenger.last_name}`);
                 }
