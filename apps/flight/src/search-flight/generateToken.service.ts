@@ -27,8 +27,8 @@ export class GenerateTokenService {
                 // EndUserIp: this.tbo_credentials.FLIGHT_ENDUSERIP,
                 EndUserIp: ip_address,
             }
-
-            const result = await axios.post(base_url, payload)
+           
+            const result = await axios.post(base_url, payload);
             await this.rediscacheservice.setCache(`tboToken:${ip_address}`,result.data.TokenId, 82800);
             return this.tbo_token;
            
@@ -51,16 +51,15 @@ export class GenerateTokenService {
 
     async getToken(ip_address: string) {
         try {
-           
+            
             let token = await this.rediscacheservice.getCache(`tboToken:${ip_address}`);
             
             const tbo_credentials = await this.getTBOCredentials();
-            if (!token) {
+            
+            if (token === null) {
                 await this.generateTBOToken(ip_address);
-
                 token = await this.rediscacheservice.getCache(`tboToken:${ip_address}`);
             }
-            
             const payload = {
                 TBO_data: tbo_credentials,
                 token: token as string,

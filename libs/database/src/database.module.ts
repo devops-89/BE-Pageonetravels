@@ -17,7 +17,10 @@ import {
   Payment,
   HotelCountryRepositoryService,
   HotelCityRepositoryService,
+  HotelRepositoryService,
   HotelDetailsRepositoryService, Enquiry,
+  HotelRoom,
+  HotelRoomRepositoryService,
 
 } from './';
 import { User, OtpVerification, LoginSession,HotelCountry,HotelDetails, HotelCity ,Address, Setting,Commission, Airport,Booking, TransactionDetail, Passenger, Hotel,Order} from './';
@@ -52,7 +55,8 @@ export class DBModule {
                 HotelCountry,
                 HotelCity,
                 HotelDetails,
-              Enquiry
+              Enquiry,
+              HotelRoom
             ],
             synchronize: true,
             logging: false,
@@ -106,7 +110,8 @@ export class DBModule {
                     HotelCountry,
                     HotelCity,
                     HotelDetails,
-                    Enquiry
+                    Enquiry,
+                    HotelRoom
                 ]),
             ],
             controllers: [],
@@ -124,6 +129,8 @@ export class DBModule {
                 HotelCountryRepositoryService,
                 HotelCityRepositoryService,
                 HotelDetailsRepositoryService,
+                HotelRepositoryService,
+                HotelRoomRepositoryService,
                 {
                     provide: TransactionManager, // Register TransactionManager
                     useFactory: (dataSource: DataSource) => new TransactionManager(dataSource),
@@ -145,7 +152,9 @@ export class DBModule {
                 FlightTicketRepositoryService,
                 HotelCountryRepositoryService,
                 HotelCityRepositoryService,
-                HotelDetailsRepositoryService
+                HotelDetailsRepositoryService,
+                HotelRepositoryService,
+                HotelRoomRepositoryService
             ],
         };
     }

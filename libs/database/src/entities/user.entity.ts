@@ -10,6 +10,7 @@ import { Booking } from "./booking.entity";
 import { Order } from "./order.entity";
 import { TransactionDetail } from "./transaction.entity";
 import { Payment } from "./payment.entity";
+import { Hotel } from "./hotel.entity";
 
 @Entity('user')
 export class User {
@@ -127,6 +128,10 @@ export class User {
   @JoinColumn({ name: 'passenger_id' })
   passenger: Passenger 
 
+
+  @OneToMany(() => Hotel, hotel => hotel.user)
+  @JoinColumn({ name: "user_id"})
+  hotels: Hotel[];  // ← relation to Hotel
   
   @OneToMany(() => LoginSession, session => session.user)
   login_sessions: LoginSession[];

@@ -10,6 +10,7 @@ import { IPaginationObject } from '../../../interfaces/commonTypes/custom.interf
 import { UserFilterDto, PaginationDto } from 'libs/dtos/authentication/user.dto';
 import { Address, Setting } from '../entities';
 import { CostOptimizationHub } from 'aws-sdk';
+import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 
 @Injectable()
 export class UserRepositoryService {
@@ -82,10 +83,10 @@ export class UserRepositoryService {
                 is_email_verified: true
             };
             
-            const user = await this.userRepository.findOne({ where: { email }, select: selectFields, loadRelationIds: true });
-            console.log("########",selectFields);
-            if (user && user.password && !getPassword) {
-                user.password = '';
+            const user = await this.userRepository.findOne({ where: { email } });
+            console.log("########",user);
+            if (user) {
+                throw { message: "Email Already Exist.", statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
             }
 
             return (user as any) || null;
@@ -173,14 +174,21 @@ export class UserRepositoryService {
     
             const fields = this.mapObject(insertVal);
     
-    
+            console.log(user_type);
             let user_id = null;
             if (id) {
                 const r = await this.userRepository.update({ id }, fields);
                 if (r.affected && r.affected > 0) {
                     user_id = id;
                 }
-            } else {
+            } else if(user_type === "HOTEL") {
+                fields.verify_status = 'VERIFIED';
+                const user = await this.userRepository.insert(this.userRepository.create(fields));
+                const userJson = JSON.parse(JSON.stringify(user));
+                if (userJson.identifiers && userJson.identifiers.length > 0 && userJson.identifiers[0].id) {
+                    user_id = userJson.identifiers[0].id;
+                }
+            }else if(user_type === "USER") {
                 fields.verify_status = 'UNVERIFIED';
                 const user = await this.userRepository.insert(this.userRepository.create(fields));
                 const userJson = JSON.parse(JSON.stringify(user));
@@ -223,6 +231,16 @@ export class UserRepositoryService {
     async getUserByEmail(email: string): Promise<(User) | null> {
         try {
             const user = await this.userRepository.findOne({ where: { email, verify_status: USER_VERIFY_STATUS.VERIFIED, is_email_verified: true }, loadRelationIds: true });
+            return (user as any) || null;
+        } catch (error) {
+            console.log('Cannot Find User By Email', error);
+            throw error;
+        }
+    }
+
+    async getUserByOnlyEmail(email: string): Promise<(User) | null> {
+        try {
+            const user = await this.userRepository.findOne({ where: { email:email,user_type:USER_TYPE.HOTEL,status:USER_ACCOUNT_STATUS.ACTIVE} });
             return (user as any) || null;
         } catch (error) {
             console.log('Cannot Find User By Email', error);

@@ -29,5 +29,5 @@ export * from './hotelCity.entity';
 export * from './hotelDetails.entity';
 export * from './packag-details.entity';
 export * from './enquiry.entity';
-
+export * from './hotel-room.entity';
 
