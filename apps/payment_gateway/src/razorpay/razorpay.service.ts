@@ -45,9 +45,7 @@ export class RazorpayService {
                 customer: {
                   email: email,
                 },
-                callback_url: 'http://localhost:3000/payment/success',
-                // callback_url: 'https://dev.page1travels.com/webhook/api/webhook/test',
-                // callback_url: 'https://dev.page1travels.com/payment/api/razorpay/payment/verify',
+                callback_url: 'https://page1-fe.vercel.app/payment/success',
               }
               
              const data = await this.razorpayPaymentService.createPaymentLink(paymentInput);

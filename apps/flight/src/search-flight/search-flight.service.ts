@@ -386,7 +386,7 @@ export class SearchFlightService {
         GSTAllowed:flight.GSTAllowed,
         IsGSTMandatory:flight.IsGSTMandatory,
         // IsGSTMandatory:flight.IsGSTMandatory,
-        AirlineLogo: `https:dev.page1travels.com/flight/AirlineLogo/${flight.AirlineCode}.gif`,
+        AirlineLogo: `https://dev.page1travels.com/flight/AirlineLogo/${flight.AirlineCode}.gif`,
         departure,
         arrival
       }

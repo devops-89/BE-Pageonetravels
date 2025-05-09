@@ -65,6 +65,7 @@ export class AuthController {
     // @UseGuards(TokenValidationGuard,CheckIfAdminGuard)
     async adminLogin(@Body() body:AdminLoginDto, @Req() req:Request, @Res() res:Response){
         try{
+            console.log(body);
             const device_type = req.headers['devicetype'];
             const result = await this.authService.adminLoginDetails(device_type,body);
             return this.ResponseHandler.sendSuccessResponse(res,result);

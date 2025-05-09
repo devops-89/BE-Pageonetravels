@@ -55,7 +55,7 @@ export class FlightBookingService {
 
             // if(!body.journey_type || !body.journey || !body.is_LCC){
             //     throw { message: "Journey Details missing like journey_type,journey, flight type", statusCode: ERROR_CODES.BAD_REQUEST };
-            // }
+            // } 
             
 
             // Store additional data in a single object to pass easily
@@ -95,7 +95,7 @@ export class FlightBookingService {
                 "ResultIndex": result_index
             } 
             const extraAmount = calculateTotalPrice(passenger_details);
-            
+            // console.log(">>>>>>>>>>>>>>>>>>>",extraAmount);
             let amount = fare[0].BaseFare + fare[0].Tax + extraAmount;
             
             const is_LCC = body.is_LCC;
@@ -118,9 +118,10 @@ export class FlightBookingService {
             }
             
             amount = amount + data;
-            
-            const response = await this.orderRepository.insertBooking(reference_id,payload,amount,is_LCC,journey,journey_type,commissionType.commission_type,commissionType.percentage);
 
+            const order_type = "FLIGHT";
+            
+            const response = await this.orderRepository.insertBooking(reference_id,order_type,payload,amount,is_LCC,journey,journey_type,commissionType.commission_type,commissionType.percentage);
            
             return { message: 'Successfully Created Order.', response: response };
         } catch (err) {
@@ -152,7 +153,7 @@ export class FlightBookingService {
                 fareBreakdown,
                 fare
             } = body;
-            console.log("Received Body:", body);
+            // console.log("Received Body:", body);
 
             // Common additional details for passenger processing
             const additionalInfo = {
@@ -189,6 +190,7 @@ export class FlightBookingService {
                 TraceId: trace_id
             };
             const extraAmount = calculateTotalPrice(passenger_details);
+            // console.log(">>>>>>",extraAmount);
             let amount = fare[0].BaseFare + fare[0].Tax + + extraAmount;
             const is_LCC = body.is_LCC;
             const journey = body.journey;
@@ -210,7 +212,8 @@ export class FlightBookingService {
             }
             
             amount = amount + data;
-            const response = await this.orderRepository.insertBooking(reference_id,payload,amount,is_LCC,journey,journey_type,commissionType.commission_type,commissionType.percentage);
+            const order_type = "FLIGHT";
+            const response = await this.orderRepository.insertBooking(reference_id,order_type,payload,amount,is_LCC,journey,journey_type,commissionType.commission_type,commissionType.percentage);
             
             return { message: 'Successfully Created Order.', response: response };
         } catch (error) {
@@ -248,7 +251,7 @@ export class FlightBookingService {
     async roundFlightBook(reference_id,body:RoundDto){
         try{
             const {ob,ib} = body;
-            console.log(body);
+            // console.log(body);
             
             if(ob.is_LCC === true && ib.is_LCC === true){
                 const obData =    await  this.handleLCC(ob);
@@ -265,9 +268,24 @@ export class FlightBookingService {
                 const secondPayload = ibData.payload;
                 const secondType = ibData.is_LCC;
                 const secondAmount = ibData.amount;
-                const amount = firstAmount + secondAmount;
+                const flightType = `FLIGHT_${journeyType}_${journey}` as COMMISSION_TYPE;
+                let data;
+                if (Object.values(COMMISSION_TYPE).includes(flightType)) {
+                    const commissionType = await this.commissionRepositoryService.getCommissionbytype(flightType); 
+                    if(commissionType.commission_type === "FIXED"){
+                        data = parseFloat(commissionType.percentage);
+                    }else if(commissionType.commission_type === "PERCENTAGE"){
+                        const percentValue = parseFloat(commissionType.percentage);
+                        const farePrice = (ob.fare[0].BaseFare + ib.fare[0].BaseFare) * percentValue;
+                        data = farePrice/100;
+                }
+                } else {
+                    throw { message: "Invalid commission type", statusCode: ERROR_CODES.BAD_REQUEST };
+                }
                 
-                const response = await this.orderRepository.roundinsertBooking(reference_id,firstPayload,amount,firstType,journey,journeyType,firstCommType,firstPerType,secondPayload,secondType)
+                const amount = firstAmount + secondAmount + data;
+                const order_type = "FLIGHT";
+                const response = await this.orderRepository.roundinsertBooking(reference_id,order_type,firstPayload,amount,firstType,journey,journeyType,firstCommType,firstPerType,secondPayload,secondType)
                 return { message: 'Successfully Created Order.', response: response };
                 
             }else if(ob.is_LCC === false && ib.is_LCC === false){
@@ -284,9 +302,24 @@ export class FlightBookingService {
                 const secondPayload = ibData.payload;
                 const secondType = ibData.is_LCC;
                 const secondAmount = ibData.amount;
-                const amount = firstAmount + secondAmount;
+                const flightType = `FLIGHT_${journeyType}_${journey}` as COMMISSION_TYPE;
+                let data;
+                if (Object.values(COMMISSION_TYPE).includes(flightType)) {
+                    const commissionType = await this.commissionRepositoryService.getCommissionbytype(flightType); 
+                    if(commissionType.commission_type === "FIXED"){
+                        data = parseFloat(commissionType.percentage);
+                    }else if(commissionType.commission_type === "PERCENTAGE"){
+                        const percentValue = parseFloat(commissionType.percentage);
+                        const farePrice = (ob.fare[0].BaseFare + ib.fare[0].BaseFare) * percentValue;
+                        data = farePrice/100;
+                }
+                } else {
+                    throw { message: "Invalid commission type", statusCode: ERROR_CODES.BAD_REQUEST };
+                }
                 
-                const response = await this.orderRepository.roundinsertBooking(reference_id,firstPayload,amount,firstType,journey,journeyType,firstCommType,firstPerType,secondPayload,secondType)
+                const amount = firstAmount + secondAmount + data;
+                const order_type = "FLIGHT";
+                const response = await this.orderRepository.roundinsertBooking(reference_id,order_type,firstPayload,amount,firstType,journey,journeyType,firstCommType,firstPerType,secondPayload,secondType)
                 return { message: 'Successfully Created Order.', response: response };
                 
             }else if(ob.is_LCC === false && ib.is_LCC === true){
@@ -303,9 +336,24 @@ export class FlightBookingService {
                 const secondPayload = ibData.payload;
                 const secondType = ibData.is_LCC;
                 const secondAmount = ibData.amount;
-                const amount = firstAmount + secondAmount;
+                const flightType = `FLIGHT_${journeyType}_${journey}` as COMMISSION_TYPE;
+                let data;
+                if (Object.values(COMMISSION_TYPE).includes(flightType)) {
+                    const commissionType = await this.commissionRepositoryService.getCommissionbytype(flightType); 
+                    if(commissionType.commission_type === "FIXED"){
+                        data = parseFloat(commissionType.percentage);
+                    }else if(commissionType.commission_type === "PERCENTAGE"){
+                        const percentValue = parseFloat(commissionType.percentage);
+                        const farePrice = (ob.fare[0].BaseFare + ib.fare[0].BaseFare) * percentValue;
+                        data = farePrice/100;
+                }
+                } else {
+                    throw { message: "Invalid commission type", statusCode: ERROR_CODES.BAD_REQUEST };
+                }
                 
-                const response = await this.orderRepository.roundinsertBooking(reference_id,firstPayload,amount,firstType,journey,journeyType,firstCommType,firstPerType,secondPayload,secondType)
+                const amount = firstAmount + secondAmount + data;
+                const order_type = "FLIGHT";
+                const response = await this.orderRepository.roundinsertBooking(reference_id,order_type,firstPayload,amount,firstType,journey,journeyType,firstCommType,firstPerType,secondPayload,secondType)
                 return { message: 'Successfully Created Order.', response: response };
                 
                 
@@ -323,9 +371,26 @@ export class FlightBookingService {
                 const secondPayload = ibData.payload;
                 const secondType = ibData.is_LCC;
                 const secondAmount = ibData.amount;
-                const amount = firstAmount + secondAmount;
                 
-                const response = await this.orderRepository.roundinsertBooking(reference_id,firstPayload,amount,firstType,journey,journeyType,firstCommType,firstPerType,secondPayload,secondType)
+                
+
+                const flightType = `FLIGHT_${journeyType}_${journey}` as COMMISSION_TYPE;
+                let data;
+                if (Object.values(COMMISSION_TYPE).includes(flightType)) {
+                    const commissionType = await this.commissionRepositoryService.getCommissionbytype(flightType); 
+                    if(commissionType.commission_type === "FIXED"){
+                        data = parseFloat(commissionType.percentage);
+                    }else if(commissionType.commission_type === "PERCENTAGE"){
+                        const percentValue = parseFloat(commissionType.percentage);
+                        const farePrice = (ob.fare[0].BaseFare + ib.fare[0].BaseFare) * percentValue;
+                        data = farePrice/100;
+                }
+                } else {
+                    throw { message: "Invalid commission type", statusCode: ERROR_CODES.BAD_REQUEST };
+                }
+                const order_type = "FLIGHT";
+                const amount = firstAmount + secondAmount + data;
+                const response = await this.orderRepository.roundinsertBooking(reference_id,order_type,firstPayload,amount,firstType,journey,journeyType,firstCommType,firstPerType,secondPayload,secondType)
                 return { message: 'Successfully Created Order.', response: response };
                 
             }
@@ -379,7 +444,7 @@ export class FlightBookingService {
             "ResultIndex": flight.result_index
         } 
         const extraAmount = calculateTotalPrice(flight.passenger_details);
-        
+       
         let amount = flight.fare[0].BaseFare + flight.fare[0].Tax + extraAmount;
         
         const is_LCC = flight.is_LCC;
@@ -401,7 +466,7 @@ export class FlightBookingService {
                 throw { message: "Invalid commission type", statusCode: ERROR_CODES.BAD_REQUEST };
         }
         
-        amount = amount + data;
+      
 
         const response = {payload, amount, is_LCC, journey,journey_type, commissionType};
         return response;
@@ -447,6 +512,7 @@ export class FlightBookingService {
             TraceId: trace_id
         };
         const extraAmount = calculateTotalPrice(passenger_details);
+        
         let amount = fare[0].BaseFare + fare[0].Tax + + extraAmount;
         const is_LCC = flight.is_LCC;
         const journey = flight.journey;
@@ -465,9 +531,9 @@ export class FlightBookingService {
                 }
         } else {
                 throw { message: "Invalid commission type", statusCode: ERROR_CODES.BAD_REQUEST };
-        }
+        } 
         
-        amount = amount + data;
+        // amount = amount + data;
 
         const response = {payload, amount, is_LCC, journey,journey_type, commissionType};
         return response;
@@ -476,5 +542,3 @@ export class FlightBookingService {
     
     
 }
-
-

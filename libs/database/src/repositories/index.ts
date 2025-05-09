@@ -15,6 +15,7 @@ export * from './hotelCity.repository';
 export * from './hotelDetails.repository';
 export * from './hotel.repository';
 export * from './hotelRoom.repository';
+export * from './enquiry-repository';
 
 export * from './header.repository';
 export * from './banner.repository';

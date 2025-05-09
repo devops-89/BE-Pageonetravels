@@ -16,7 +16,6 @@ export class FlightValidator {
       const today = new Date();
       const providedDate = new Date(date);
       if (!date || providedDate <= today) {
-        // throw (errorMessage || "Date should be a future date."); 
         throw { message: "Date should be a future date.", statusCode: ERROR_CODES.BAD_REQUEST };
       }
     }
