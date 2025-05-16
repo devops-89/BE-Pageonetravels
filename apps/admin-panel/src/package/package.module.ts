@@ -1,30 +1,38 @@
 import { Module } from '@nestjs/common';
-
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '../../../../libs/config/config.module';
 import { PackageController } from './package.controller';
 import { PackageService } from './package.services';
 import { ResponseHandlerModule } from '../../../../libs/response-handler/response-handler.module';
-import { TypeOrmModule } from '@nestjs/typeorm/dist/typeorm.module';
 import { TransactionManager } from '../../../../libs/database/src/repositories/utils';
 import { JwtService } from '../../../../libs/jwt-service/jwt.service';
 import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMiddleware';
 import { DBModule, User, UserRepositoryService } from '../../../../libs/database/src';
-
-
+import { PackageCategoryRepositoryService } from '../../../../libs/database/src/repositories/packagecategory.repository';
+import { PackageCategory } from '../../../../libs/database/src/entities/packageCategory.entity'; // Make sure to import your entity
+import { PackageAmenite } from '../../../../libs/database/src/entities/packageAmenite.entity'; // Make sure to import your entity
+import { PackageAmeniteRepositoryService } from '../../../../libs/database/src/repositories/packageamenite.repository';
 @Module({
-    imports: [
-        DBModule.forRoot(),
-        TypeOrmModule.forFeature([
-             User,
-             TransactionManager,
-             UserRepositoryService
-        ]),
-        ConfigModule,
-        ResponseHandlerModule,  
-    ],
-    controllers: [PackageController],
-    providers: [ TransactionManager,PackageService,UserRepositoryService, JwtService, TokenValidationMiddleware],
+  imports: [
+    DBModule.forRoot(),
+    TypeOrmModule.forFeature([
+      User,
+      PackageCategory, // Register your entity here
+      PackageAmenite,
+    ]),
+    ConfigModule,
+    ResponseHandlerModule,
+  ],
+  controllers: [PackageController],
+  providers: [
+    TransactionManager,
+    PackageService,
+    UserRepositoryService,
+    PackageCategoryRepositoryService, // Add this provider
+    JwtService,
+    TokenValidationMiddleware,
+    PackageAmeniteRepositoryService,
+  ],
+  exports: [PackageService], // Export if needed by other modules
 })
-
-
-export class PackageModule {} 
+export class PackageModule {}

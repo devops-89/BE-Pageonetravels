@@ -61,7 +61,7 @@ private readonly testimonialService : TestimonialService,
 )
 async addHeader(@Body() body:AddHeaderDto, @UploadedFiles() files , @Req() req: Request, @Res() res:Response ){
     try{  
-        const payload: JWTPayload=req['userPayload']; 
+        const payload: JWTPayload=req['userPayload'];  
         const result = await this.headerService.addHeader(payload,body,files);
         return this.responseHandler.sendSuccessResponse(res, result); 
     }catch(error){     

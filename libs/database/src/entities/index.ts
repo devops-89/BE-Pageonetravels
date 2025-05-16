@@ -27,7 +27,9 @@ export * from './payment.entity';
 export * from './hotelCountry.entity';
 export * from './hotelCity.entity';
 export * from './hotelDetails.entity';
-export * from './packag-details.entity';
 export * from './enquiry.entity';
 export * from './hotel-room.entity';
-
+export * from './package.entity';
+export * from './packageAmenite.entity';
+export * from './packageCategory.entity';
+export * from './packageDay.entity';

@@ -24,7 +24,11 @@ export class HotelRoomRepositoryService {
                 if (!hotel) {
                     throw { message: "Please provide a valid Hotel ID.", statusCode: ERROR_CODES.BAD_REQUEST };
                 }
-        
+                
+                const upload = body.gallery_images;
+                const originalNames = upload.map(file =>file.path).join(', ');
+                const mainImage = body.main_image.path;
+
                 // Create the new room with the hotel relation
                 const newRoom = this.hotelRoomRepo.create({
                     hotel,  // Pass the entire hotel entity
@@ -36,15 +40,17 @@ export class HotelRoomRepositoryService {
                     base_price: body.base_price,
                     tax_percentage: body.tax_percentage,
                     currency: body.currency,
-                    main_image: body.main_image,
-                    gallery_images: body.gallery_images,
-                    wifi: body.wifi,
-                    ac: body.ac,
-                    tv: body.tv,
-                    balcony: body.balcony,
-                    attached_bathroom: body.attached_bathroom,
-                    room_service: body.room_service,
-                    breakfast_included: body.breakfast_included,
+                    main_image: mainImage,
+                    gallery_images: originalNames,
+                    amenities:{
+                        wifi: body.amenities.wifi,
+                        ac: body.amenities.ac,
+                        tv: body.amenities.tv,
+                        balcony: body.amenities.balcony,
+                        attached_bathroom: body.amenities.attached_bathroom,
+                        room_service: body.amenities.room_service,
+                        breakfast_included: body.amenities.breakfast_included,
+                    },
                     number_of_rooms: body.number_of_rooms,
                     available_rooms: body.available_rooms
                 });

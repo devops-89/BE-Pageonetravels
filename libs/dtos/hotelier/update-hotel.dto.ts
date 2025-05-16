@@ -12,79 +12,97 @@ import { Type, Transform } from 'class-transformer';
 import { CustomFile } from '../../../apps/hotel_management/src/utils/customtypes';
 
 class AmenitiesDto {
+  @IsOptional()
   @IsBoolean()
   @Type(() => Boolean)
-  wifi: boolean;
+  wifi?: boolean;
 
+  @IsOptional()
   @IsBoolean()
   @Type(() => Boolean)
-  parking: boolean;
+  parking?: boolean;
 
+  @IsOptional()
   @IsBoolean()
   @Type(() => Boolean)
-  ac: boolean;
+  ac?: boolean;
 
+  @IsOptional()
   @IsBoolean()
   @Type(() => Boolean)
-  restaurant: boolean;
+  restaurant?: boolean;
 
+  @IsOptional()
   @IsBoolean()
   @Type(() => Boolean)
-  pool: boolean;
+  pool?: boolean;
 
+  @IsOptional()
   @IsBoolean()
   @Type(() => Boolean)
-  gym: boolean;
+  gym?: boolean;
 
+  @IsOptional()
   @IsBoolean()
   @Type(() => Boolean)
-  spa: boolean;
+  spa?: boolean;
 
+  @IsOptional()
   @IsBoolean()
   @Type(() => Boolean)
-  bar: boolean;
+  bar?: boolean;
 
+  @IsOptional()
   @IsBoolean()
   @Type(() => Boolean)
-  laundry: boolean;
+  laundry?: boolean;
 }
 
-export class CreateHotelDto {
+export class UpdateHotelDto {
+  @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  name: string;
+  name?: string;
 
+  @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  description: string;
+  description?: string;
 
+  @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  type: string;
+  type?: string;
 
+  @IsOptional()
   @IsInt()
   @Type(() => Number)
-  star_rating: number;
+  star_rating?: number;
 
+  @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  address_line: string;
+  address_line?: string;
 
+  @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  city: string;
+  city?: string;
 
+  @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  state: string;
+  state?: string;
 
+  @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  country: string;
+  country?: string;
 
+  @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  postal_code: string;
+  postal_code?: string;
 
   @IsOptional()
   @IsNumber()
@@ -96,38 +114,44 @@ export class CreateHotelDto {
   @Type(() => Number)
   longitude?: number;
 
+  @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  contact_name: string;
+  contact_name?: string;
 
+  @IsOptional()
   @IsEmail()
   @Transform(({ value }) => value?.trim())
-  contact_email: string;
+  contact_email?: string;
 
+  @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  contact_phone: string;
+  contact_phone?: string;
 
   @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
   alternate_phone?: string;
 
+  @IsOptional()
   @Matches(/^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, {
     message: 'check_in_time must be in the format HH:mm:ss',
   })
   @Transform(({ value }) => value?.trim())
-  check_in_time: string;
+  check_in_time?: string;
 
+  @IsOptional()
   @Matches(/^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, {
     message: 'check_out_time must be in the format HH:mm:ss',
   })
   @Transform(({ value }) => value?.trim())
-  check_out_time: string;
+  check_out_time?: string;
 
+  @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim())
-  cancellation_policy: string;
+  cancellation_policy?: string;
 
   @IsOptional()
   @IsString()
@@ -139,25 +163,29 @@ export class CreateHotelDto {
   @Transform(({ value }) => value?.trim())
   pet_policy?: string;
 
+  @IsOptional()
   @IsNumber()
   @Type(() => Number)
-  base_price: number;
+  base_price?: number;
 
+  @IsOptional()
   @IsNumber()
   @Type(() => Number)
-  tax_percentage: number;
+  tax_percentage?: number;
 
-  @IsString()
-  @Transform(({ value }) => value?.trim())
-  currency: string;
+  // @IsOptional()
+  // @IsString()
+  // @Transform(({ value }) => value?.trim())
+  // currency?: string;
 
-  // Nested amenities object
+  // ✅ Nested Amenities Object
+  @IsOptional()
   @ValidateNested()
   @Type(() => AmenitiesDto)
-  amenities: AmenitiesDto;
+  amenities?: AmenitiesDto;
 
-  // File upload fields
-  main_image: CustomFile;
+  @IsOptional()
+  main_image?: CustomFile;
 
   @IsOptional()
   gallery_images?: CustomFile[];

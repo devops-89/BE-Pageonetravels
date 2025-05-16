@@ -10,7 +10,36 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 import { HotelRoom } from './hotel-room.entity';
+import { IsBoolean, IsObject } from 'class-validator';
 
+export class AmenitiesDto {
+  @IsBoolean()
+  wifi: boolean;
+
+  @IsBoolean()
+  parking: boolean;
+
+  @IsBoolean()
+  ac: boolean;
+
+  @IsBoolean()
+  restaurant: boolean;
+
+  @IsBoolean()
+  pool: boolean;
+
+  @IsBoolean()
+  gym: boolean;
+
+  @IsBoolean()
+  spa: boolean;
+
+  @IsBoolean()
+  bar: boolean;
+
+  @IsBoolean()
+  laundry: boolean;
+}
 
 @Entity('hotel')
 export class Hotel {
@@ -81,7 +110,7 @@ export class Hotel {
   main_image: string;
 
   @Column('simple-array', { nullable: true })
-  gallery_images: string[];
+  gallery_images: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   base_price: number;
@@ -89,26 +118,14 @@ export class Hotel {
   @Column({ type: 'decimal', precision: 5, scale: 2 })
   tax_percentage: number;
 
-  @Column()
-  currency: string;
 
-  // Boolean amenities
-  @Column({ default: false }) wifi: boolean;
-  @Column({ default: false }) parking: boolean;
-  @Column({ default: false }) ac: boolean;
-  @Column({ default: false }) restaurant: boolean;
-  @Column({ default: false }) pool: boolean;
-  @Column({ default: false }) gym: boolean;
-  @Column({ default: false }) spa: boolean;
-  @Column({ default: false }) bar: boolean;
-  @Column({ default: false }) laundry: boolean;
+  @Column({ type: 'jsonb' })  // Use jsonb for PostgreSQL, or 'simple-json' for other databases
+  @IsObject()
+  amenities: AmenitiesDto;
 
-  
-  /** foreign key column referencing User.id */
   @Column({ type: 'uuid' })
   user_id: string;
 
-  /** relation: many hotels to one user */
   @ManyToOne(() => User, user => user.hotels, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
@@ -121,9 +138,7 @@ export class Hotel {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  
-
 }
+
 
 

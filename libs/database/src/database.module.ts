@@ -23,6 +23,10 @@ import {
   HotelRoomRepositoryService,
   EnquiryRepositoryService,
   Enquiry,
+  Package,
+  PackageAmenite,
+  PackageCategory,
+  PackageDay,
 
 } from './';
 import { User, OtpVerification, LoginSession,HotelCountry,HotelDetails, HotelCity ,Address, Setting,Commission, Airport,Booking, TransactionDetail, Passenger, Hotel,Order} from './';
@@ -57,8 +61,12 @@ export class DBModule {
                 HotelCountry,
                 HotelCity,
                 HotelDetails,
-              Enquiry,
-              HotelRoom
+                Enquiry,
+                HotelRoom,
+                Package,
+                PackageAmenite,
+                PackageCategory,
+                PackageDay,
             ],
             synchronize: true,
             logging: false,
@@ -69,8 +77,7 @@ export class DBModule {
     private static getConnectionOptionsPostgres(dbData: ConfigDatabase): TypeOrmModuleOptions {
         const { database, entities, host, logging, password, port, synchronize, type, username, url } = dbData;
         // return {url, type:'postgres'}
-      console.log(">>>>>>>>>>>>d", database);
-
+        
         return {
             database,
             entities,
@@ -113,7 +120,11 @@ export class DBModule {
                     HotelCity,
                     HotelDetails,
                     Enquiry,
-                    HotelRoom
+                    HotelRoom,
+                    Package,
+                    PackageAmenite,
+                    PackageCategory,
+                    PackageDay,
                 ]),
             ],
             controllers: [],

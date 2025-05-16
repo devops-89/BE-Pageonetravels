@@ -8,6 +8,32 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Hotel } from './hotel.entity';
+import { IsObject,IsBoolean } from 'class-validator';
+
+
+export class RoomAmenitiesDto {
+  @IsBoolean()
+  wifi: boolean;
+
+  @IsBoolean()
+  ac: boolean;
+
+  @IsBoolean()
+  tv: boolean;
+
+  @IsBoolean()
+  balcony: boolean;
+
+  @IsBoolean()
+  attached_bathroom: boolean;
+
+  @IsBoolean()
+  room_service: boolean;
+
+  @IsBoolean()
+  breakfast_included: boolean;
+}
+
 
 @Entity('hotel_rooms')
 export class HotelRoom {
@@ -46,29 +72,11 @@ export class HotelRoom {
   main_image: string;
 
   @Column({ type: 'simple-array', nullable: true })
-  gallery_images: string[];
+  gallery_images: string;
 
-  // Amenities
-  @Column({ type: 'boolean', default: false })
-  wifi: boolean;
-
-  @Column({ type: 'boolean', default: false })
-  ac: boolean;
-
-  @Column({ type: 'boolean', default: false })
-  tv: boolean;
-
-  @Column({ type: 'boolean', default: false })
-  balcony: boolean;
-
-  @Column({ type: 'boolean', default: false })
-  attached_bathroom: boolean;
-
-  @Column({ type: 'boolean', default: false })
-  room_service: boolean;
-
-  @Column({ type: 'boolean', default: false })
-  breakfast_included: boolean;
+  @Column({ type: 'jsonb' }) // Use 'json' or 'simple-json' for non-PostgreSQL DBs
+  @IsObject()
+  amenities: RoomAmenitiesDto;
 
   @Column({ type: 'int', default: 1 })
   number_of_rooms: number;
@@ -82,3 +90,5 @@ export class HotelRoom {
   @UpdateDateColumn()
   updated_at: Date;
 }
+
+

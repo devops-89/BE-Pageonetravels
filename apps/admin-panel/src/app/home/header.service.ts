@@ -22,7 +22,7 @@ export class HeaderService {
            const favicon = files.favicon[0].originalname;
            const header_logo = files.header_logo[0].originalname;
            const header_links = headerDto.header_links;
-           const {reference_id}= payload; 
+           const {reference_id}= payload;  
            const refData = await this.userRepositoryService.getUserByUserId(reference_id);
            if(!refData){
                 throw (`An Error occurred while adding Header.`);

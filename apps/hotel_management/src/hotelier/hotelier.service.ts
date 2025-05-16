@@ -13,9 +13,11 @@ import { getRandomString } from "../../../../libs/utils/basicUtils";
 import { JwtService } from "../../../../libs/jwt-service/jwt.service";
 import { LoginSessionService } from "../../../../libs/database/src";
 import { CreateHotelDto } from '../../../../libs/dtos/hotelier/create-hotel.dto';
+import { UpdateHotelDto } from '../../../../libs/dtos/hotelier/update-hotel.dto';
 import { HotelRepositoryService } from '../../../../libs/database/src/repositories/hotel.repository';
 import { HotelRoomRepositoryService } from '../../../../libs/database/src/repositories/hotelRoom.repository';
 import { CreateHotelRoomDto } from '../../../../libs/dtos/hotelier/hotel-room.dto';
+import { retry } from "rxjs";
 
 
 @Injectable()
@@ -147,9 +149,9 @@ export class HotelierService {
     }
 
 
-    async addHotel(body:CreateHotelDto){
+    async addHotel(reference_id:string,body:CreateHotelDto){
         try{
-            const result  = await this.hotelRepositoryService.createHotel(body);
+            const result  = await this.hotelRepositoryService.createHotel(reference_id,body);
             return { message: `Hotel Created Successfully`, data: result };
         }catch(error){
             console.log("Error in Add Hotel.", error);
@@ -157,10 +159,31 @@ export class HotelierService {
         }
     }
 
+    async updateHotel(reference_id:string,hotel_id: string, body: UpdateHotelDto) {
+        try {
+            const result = await this.hotelRepositoryService.updateHotel(reference_id,hotel_id, body);
+            return { message: `Hotel Updated Successfully`, data: result };
+        } catch (error) {
+            console.log("Error in Update Hotel.", error);
+            throw error;
+        }
+    }
+
+
     async addRoom(body:CreateHotelRoomDto){
         try{
             const result = await this.hotelRoomRepositoryService.createRoom(body);
             return { message: `Hotel Room Created Successfully`, data: body };
+        }catch(error){
+            console.log(error);
+            throw error;
+        }
+    }
+
+    async fetchHotelList(){
+        try{
+            const result = await this.hotelRepositoryService.getAllHotel();
+            return {message: `Hotel List Fetch Successfully`,data:result}
         }catch(error){
             console.log(error);
             throw error;

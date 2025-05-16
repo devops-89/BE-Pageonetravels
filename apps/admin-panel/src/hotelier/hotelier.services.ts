@@ -65,9 +65,7 @@ export class HotelierService {
         }
     }
 
-      
-
-
+    
 }
 
 

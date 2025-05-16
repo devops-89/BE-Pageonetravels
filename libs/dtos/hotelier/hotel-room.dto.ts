@@ -1,111 +1,94 @@
-import { 
-  IsArray, 
-  IsBoolean, 
-  IsInt, 
-  IsNotEmpty, 
-  IsOptional, 
-  IsString, 
-  IsUUID, 
+import {
+  IsString,
   IsNumber,
+  IsOptional,
+  IsUUID,
+  IsInt,
+  IsDecimal,
   IsPositive,
-  IsNumberString
+  IsArray,
+  IsEnum,
+  IsObject,
+  ValidateNested,
+  IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { CustomFile } from '../../../apps/hotel_management/src/utils/customtypes';
+
+export class RoomAmenitiesDto {
+  @IsBoolean()
+  wifi: boolean;
+
+  @IsBoolean()
+  ac: boolean;
+
+  @IsBoolean()
+  tv: boolean;
+
+  @IsBoolean()
+  balcony: boolean;
+
+  @IsBoolean()
+  attached_bathroom: boolean;
+
+  @IsBoolean()
+  room_service: boolean;
+
+  @IsBoolean()
+  breakfast_included: boolean;
+}
 
 export class CreateHotelRoomDto {
   @IsUUID()
-  @IsNotEmpty()
   hotel_id: string;
 
   @IsString()
-  @IsNotEmpty()
   room_type: string;
 
   @IsString()
-  @IsNotEmpty()
   room_title: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   room_description?: string;
 
-  @IsInt()
   @IsOptional()
-  @Type(() => Number)
+  @IsInt()
   max_adults?: number = 2;
 
-  @IsInt()
   @IsOptional()
-  @Type(() => Number)
+  @IsInt()
   max_children?: number = 0;
 
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @IsPositive()
-  @IsNotEmpty()
-  @Type(() => Number)
+  @IsNumber()
   base_price: number;
 
-  @IsNumber({ maxDecimalPlaces: 2 })
   @IsOptional()
-  @Type(() => Number)
+  @IsNumber()
   tax_percentage?: number = 0;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   currency?: string = 'INR';
 
-  @IsString()
-  @IsOptional()
-  main_image?: string;
+ 
+  
+  main_image: CustomFile;
 
-  @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  gallery_images?: string[];
+  gallery_images?: CustomFile[];
 
-  // Amenities
-  @IsBoolean()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => RoomAmenitiesDto)
+  amenities: RoomAmenitiesDto;
+
   @IsOptional()
-  @Type(() => Boolean)
-  wifi?: boolean = false;
-
-  @IsBoolean()
-  @IsOptional()
-  @Type(() => Boolean)
-  ac?: boolean = false;
-
-  @IsBoolean()
-  @IsOptional()
-  @Type(() => Boolean)
-  tv?: boolean = false;
-
-  @IsBoolean()
-  @IsOptional()
-  @Type(() => Boolean)
-  balcony?: boolean = false;
-
-  @IsBoolean()
-  @IsOptional()
-  @Type(() => Boolean)
-  attached_bathroom?: boolean = false;
-
-  @IsBoolean()
-  @IsOptional()
-  @Type(() => Boolean)
-  room_service?: boolean = false;
-
-  @IsBoolean()
-  @IsOptional()
-  @Type(() => Boolean)
-  breakfast_included?: boolean = false;
-
   @IsInt()
-  @IsOptional()
-  @Type(() => Number)
   number_of_rooms?: number = 1;
 
-  @IsInt()
   @IsOptional()
-  @Type(() => Number)
+  @IsInt()
   available_rooms?: number = 1;
 }
+
