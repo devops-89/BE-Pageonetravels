@@ -31,7 +31,13 @@ export class Package {
   description: string;
 
   @Column({ nullable: true })
-  image: string;
+  main_image: string;
+
+  @Column({ nullable: true })
+  gallery_image: string;
+
+  @Column({ nullable: true })
+  banner_image: string;
 
   @Column({ unique: true })
   package_slug: string;
@@ -42,11 +48,11 @@ export class Package {
   @Column()
   package_no_of_person: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  customize_day_price: number;
+  // @Column({ type: 'decimal', precision: 10, scale: 2 })
+  // customize_day_price: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  customize_person_price: number;
+  // @Column({ type: 'decimal', precision: 10, scale: 2 })
+  // customize_person_price: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   package_price: number;

@@ -2,9 +2,11 @@ import { Body, Controller, Get, Param, Post, Query, Req, Res, UploadedFiles, Use
 import { PackageService } from "./package.services";
 import { CreatePackageCategoryDto,UpdatePackageCategoryDto } from '../../../../libs/dtos/package/package-category.dto';
 import { CreatePackageAmeniteDto , UpdatePackageAmeniteDto ,AmeniteIdParams } from '../../../../libs/dtos/package/package-amenites.dto';
+import { CreatePackageDayDto, PkgIdParams ,UpdatePackageDayDto } from '../../../../libs/dtos/package/package-days.dto';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { imageFileFilter } from '../../../../libs/utils/fileUpload';
+
 
 @Controller('package')
 export class PackageController {
@@ -14,7 +16,6 @@ export class PackageController {
     ){}
 
 
-    
     @Post('create')
     async addPackage(@Res() res:Response,@Req() req:Request,@Body() body:any)
     {
@@ -24,6 +25,15 @@ export class PackageController {
             console.log("Create Package Error",error);
         }
     } 
+
+    @Get('list')
+    async getPackageList(@Res() res:Response,@Req() req:Request){
+        try{
+            console.log("Package List");
+        }catch(error){
+            console.log("Get Package List Error",error);
+        }
+    }
     
     
     @Post('update')
@@ -117,6 +127,7 @@ export class PackageController {
         }
     }
 
+    // Amenite -Get
     @Get('amenities/getAll')
     async getPkgAmenites(@Res() res:Response,@Req() req:Request){
         try{
@@ -128,6 +139,7 @@ export class PackageController {
         }
     }
 
+    // Amenite -Update
     @Post('amenities/update')
     @UseInterceptors(
       FileFieldsInterceptor(
@@ -147,7 +159,40 @@ export class PackageController {
         }
     }
 
+    // pkg day's 
 
+    @Post('pkgday/add')
+    async addPkgday(@Res() res:Response,@Req() req:Request,@Body() body:CreatePackageDayDto){
+        try{
+            const result = await this.packageService.addPkgDay(body);
+            return this.responseHandlerService.sendSuccessResponse(res,result);
+        }catch(error){
+            console.log("Add pkg Day Error",error);
+            return this.responseHandlerService.sendErrorResponse(res,error);
+        }
+    }
+
+    @Get('pkgday/list')
+    async getPkgdaylist(@Res() res:Response){
+        try{
+            const  result = await this.packageService.getPkgDayList();
+            return this.responseHandlerService.sendSuccessResponse(res,result);
+        }catch(error){
+            console.log("Get pkg Day List Error",error);
+            throw error;
+        }
+    }
+
+    @Post('pkgday/update')
+    async updatePkgday(@Req() req:Request, @Res() res:Response,@Query() query: PkgIdParams, @Body() body:UpdatePackageDayDto){
+        try{
+            const result = await this.packageService.updatePkgDay(query.pkgday_id,body);
+            return this.responseHandlerService.sendSuccessResponse(res,result);
+        }catch(error){
+            console.log("Update Pkg Day Error",error);
+            throw error;
+        }
+    }
 
 
 }

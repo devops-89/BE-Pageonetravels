@@ -9,8 +9,10 @@ import { JwtService } from '../../../../libs/jwt-service/jwt.service';
 import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMiddleware';
 import { DBModule, User, UserRepositoryService } from '../../../../libs/database/src';
 import { PackageCategoryRepositoryService } from '../../../../libs/database/src/repositories/packagecategory.repository';
+import { PackageDayRepositoryService } from '../../../../libs/database/src/repositories/packageday.repository';
 import { PackageCategory } from '../../../../libs/database/src/entities/packageCategory.entity'; // Make sure to import your entity
 import { PackageAmenite } from '../../../../libs/database/src/entities/packageAmenite.entity'; // Make sure to import your entity
+import { PackageDay } from '../../../../libs/database/src/entities/packageDay.entity'; // Make sure to import your entity
 import { PackageAmeniteRepositoryService } from '../../../../libs/database/src/repositories/packageamenite.repository';
 @Module({
   imports: [
@@ -19,6 +21,7 @@ import { PackageAmeniteRepositoryService } from '../../../../libs/database/src/r
       User,
       PackageCategory, // Register your entity here
       PackageAmenite,
+      PackageDay,
     ]),
     ConfigModule,
     ResponseHandlerModule,
@@ -32,6 +35,7 @@ import { PackageAmeniteRepositoryService } from '../../../../libs/database/src/r
     JwtService,
     TokenValidationMiddleware,
     PackageAmeniteRepositoryService,
+    PackageDayRepositoryService,
   ],
   exports: [PackageService], // Export if needed by other modules
 })
