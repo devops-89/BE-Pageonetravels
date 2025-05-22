@@ -58,8 +58,8 @@ export class CreatePackageDto {
   @IsString()
   package_slug: string;
 
-  @IsNumber()
-  package_day: number;
+  @IsString()
+  package_day: string;
 
   @IsNumber()
   package_no_of_person: number;

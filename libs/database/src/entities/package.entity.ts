@@ -43,7 +43,7 @@ export class Package {
   package_slug: string;
 
   @Column()
-  package_day: number;
+  package_day: string;
 
   @Column()
   package_no_of_person: number;

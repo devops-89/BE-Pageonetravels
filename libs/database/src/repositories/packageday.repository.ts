@@ -66,4 +66,18 @@ export class PackageDayRepositoryService {
     }
     
 
+    async findDayExist(pkddayduartion:string){
+        try{
+            const result = await this.pkdDayRepository.findOne({where: { pkgday_duration: pkddayduartion }});
+            if(!result){
+                throw {message:`package day's not Match`, statusCode: ERROR_CODES.BAD_REQUEST }
+            }
+            return result;
+        }catch(error){
+            console.log(error);
+            throw error;
+        }
+    }
+
+
 }
