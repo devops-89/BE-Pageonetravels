@@ -4,6 +4,7 @@ import { CreatePackageCategoryDto , UpdatePackageCategoryDto } from '../../../..
 import { PackageCategoryRepositoryService } from '../../../../libs/database/src/repositories/packagecategory.repository';
 import { PackageAmeniteRepositoryService } from '../../../../libs/database/src/repositories/packageamenite.repository';
 import { PackageDayRepositoryService } from '../../../../libs/database/src/repositories/packageday.repository';
+import { PackageRepositoryService } from '../../../../libs/database/src/repositories/package.repository';
 import { CreatePackageAmeniteDto , UpdatePackageAmeniteDto } from '../../../../libs/dtos/package/package-amenites.dto';
 import { CreatePackageDayDto, UpdatePackageDayDto } from '../../../../libs/dtos/package/package-days.dto';
 
@@ -13,9 +14,24 @@ export class PackageService {
     constructor(
         private readonly UserModel: UserRepositoryService,
         private readonly packageDayRepositoryService: PackageDayRepositoryService,
+        private readonly packageRepositoryService:PackageRepositoryService,
         private readonly packageCategoryRepositoryService:PackageCategoryRepositoryService,
         private readonly packageAmeniteRepositoryService:PackageAmeniteRepositoryService
     ){}
+
+
+    // Create Package 
+
+    async createPackage(body){
+        try{ 
+            const result = await this.packageRepositoryService.insertPackage(body);
+            return {message:`Package Created Successfully.`,data:result}
+        }catch(error){
+            console.log("Create Package Service Error...",error);
+            throw error;
+        }
+    }
+
 
     
     // add-category

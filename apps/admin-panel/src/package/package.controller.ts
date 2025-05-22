@@ -3,6 +3,7 @@ import { PackageService } from "./package.services";
 import { CreatePackageCategoryDto,UpdatePackageCategoryDto } from '../../../../libs/dtos/package/package-category.dto';
 import { CreatePackageAmeniteDto , UpdatePackageAmeniteDto ,AmeniteIdParams } from '../../../../libs/dtos/package/package-amenites.dto';
 import { CreatePackageDayDto, PkgIdParams ,UpdatePackageDayDto } from '../../../../libs/dtos/package/package-days.dto';
+import { CreatePackageDto } from '../../../../libs/dtos/package/package-create.dto';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { imageFileFilter } from '../../../../libs/utils/fileUpload';
@@ -17,12 +18,14 @@ export class PackageController {
 
 
     @Post('create')
-    async addPackage(@Res() res:Response,@Req() req:Request,@Body() body:any)
+    async addPackage(@Res() res:Response,@Req() req:Request,@Body() body:CreatePackageDto)
     {
         try{
-            console.log("Create Package",body);
+            const result = await this.packageService.createPackage(body);
+            // return this.responseHandlerService.sendSuccessResponse(res,result);
         }catch(error){
             console.log("Create Package Error",error);
+            return this.responseHandlerService.sendErrorResponse(res,error);
         }
     } 
 
@@ -193,6 +196,7 @@ export class PackageController {
             throw error;
         }
     }
+
 
 
 }

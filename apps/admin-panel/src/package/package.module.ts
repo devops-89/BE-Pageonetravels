@@ -10,9 +10,11 @@ import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMidd
 import { DBModule, User, UserRepositoryService } from '../../../../libs/database/src';
 import { PackageCategoryRepositoryService } from '../../../../libs/database/src/repositories/packagecategory.repository';
 import { PackageDayRepositoryService } from '../../../../libs/database/src/repositories/packageday.repository';
+import { PackageRepositoryService } from '../../../../libs/database/src/repositories/package.repository';
 import { PackageCategory } from '../../../../libs/database/src/entities/packageCategory.entity'; // Make sure to import your entity
 import { PackageAmenite } from '../../../../libs/database/src/entities/packageAmenite.entity'; // Make sure to import your entity
 import { PackageDay } from '../../../../libs/database/src/entities/packageDay.entity'; // Make sure to import your entity
+import { Package } from '../../../../libs/database/src/entities/package.entity'; // Make sure to import your entity
 import { PackageAmeniteRepositoryService } from '../../../../libs/database/src/repositories/packageamenite.repository';
 @Module({
   imports: [
@@ -22,6 +24,7 @@ import { PackageAmeniteRepositoryService } from '../../../../libs/database/src/r
       PackageCategory, // Register your entity here
       PackageAmenite,
       PackageDay,
+      Package,
     ]),
     ConfigModule,
     ResponseHandlerModule,
@@ -36,6 +39,7 @@ import { PackageAmeniteRepositoryService } from '../../../../libs/database/src/r
     TokenValidationMiddleware,
     PackageAmeniteRepositoryService,
     PackageDayRepositoryService,
+    PackageRepositoryService,
   ],
   exports: [PackageService], // Export if needed by other modules
 })
