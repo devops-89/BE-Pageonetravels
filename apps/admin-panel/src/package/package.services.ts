@@ -25,13 +25,24 @@ export class PackageService {
     async createPackage(body){
         try{ 
             const result = await this.packageRepositoryService.insertPackage(body);
-            return {message:`Package Created Successfully.`,data:result}
+            return {message:`Package Created Successfully.`,data:result};
         }catch(error){
             console.log("Create Package Service Error...",error);
             throw error;
         }
     }
 
+    // Get Package List
+
+    async getPackage(){
+        try{
+            const result = await this.packageRepositoryService.getPackageList();
+            return {message:`Package list fetch Successfully.`,data:result}
+        }catch(error){
+            console.log("Package list service Error",error);
+            throw error;
+        }
+    }
 
     
     // add-category

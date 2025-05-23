@@ -22,7 +22,7 @@ export class PackageController {
     {
         try{
             const result = await this.packageService.createPackage(body);
-            // return this.responseHandlerService.sendSuccessResponse(res,result);
+            return this.responseHandlerService.sendSuccessResponse(res,result);
         }catch(error){
             console.log("Create Package Error",error);
             return this.responseHandlerService.sendErrorResponse(res,error);
@@ -32,9 +32,11 @@ export class PackageController {
     @Get('list')
     async getPackageList(@Res() res:Response,@Req() req:Request){
         try{
-            console.log("Package List");
+            const result = await this.packageService.getPackage();
+            return this.responseHandlerService.sendSuccessResponse(res,result);
         }catch(error){
             console.log("Get Package List Error",error);
+            return this.responseHandlerService.sendErrorResponse(res,error);
         }
     }
     
@@ -44,8 +46,10 @@ export class PackageController {
     {
         try{
             console.log("Update Package",body);
+            
         }catch(error){
             console.log("Update Package Error",error);
+            return this.responseHandlerService.sendErrorResponse(res,error);
         }
     }    
 

@@ -67,4 +67,26 @@ export class PackageAmeniteRepositoryService {
         }
     }
 
+
+    async checkAmenite(amenite:any){
+        try{
+            let arr = [];
+            for(let i = 0; i < amenite.length; i++){
+                const existingAmenites = await this.pkgAmeniteRepository.findOne({
+                    where: { amenite_name: amenite[i] }
+                });
+                if(!existingAmenites){
+                    throw { message: "Amenites Not Exist. Please Provide Correct Amenites.", statusCode: ERROR_CODES.BAD_REQUEST };
+                }
+                arr.push(existingAmenites);
+            }
+
+            return arr;
+
+        }catch(error){
+            console.log(">>>>",error);
+            throw error;
+        }
+    }
+
 }

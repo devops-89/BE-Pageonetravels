@@ -116,7 +116,6 @@ export class HotelRepositoryService {
             const originalNames = upload.map(file =>file.path).join(', ');
             updateData.gallery_images = originalNames;
         }
-
         // Update the hotel
         await this.hotelRepo.update(hotel_id, updateData);
         
@@ -139,6 +138,16 @@ export class HotelRepositoryService {
     async getAllHotel(){
         try{
             const hotel = await this.hotelRepo.find();
+            return hotel;
+        }catch(error){
+            console.log(error);
+            throw error;
+        }
+    }
+
+    async getSingleHotel(hotel_id:string){
+        try{
+            const hotel = await this.hotelRepo.findOne({where: { hotel_id: hotel_id }});
             return hotel;
         }catch(error){
             console.log(error);

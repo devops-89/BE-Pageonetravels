@@ -15,14 +15,13 @@ export class PackageCategoryRepositoryService {
 
     async insertCategory(input:InsertCategory){
         try{
-
-            const mainImage = input.category_image.path;
-
+            
+            const mainImage = input.category_image[0].path;
+            
             const details = this.pkgCatRepository.create({
                 category_name : input.category_name,
                 category_image : mainImage
             });
-    
             const result = await this.pkgCatRepository.save(details);
             return result;
         }catch(error){
@@ -70,6 +69,20 @@ export class PackageCategoryRepositoryService {
         }
     }
 
+    async findCategory(package_type:string){
+        try{
+            console.log(">>>>>>>>>>>",package_type);
+            const result = await this.pkgCatRepository.findOne({where: { category_name : package_type }});
+            console.log(">>>>>>>>",result);
+            if(!result){
+                throw {message:`package category not Match`, statusCode: ERROR_CODES.BAD_REQUEST }
+            }
+            return result;
+        }catch(error){
+            console.log("Error in Category Repository.",error);
+            throw error;
+        }
+    }
   
 
 }

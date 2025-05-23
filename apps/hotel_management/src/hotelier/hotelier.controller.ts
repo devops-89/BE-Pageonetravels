@@ -83,6 +83,7 @@ export class HotelierController {
             }
 
             if(payload.user_type === "HOTEL"){
+                
                 const result = await this.hotelierService.updateHotel(payload.reference_id,hotel_id, body);
                 return this.responseHandlerService.sendSuccessResponse(res, result);
             }else{
@@ -115,7 +116,27 @@ export class HotelierController {
         }
     }
 
+    @Get("fetch-hotel")
+    @UseGuards(TokenValidationGuard)
+    async getHotelById(@Req() req:Request,@Res() res:Response,@Query('hotel_id') hotel_id: string){
+        try{
+           const payload: JWTPayload=req['userPayload'];
+            
+            if(!payload){
+                throw { message: "Please provide a valid Token.", statusCode: ERROR_CODES.BAD_REQUEST };
+            }
 
+            if(payload.user_type === "HOTEL"){
+                const result = await this.hotelierService.fetchHotelById(hotel_id);
+                return this.responseHandlerService.sendSuccessResponse(res, result);
+            }else{
+                throw { message: "Please provide a valid Token.", statusCode: ERROR_CODES.BAD_REQUEST };
+            }
+        }catch(error){
+            console.log("Error in Fetch hotel",error);
+            return this.responseHandlerService.sendErrorResponse(res, error);
+        }
+    }
 
 
 

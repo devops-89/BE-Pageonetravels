@@ -190,4 +190,14 @@ export class HotelierService {
         }
     }
 
+    async fetchHotelById(hotel_id:string){
+        try{
+            const result = await this.hotelRepositoryService.getSingleHotel(hotel_id);
+            return {message: `Hotel Fetch Successfully`,data:result}
+        }catch(error){
+            console.log(error);
+            throw error;
+        }
+    }
+
 }
