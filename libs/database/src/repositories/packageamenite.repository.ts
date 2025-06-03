@@ -16,12 +16,11 @@ export class PackageAmeniteRepositoryService {
 
       async insetAmenites(input:InsertAmenites){
         try{
-            const mainImage = input.amenite_image.path;
+            const mainImage = input.amenite_image[0].path;
             const details = this.pkgAmeniteRepository.create({
                 amenite_name : input.amenite_name,
                 amenite_image : mainImage
             });
-    
             const result = await this.pkgAmeniteRepository.save(details);
             return result;
         }catch(error){
@@ -57,7 +56,7 @@ export class PackageAmeniteRepositoryService {
             const updatedAmenites = await this.pkgAmeniteRepository.save({
                                         ...existingAmenites,
                                         amenite_name: body.amenite_name,
-                                        ...(body.amenite_image?.path && { amenite_image: body.amenite_image.path }),
+                                        ...(body.amenite_image?.path && { amenite_image: body.amenite_image[0].path }),
                                     });
 
             return updatedAmenites;

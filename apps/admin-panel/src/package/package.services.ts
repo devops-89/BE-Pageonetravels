@@ -20,6 +20,28 @@ export class PackageService {
     ){}
 
 
+    // get Data list Package
+    async getPkgListData() {
+        try {
+            const totalAmenites = await this.packageAmeniteRepositoryService.getAllAmenites();
+            const totalCateogry = await this.packageCategoryRepositoryService.getAllCategory();
+            const totalDays = await this.packageDayRepositoryService.getDayFetch();
+            const data = {
+                amenites: totalAmenites,
+                category: totalCateogry,
+                days: totalDays
+            };
+
+            return {
+                message: `All Package Days, Amenites, Category`,
+                data: data
+            };
+        } catch(error) {
+            console.log(error);
+            throw error;
+        }
+    }
+
     // Create Package 
 
     async createPackage(body){
@@ -44,6 +66,15 @@ export class PackageService {
         }
     }
 
+    async pkgUpdate(id,body:any){
+        try{    
+            const result = await this.packageRepositoryService.getPackageUpdate(id,body);
+            return {message:`Package Updated Successfully.`,data:result};
+        }catch(error){
+            console.log("Package Update Service Error...",error);
+            throw error;
+        }
+    }
     
     // add-category
     async addCategory(input: CreatePackageCategoryDto){
@@ -102,7 +133,7 @@ export class PackageService {
     async updateAmenites(amenite_id,body:UpdatePackageAmeniteDto){
         try{
             const result = await this.packageAmeniteRepositoryService.updateAmenites(amenite_id,body);
-            return {message:`Package Amenites Updated Successfully.`}
+            return {message:`Package Amenites Updated Successfully.`,data:result}
         }catch(error){
             console.log(error);
             throw error;

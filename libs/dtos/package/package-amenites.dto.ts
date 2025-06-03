@@ -14,7 +14,6 @@ export class CreatePackageAmeniteDto {
     amenite_name: string;
 
     @IsNotEmpty()
-    @IsString()
     amenite_image: CustomFile;
 }
 
@@ -24,7 +23,6 @@ export class UpdatePackageAmeniteDto {
     amenite_name?: string;
 
     @IsOptional()
-    @IsString()
     amenite_image?: CustomFile;
 }
 

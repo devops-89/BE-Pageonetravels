@@ -8,6 +8,7 @@ import {
   IsObject,
   IsNotEmptyObject,
   IsNotEmpty,
+  IsUUID,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -117,4 +118,11 @@ export class CreatePackageDto {
   @IsArray()
   @IsOptional()
   amenities?: string[];
+}
+
+
+export class PkgId {
+   @IsUUID('4')
+   @IsNotEmpty()
+   id: string;
 }

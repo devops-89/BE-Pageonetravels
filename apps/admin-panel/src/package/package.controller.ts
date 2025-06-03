@@ -3,7 +3,7 @@ import { PackageService } from "./package.services";
 import { CreatePackageCategoryDto,UpdatePackageCategoryDto } from '../../../../libs/dtos/package/package-category.dto';
 import { CreatePackageAmeniteDto , UpdatePackageAmeniteDto ,AmeniteIdParams } from '../../../../libs/dtos/package/package-amenites.dto';
 import { CreatePackageDayDto, PkgIdParams ,UpdatePackageDayDto } from '../../../../libs/dtos/package/package-days.dto';
-import { CreatePackageDto } from '../../../../libs/dtos/package/package-create.dto';
+import { CreatePackageDto ,PkgId } from '../../../../libs/dtos/package/package-create.dto';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { imageFileFilter } from '../../../../libs/utils/fileUpload';
@@ -16,6 +16,16 @@ export class PackageController {
         private readonly responseHandlerService: ResponseHandlerService
     ){}
 
+    @Get('pkglistdata')
+    async getPkgListData(@Res() res:Response,@Req() req:Request){
+        try{
+            const result = await this.packageService.getPkgListData();
+            return this.responseHandlerService.sendSuccessResponse(res,result);
+        }catch(error){
+            console.log("Error in find Pkd All List",error);
+            return this.responseHandlerService.sendErrorResponse(res,error);
+        }
+    }
 
     @Post('create')
     async addPackage(@Res() res:Response,@Req() req:Request,@Body() body:CreatePackageDto)
@@ -42,11 +52,12 @@ export class PackageController {
     
     
     @Post('update')
-    async updatePackage(@Res() res:Response,@Req() req:Request,@Body() body:any)
+    async updatePackage(@Res() res:Response,@Query() id: PkgId,@Req() req:Request,@Body() body:any)
     {
         try{
-            console.log("Update Package",body);
             
+            const result = await this.packageService.pkgUpdate(id.id,body);
+            // return this.responseHandlerService.sendSuccessResponse
         }catch(error){
             console.log("Update Package Error",error);
             return this.responseHandlerService.sendErrorResponse(res,error);

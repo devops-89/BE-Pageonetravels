@@ -5,6 +5,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { PackageAmeniteRepositoryService } from '../../../../libs/database/src/repositories/packageamenite.repository';
 import { PackageCategoryRepositoryService } from '../../../../libs/database/src/repositories/packagecategory.repository';
 import { PackageDayRepositoryService } from '../../../../libs/database/src/repositories/packageday.repository';
+import { ERROR_CODES } from "../../../../libs/constants/commonConstants";
 
 @Injectable()
 export class PackageRepositoryService {
@@ -51,7 +52,7 @@ export class PackageRepositoryService {
                     status:body.status,
                     highlight:body.highlight
            });
-
+           console.log(">>>>>>>>>>>>@#$@#$ ...",pkgData);
            const result = await this.pkgRepository.save(pkgData);
             return result;
         }catch(error){
@@ -71,4 +72,18 @@ export class PackageRepositoryService {
         }
     }
 
+    async getPackageUpdate(id,body:any){
+        try{
+            const existingPackage = await this.pkgRepository.findOne({ where: { id: id }  });
+            if (!existingPackage) {
+                throw { message: "Please provide a valid Package ID.", statusCode: ERROR_CODES.BAD_REQUEST };
+            }
+            return existingPackage;
+        }catch(error){
+            console.log("Package Update Repository Error.",error);
+            throw error;
+        }
+    }
+
 }
+

@@ -14,7 +14,7 @@ export class HotelierController {
     async hotelierLogin(@Req() req: Request, @Res() res: Response, @Body() body:RegisterDto){
         try{
             console.log(">>>>>>>",body);
-            const result = await this.authService.registerWithEmailPassword(body);
+            //const result = await this.authService.registerWithEmailPassword(body);
         }catch(error){
             console.log(error);
             return  this.responseHandlerService.sendErrorResponse(res,error);
