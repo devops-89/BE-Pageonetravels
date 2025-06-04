@@ -13,7 +13,13 @@ export * from './flightticket.repository';
 export * from './hotelCountry.repository';
 export * from './hotelCity.repository';
 export * from './hotelDetails.repository';
+export * from './hotel.repository';
+export * from './hotelRoom.repository';
 export * from './enquiry-repository';
+export * from './package.repository';
+export * from './packageamenite.repository';
+export * from './packagecategory.repository';
+export * from './packageday.repository';
 
 export * from './header.repository';
 export * from './banner.repository';

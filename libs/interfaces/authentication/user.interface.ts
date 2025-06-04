@@ -74,6 +74,8 @@ export declare namespace UserI {
         loginSource?:USER_LOGIN_SOURCE,
     }
 
+    
+
     interface InsertDefaultUser 
     {
         email: string,

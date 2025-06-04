@@ -7,7 +7,7 @@ import { AppService } from './app.service';
     imports: [
 
 
-        TypeOrmModule.forFeature([Enquiry],),
+       // TypeOrmModule.forFeature([Enquiry],),
 
     ],
     

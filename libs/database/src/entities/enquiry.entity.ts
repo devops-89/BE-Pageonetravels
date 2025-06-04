@@ -9,7 +9,6 @@ export enum EnquiryType {
     SELF_DRIVE= "Self Drive",
     OUTSTATION_CABS="Outstation Cabs",
     ACTIVITIE= "Activities",
-  
 }
 
 @Entity('enquiry')
