@@ -1,18 +1,21 @@
-import { Controller, Res, Get, Post, Body, Req } from '@nestjs/common';
+import { Controller, Res, Get, Post, Body, Req, UseGuards } from '@nestjs/common';
 import { SearchHotelService } from './search-hotel.service';
 // import { HotelSearchDto } from '../../../../libs/dtos/hotel/search-hotel.dto';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { GenerateTokenService } from './generateToken.service';
+import { UserRepositoryService } from '../../../../libs/database/src';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 import { HotelSearchRequestDto , BookingDto } from '../../../../libs/dtos/hotel/search-hotel.dto';
 import { CreateHotelBookingDto,CreateBookingDto } from '../../../../libs/dtos/hotel/hotel-booking.dto';
+import {TokenValidationGuard} from '../../../../libs/middlewares/authMiddleware.guard';
 
 @Controller('/hotel') 
 export class SearchHotelController { 
   constructor( 
     private readonly searchHotelService: SearchHotelService,
     private readonly responseHandler: ResponseHandlerService,
-    private readonly generateTokenService: GenerateTokenService
+    private readonly generateTokenService: GenerateTokenService,
+    private readonly userRepositoryService: UserRepositoryService
   ) { } 
    
   @Get('/country-list') 
@@ -138,9 +141,17 @@ export class SearchHotelController {
 
 
   @Post('/hotelBooking')
+  @UseGuards(TokenValidationGuard)
   async hotelBooking(@Req() req:Request, @Res() res:Response, @Body() body:CreateHotelBookingDto){
     try{
-      const result = await this.searchHotelService.bookingHotel(body);
+      const payload = req['userPayload'];
+      console.log(payload);
+      const {reference_id}= payload;
+      const refData = await this.userRepositoryService.getUserByUserId(reference_id);
+      if(!refData){
+          throw (`An error occurred while fetching the user. Please try again later.`);
+      }
+      const result = await this.searchHotelService.bookingHotel(body,reference_id);
       console.log("??????",result);
       
       // return this.responseHandler.sendSuccessResponse(res, result);

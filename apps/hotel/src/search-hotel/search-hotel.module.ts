@@ -12,6 +12,14 @@ import { SearchHotelService } from './search-hotel.service';
 import { SearchHotelController } from './search-hotel.controller';
 import { HotelTBOAPIService } from '../../../../libs/http-api-service/hoteltbo-api-service';
 
+
+import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
+import { RazorpayModule } from '../../../../libs/paymentgateway/razorpay.module'
+import { RazorpayService } from "../../../../libs/paymentgateway/razorpay.service";
+import { JwtService } from '../../../../libs/jwt-service/jwt.service';
+import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMiddleware';
+
+
 @Module({
     imports:[
         DBModule.forRoot(),
@@ -24,8 +32,9 @@ import { HotelTBOAPIService } from '../../../../libs/http-api-service/hoteltbo-a
             SettingRepositoryService,
             SearchRepositoryService
         ]),
+        RazorpayModule,
     ],
     controllers: [SearchHotelController],
-    providers: [SearchHotelService, GenerateTokenService, TBO_CredentialsService, HotelTBOAPIService],
+    providers: [SearchHotelService, GenerateTokenService, TBO_CredentialsService, HotelTBOAPIService,HTTPSTboAPIService, RazorpayService,JwtService,TokenValidationMiddleware ],
 })
 export class SearchHotelModule {}

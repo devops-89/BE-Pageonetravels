@@ -7,6 +7,7 @@ import { HotelCountryRepositoryService } from "../../../../libs/database/src/rep
 import { CommissionRepositoryService } from "../../../../libs/database/src/repositories/commission.repository";
 import { HotelDetailsRepositoryService } from "../../../../libs/database/src/repositories/hotelDetails.repository";
 import { HotelCityRepositoryService } from "../../../../libs/database/src/repositories/hotelCity.repository";
+import { OrderRepositoryService } from "../../../../libs/database/src";
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 import { COMMISSION_TYPE } from '../../../../libs/constants/autenticationConstants/userContants';
 import { CreateHotelBookingDto ,CreateBookingDto } from '../../../../libs/dtos/hotel/hotel-booking.dto';
@@ -20,6 +21,7 @@ export class SearchHotelService {
     private readonly hotelTBOAPIService: HotelTBOAPIService,
     private readonly commissionRepositoryService: CommissionRepositoryService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly orderRepository: OrderRepositoryService,
     private readonly hotelCountryRepositoryService: HotelCountryRepositoryService,
     private readonly hotelDetailsRepositoryService: HotelDetailsRepositoryService,
     private readonly hotelCityRepositoryService: HotelCityRepositoryService,
@@ -259,20 +261,21 @@ export class SearchHotelService {
     }
   }
 
-  async bookingHotel(body:CreateHotelBookingDto){
+  async bookingHotel(body:CreateHotelBookingDto,reference_id:string){
     try{ 
       console.log(">>>",body);
       const order_type = "HOTEL";
-            const amount = 10;
+            const amount = "10";
             const is_LCC = "";
             const journey = "";
             const journey_type = "";
-            const commissionType : {
-              commission_type: "FIXED",
-              percentage:5
+            let commissionType: {
+              "commission_type": "FIXED",
+              "percentage": "350.00"
             }
-            
-      await this.orderRepository.insertBooking(reference_id,order_type,body,amount,is_LCC,journey,journey_type,commissionType.commission_type,commissionType.percentage);
+            console.log(commissionType);
+            const result  = await this.orderRepository.insertBooking(reference_id,order_type,body,amount,is_LCC,journey,journey_type,"FIXED","350.00");
+            console.log(">>>>>>>>>>>",result);
       
       // const url = 'https://HotelBE.tektravels.com/hotelservice.svc/rest/book/';
       // const result = await this.hotelTBOAPIService.hotelBook(url,body);

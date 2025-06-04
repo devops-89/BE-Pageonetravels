@@ -33,6 +33,7 @@ export class FlightService {
         try{ 
             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
             const payload = JSON.parse(order_request);
+            console.log(">>>>>>>>>  hello",payload);
             const userDetails = await this.userRepositoryService.getUserByUserId(user);
             
             const payloadSecond = JSON.parse(order_request_second);

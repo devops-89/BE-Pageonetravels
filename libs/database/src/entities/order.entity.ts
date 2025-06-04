@@ -44,10 +44,10 @@ export class Order {
     @IsString()
     journey: string;
 
-    @Column({ type: 'boolean' })
+    @Column({ type: 'boolean', nullable: true }) // <- important!
     @IsBoolean()
-    @IsNotEmpty()
-    isLCC: boolean; 
+    @IsOptional()
+    isLCC?: boolean;
 
     @Column({ type: 'boolean', nullable: true })
     @IsBoolean()

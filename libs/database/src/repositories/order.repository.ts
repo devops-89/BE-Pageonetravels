@@ -48,6 +48,32 @@ export class OrderRepositoryService {
             });
             
             return order;
+        }else if(order_type == ORDER_TYPE.HOTEL){
+            var orderId = `${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 999)}-${Math.floor(1000 + Math.random() * 9000)}`;
+            const newOrder = this.orderRepository.create({
+                custom_order_id : orderId, 
+                commission_type: commtype,
+                commission: commpercentage,
+                order_type:order_type,
+                journey_type : journey_type,
+                journey: journey,
+                order_request: payload,
+                user: { id: reference_id },  // Correct way to assign a relation
+                amount: amount,
+                status: ORDER_STATUS.INIT
+            });
+            console.log(">>>>>>>>>>>>kkk",newOrder);
+            // Save the order to the database and get the inserted ID
+            const savedOrder = await this.orderRepository.save(newOrder);
+
+            // Fetch the saved order with its relations (e.g., related user)
+            let order = await this.orderRepository.findOne({
+                where: { custom_order_id: savedOrder.custom_order_id },
+                select: ["custom_order_id","amount"], // Select only relevant fields
+            });
+            
+            return order;
+            
         }
         }catch(error){
             console.log("save Booking API Database into database...error",error);
