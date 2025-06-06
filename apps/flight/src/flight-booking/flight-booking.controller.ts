@@ -75,7 +75,7 @@ export class FlightBookingController {
 
 
     
-
+    // Not Usefull
     @Post('/ticket')
     async flighticketAfterBooking(@Res() res: Response, @Body() body: TicketDto) {
         try {
