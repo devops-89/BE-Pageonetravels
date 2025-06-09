@@ -5,7 +5,7 @@ import { Package } from "./package.entity";
 export class PackageDay {
 
     @PrimaryGeneratedColumn('uuid')
-    pkgday_id:string
+    pkgday_id:string;
 
     @Column({ nullable: false })
     pkgday_duration: string;

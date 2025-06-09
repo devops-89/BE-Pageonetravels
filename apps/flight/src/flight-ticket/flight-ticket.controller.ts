@@ -29,6 +29,7 @@ export class FlightTicketController {
                 throw (`An error occurred while fetching the user. Please try again later.`);
             }
             const result = await this.flightTicketService.directTicket(reference_id,body);
+            console.log(result);
             return this.responsehandlderservice.sendSuccessResponse(res,result);
 
         }catch(error){

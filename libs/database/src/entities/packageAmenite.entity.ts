@@ -5,7 +5,7 @@ import { Package } from "./package.entity";
 export class PackageAmenite {
 
     @PrimaryGeneratedColumn('uuid')
-    amenite_id:string
+    amenite_id:string;
 
     @Column({ nullable: false })
     amenite_name: string;

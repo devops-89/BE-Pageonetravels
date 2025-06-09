@@ -5,7 +5,7 @@ import { Package } from "./package.entity";
 export class PackageCategory {
 
     @PrimaryGeneratedColumn('uuid')
-    category_id:string
+    category_id:string;
 
     @Column({ nullable: false })
     category_name: string;
