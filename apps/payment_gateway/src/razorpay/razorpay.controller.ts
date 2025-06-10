@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { UserRepositoryService } from '../../../../libs/database/src/repositories/user.repository';
-import { LccTicketDto,VerifyDto } from '../../../../libs/dtos/flight/flight-ticket.dto';
+import { LccTicketDto } from '../../../../libs/dtos/flight/flight-ticket.dto';
 import { TokenValidationGuard } from '../../../../libs/middlewares/authMiddleware.guard';
 import { RazorpayService } from './razorpay.service';
 

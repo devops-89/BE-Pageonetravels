@@ -12,6 +12,7 @@ import { User } from './user.entity';
 import { HotelRoom } from './hotel-room.entity';
 import { IsBoolean, IsObject } from 'class-validator';
 
+
 export class AmenitiesDto {
   @IsBoolean()
   wifi: boolean;
