@@ -130,7 +130,7 @@ export class User {
 
 
   @OneToMany(() => Hotel, hotel => hotel.user)
-  @JoinColumn({ name: "user_id"})
+  @JoinColumn({ name: "hotel_id"})
   hotels: Hotel[];  // ← relation to Hotel
   
   @OneToMany(() => LoginSession, session => session.user)
