@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
-import { Hotel } from "../entities";
+import { Hotel } from "../entities/hotel.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import {ICreateHotel} from '../../../../libs/interfaces/ourHotel/hotel.interface';
 import { ERROR_CODES } from "../../../../libs/constants/commonConstants";
@@ -38,7 +38,7 @@ export class HotelRepositoryService {
             cancellation_policy : input.cancellation_policy,
             child_policy : input.child_policy,
             pet_policy : input.pet_policy,
-            main_image : mainImage,
+            main_image : "https://example.com/images/hotel-main.jpg",
             gallery_images : originalNames,
             base_price : input.base_price,
             tax_percentage : input.tax_percentage,

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, Post,Get, Req, Res } from "@nestjs/common";
 import { HotelierService } from './hotelier.services';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { RegisterDto } from '../../../../libs/dtos/authentication/user.dto';
@@ -19,6 +19,17 @@ export class HotelierController {
         } catch (error) {
            return this.responsehandlderservice.sendErrorResponse(res, error);
         }
+    }
+
+    @Get("/gethotliers")
+    async getHotliers(@Req() req:Request,@Res() res:Response){
+         try{
+           const hotliers=await this.hotelierService.getAllHotliers();
+           return this.responsehandlderservice.sendSuccessResponse(res,hotliers);
+         }
+         catch(error){
+            return this.responsehandlderservice.sendErrorResponse(res,error);
+         }
     }
 
 }
