@@ -129,9 +129,9 @@ export class User {
   passenger: Passenger 
 
 
-  @OneToMany(() => Hotel, hotel => hotel.user)
-  @JoinColumn({ name: "user_id"})
-  hotels: Hotel[];  // ← relation to Hotel
+  // @OneToMany(() => Hotel, hotel => hotel.user)
+  // @JoinColumn({ name: "hotel_id"})
+  // hotels: Hotel[];  // ← relation to Hotel
   
   @OneToMany(() => LoginSession, session => session.user)
   login_sessions: LoginSession[];

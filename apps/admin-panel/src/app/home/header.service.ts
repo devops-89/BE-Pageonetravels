@@ -45,7 +45,6 @@ export class HeaderService {
         }
     }
 
-    
 
     async updateHeader(payload:JWTPayload,headerDto:UpdateHeaderDto,files){
         try{

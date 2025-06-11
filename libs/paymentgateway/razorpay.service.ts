@@ -65,7 +65,7 @@ export class RazorpayService {
           // Make the API request to create the payment link
           // console.log(">>>>",paymentLinkData);
           const response = await this.razorpay.paymentLink.create(paymentLinkData);
-          
+          // console.log(">>>>>>>>>>>>>>> >response i",response);
           return response; // The response will contain a URL that can be shared with the customer
         } catch (error) {
           throw { message: error.error.description, statusCode: error.statusCode };

@@ -12,12 +12,14 @@ export class AppController {
     ) {}
 
     @Post()
-   async createAEnquiry(@Body() body: any, @Res() res: Response,) {
+   async createAEnquiry(@Body() body: any, @Res() res: Response) {
         
        await this.appService.createAEnquiry(body);
        return this.responseHandler.sendSuccessResponse(res, { statusCode: 200, success: true });
         // return { message: undefined };
     }
+
+    
 
     @Get()
     async getEnquiry(@Res() res: Response,@Query('enquiryType') enquiryType?: string ){

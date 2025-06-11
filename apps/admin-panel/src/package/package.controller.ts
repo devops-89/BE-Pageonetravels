@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Req, Res, UploadedFiles, UseInterceptors, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Get,  Post, Query, Req, Res, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { PackageService } from "./package.services";
 import { CreatePackageCategoryDto,UpdatePackageCategoryDto } from '../../../../libs/dtos/package/package-category.dto';
 import { CreatePackageAmeniteDto , UpdatePackageAmeniteDto ,AmeniteIdParams } from '../../../../libs/dtos/package/package-amenites.dto';
@@ -137,6 +137,7 @@ export class PackageController {
     ) 
     async addPkgAmenities(@Res() res:Response,@Req() req:Request,@Body() body:CreatePackageAmeniteDto , @UploadedFiles() files ){
         try{
+            // console.log(">>>>>>> amenite >",files);
             const result = await this.packageService.addAmenites(body);
             return this.responseHandlerService.sendSuccessResponse(res,result);
         }catch(error){

@@ -22,7 +22,7 @@ import { AddFestivalDto, UpdateFestivalDto } from '../../../../../libs/dtos/admi
 import { AddServiceDto, UpdateServiceDto } from '../../../../../libs/dtos/admin/service.dto';
 import { UpdateHeaderDto } from '../../../../../libs/dtos/admin/header.dto';
 import {TokenValidationGuard} from '../../../../../libs/middlewares/authMiddleware.guard';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { imageFileFilter } from '../../../../../libs/utils/fileUpload';
 import { ResponseHandlerService } from '../../../../../libs/response-handler/response-handler.service';
 import { TabService } from './tab.service';
@@ -49,7 +49,7 @@ private readonly testimonialService : TestimonialService,
 
 @Post('/header')
 @UseGuards(TokenValidationGuard)
-// @UseInterceptors(FileInterceptor('avatar',{fileFilter:imageFileFilter}))
+@UseInterceptors(FileInterceptor('avatar',{fileFilter:imageFileFilter}))
 @UseInterceptors(
   FileFieldsInterceptor(
     [

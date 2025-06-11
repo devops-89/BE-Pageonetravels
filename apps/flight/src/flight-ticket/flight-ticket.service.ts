@@ -33,6 +33,7 @@ export class FlightTicketService {
             }
             const paymentInput = { amount, currency, custom_order_id };
             const data = await this.razorpayservice.createPayment(paymentInput);
+            console.log(">>>>>>dddd",data);
             const orderSave  = await this.flightTicketService.insertOrder(data, {order_id: orderdetails.order_id , user :reference_id});
             return { message: "Order Created successfully", data: orderSave };
         }catch(error){

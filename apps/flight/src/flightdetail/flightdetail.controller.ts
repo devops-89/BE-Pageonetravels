@@ -12,7 +12,7 @@ export class FlightdetailController {
 
     @Post('/farerule')
     async FareRule(@Req() req: Request, @Res() res: Response,
-    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })) body: FlightRuleDto,) {
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })) body: FlightRuleDto) {
         try {
             const result = await this.flightdetailservice.FareRule(body);
             return this.responseHandler.sendSuccessResponse(res, result);
@@ -34,6 +34,8 @@ export class FlightdetailController {
         }
     }
 
+
+    // this is not userful
     @Post('/fetch_seat_meal_baggage_details')
     async FetchSeatMealBaggaeDetails(@Req() req: Request, @Res() res: Response,
     @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })) body: FlightDetailRequestDto,) {

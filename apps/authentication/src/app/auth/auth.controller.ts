@@ -161,7 +161,7 @@ export class AuthController {
 
     @Post('/signup_login_via_email')
     async emailSent(@Req() req:Request,@Res() res:Response,@Body(new ValidationPipe()) body: SignupLoginDTO){
-        try{
+        try{ 
             const result = await this.authService.loginWithEmail(body);
             return this.ResponseHandler.sendSuccessResponse(res,result);
         }catch(error){

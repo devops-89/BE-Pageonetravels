@@ -29,7 +29,7 @@ export class RazorpayService {
             if(checkOrder){
                 throw { message: "Payment record already exists for this order. Please initiate the process again.", statusCode: ERROR_CODES.BAD_REQUEST };
             }
-            console.log(checkOrder);
+            
             const orderAmount =  Math.round(parseFloat(orderdetails.amount) * 100);
             if(amount !==  orderAmount){
                 throw { message: "Amount not matched", statusCode: ERROR_CODES.BAD_REQUEST };

@@ -84,10 +84,8 @@ export class UserRepositoryService {
             };
             
             const user = await this.userRepository.findOne({ where: { email } });
-            console.log("########",user);
-            if (user) {
-                throw { message: "Email Already Exist.", statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
-            }
+            
+            
 
             return (user as any) || null;
         } catch (error) {
