@@ -126,9 +126,9 @@ export class Hotel {
   @Column({ type: 'uuid' })
   user_id: string;
 
-  // @ManyToOne(() => User, user => user.hotels, { onDelete: 'CASCADE' })
-  // @JoinColumn({ name: 'user_id' })
-  // user: User;
+  @ManyToOne(() => User, user => user.hotels, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
   @OneToMany(() => HotelRoom, (room) => room.hotel)
   rooms: HotelRoom[];
