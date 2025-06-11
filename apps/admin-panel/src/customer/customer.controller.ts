@@ -1,6 +1,6 @@
 import { Controller,Get,Req,Res } from '@nestjs/common';
 import { CustomerService } from './customer.service';
-import { ResponseHandlerService } from 'libs/response-handler/response-handler.service';
+import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 
 @Controller('customer')
 export class CustomerController {

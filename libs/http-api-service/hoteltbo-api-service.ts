@@ -4,7 +4,7 @@ import {  IHotelSearchPayload, IFareRule } from '../../libs/interfaces/hotel/sea
 import { HotelCountry } from '../../libs/interfaces/hotel/search.interface'; 
 import { HotelCityRepositoryService } from '../../libs/database/src/repositories/hotelCity.repository';
 import { HotelDetailsRepositoryService } from "../../libs/database/src/repositories/hotelDetails.repository";
-import { ERROR_CODES } from '../../libs/constants/commonConstants';
+import { ERROR_CODES } from '../constants/commonConstants';
 import { CommissionRepositoryService } from "../../libs/database/src/repositories/commission.repository";
 import { COMMISSION_TYPE } from 'libs/constants/autenticationConstants/userContants';
 
@@ -348,45 +348,53 @@ export class HotelTBOAPIService {
     }
   }
 
-  async hotelBook(url:string,data:any){
-    try{
-      const username = "Pageone";
-      const password = "Pageone@1234";
-      const credentials = Buffer.from(`${username}:${password}`).toString('base64');
-  
-      const headers = {
-        'Authorization': `Basic ${credentials}`,
-        'Content-Type': 'application/json',
-      };
+  async hotelBook(url: string, body: any) {
+    try {
+      const response = await axios.post(url, body, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
-      const payload = data;
-      
-      const response = await this.httpPostAPICall(url, payload, headers);
-      return response;
-    }catch(error){
-      console.log(error);
-      throw error;
+      if (response.data.Error) {
+        throw {
+          message: response.data.Error.ErrorMessage || "Error from TBO API",
+          statusCode: ERROR_CODES.BAD_REQUEST
+        };
+      }
+
+      return response.data;
+    } catch (error) {
+      console.log('Error in TBO hotel booking API:', error);
+      throw {
+        message: error.message || "Error communicating with TBO API",
+        statusCode: error.statusCode || ERROR_CODES.OUTGOING_API_ERROR
+      };
     }
   }
 
-  async hotelBookingDetails(url:string,data:any){
-    try{
-      const username = "Pageone";
-      const password = "Pageone@1234";
-      const credentials = Buffer.from(`${username}:${password}`).toString('base64');
-  
-      const headers = {
-        'Authorization': `Basic ${credentials}`,
-        'Content-Type': 'application/json',
-      };
+  async hotelBookingDetails(url: string, body: any) {
+    try {
+      const response = await axios.post(url, body, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
-      const payload = data;
-      
-      const response = await this.httpPostAPICall(url, payload, headers);
-      return response;
-    }catch(error){
-      console.log(error);
-      throw error;
+      if (response.data.Error) {
+        throw {
+          message: response.data.Error.ErrorMessage || "Error from TBO API",
+          statusCode: ERROR_CODES.BAD_REQUEST
+        };
+      }
+
+      return response.data;
+    } catch (error) {
+      console.log('Error in TBO hotel booking details API:', error);
+      throw {
+        message: error.message || "Error communicating with TBO API",
+        statusCode: error.statusCode || ERROR_CODES.OUTGOING_API_ERROR
+      };
     }
   }
   
