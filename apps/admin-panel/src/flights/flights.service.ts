@@ -1,10 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { BookingRepositoryService } from '../../../../libs/database/src/repositories/booking.repository';
 
 @Injectable()
 export class FlightsService {
+  constructor(private readonly BookingModel: BookingRepositoryService) { }
 
-  findAll() {
-    return `This action returns all flights`;
+  async findAll() {
+    try {
+      const data =await this.BookingModel.getAllFlightBookings()
+      return { message: "All booking details fetched.", data: data }
+    } catch (error) {
+
+    }
   }
 
   findOne(id: number) {

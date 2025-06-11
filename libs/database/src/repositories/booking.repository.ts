@@ -91,5 +91,9 @@ export class BookingRepositoryService {
         //     await queryRunner.release();
         // }
     }
+
+    async getAllFlightBookings() {
+        return await this.bookingRepository.find()
+    }
     
 }
