@@ -30,10 +30,55 @@ export class BookingRepositoryService {
         return resObj;
     }
 
+    async getBookingById(bookingId: string) {
+        try {
+            const booking = await this.bookingRepository.findOne({
+                where: { id: bookingId },
+                relations: ['user']
+            });
+
+            if (!booking) {
+                throw Error("Booking not found");
+            }
+
+            // Parse JSON strings into objects
+            const flightDetails = booking.flight_details ? JSON.parse(booking.flight_details) : null;
+            const passengerDetails = booking.passenger_details ? JSON.parse(booking.passenger_details) : null;
+
+            return {
+                ...booking,
+                flight_details: flightDetails,
+                passenger_details: passengerDetails
+            };
+        } catch (error) {
+            console.log("Error in get Booking By Id:", error);
+            throw error;
+        }
+    }
+
+    async getAllBookings(userId?: string) {
+        try {
+            const query = this.bookingRepository.createQueryBuilder('booking')
+                .leftJoinAndSelect('booking.user', 'user');
+
+            if (userId) {
+                query.where('user.id = :userId', { userId });
+            }
+
+            const bookings = await query.getMany();
+
+            return bookings.map(booking => ({
+                ...booking,
+                flight_details: booking.flight_details ? JSON.parse(booking.flight_details) : null,
+                passenger_details: booking.passenger_details ? JSON.parse(booking.passenger_details) : null
+            }));
+        } catch (error) {
+            console.log("Error in get All Bookings:", error);
+            throw error;
+        }
+    }
 
     async createBookingService(booking_payload) {
-
-      
         try {
             const {
                 bookingpayment_amount,
@@ -45,12 +90,11 @@ export class BookingRepositoryService {
                 userId
             } = booking_payload;
     
-         
             let fields = this.mapObject({
                 bookingpayment_amount,
                 bookingpayment_date,
-                flight_details,
-                passenger_details,
+                flight_details: typeof flight_details === 'string' ? flight_details : JSON.stringify(flight_details),
+                passenger_details: typeof passenger_details === 'string' ? passenger_details : JSON.stringify(passenger_details),
                 booking_status: BOOKING_STATUS.INIT,
                 booking_date: new Date(),
                 booking_type,
@@ -58,38 +102,21 @@ export class BookingRepositoryService {
                 bookingpaymentcurrency
             });
     
-          
             if (!bookingpayment_amount || bookingpayment_amount <= 0) {
-                throw new Error("Invalid payment amount");
+                throw Error("Invalid payment amount");
             }
             if (!flight_details || !passenger_details) {
-                throw new Error("Missing flight or passenger details");
+                throw Error("Missing flight or passenger details");
             }
     
-          
-            
-          return  this.transactionManager.runInTransaction(async (manager) => {
-            const saveBookingData = manager.create("booking",fields);
-
+            return this.transactionManager.runInTransaction(async (manager) => {
+                const saveBookingData = manager.create("booking", fields);
                 await manager.save("booking", saveBookingData);
-            return saveBookingData;
-
-
-            })
-            
-            // await this.bookingRepository.save(saveBookingData);
-        
-           
-    
+                return saveBookingData;
+            });
         } catch (error) {
-        
             console.log("Error in createBookingService Repo:", error);
             throw error;
-        } 
-        // finally {
-           
-        //     await queryRunner.release();
-        // }
+        }
     }
-    
 }

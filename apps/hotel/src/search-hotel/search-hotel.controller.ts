@@ -154,7 +154,7 @@ export class SearchHotelController {
       const result = await this.searchHotelService.bookingHotel(body,reference_id);
       console.log("??????",result);
       
-      // return this.responseHandler.sendSuccessResponse(res, result);
+      //return this.responseHandler.sendSuccessResponse(res, result);
     }catch(error){
       return this.responseHandler.sendErrorResponse(res,error);
     }

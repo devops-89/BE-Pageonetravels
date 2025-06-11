@@ -6,6 +6,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 import {MongoDBModule} from '../../../../libs/database/src/mongodb/mongodbconnect';
 
+
 @Module({
     imports: [
         SearchHotelModule,
