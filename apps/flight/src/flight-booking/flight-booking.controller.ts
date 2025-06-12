@@ -1,17 +1,20 @@
-import { Body, Controller, Post,  Req,  Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post,  Req,  Res, UseGuards, Get, Param, Query } from '@nestjs/common';
+import { Response } from 'express';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { FlightBookingService } from './flight-booking.service';
 import { BookingDto, BookingNonLccDto, TicketDto } from '../../../../libs/dtos/flight/booking-flight.dto';
 import { RoundDto} from '../../../../libs/dtos/flight/round-flight.dto';
 import { UserRepositoryService } from '../../../../libs/database/src';
 import {TokenValidationGuard} from '../../../../libs/middlewares/authMiddleware.guard';
+import { BookingRepositoryService } from '../../../../libs/database/src';
 
 @Controller('flight-booking')
 export class FlightBookingController {
     constructor(
-        private readonly responsehandlderservice:ResponseHandlerService,
+        private readonly responsehandlerservice:ResponseHandlerService,
         private readonly flightBookingService:FlightBookingService,
         private readonly userRepositoryService: UserRepositoryService,
+        private readonly bookingRepository: BookingRepositoryService
     ){}
  
 
@@ -38,10 +41,10 @@ export class FlightBookingController {
             
             const result = await this.flightBookingService.bookFlight(reference_id,body);
          
-            return  this.responsehandlderservice.sendSuccessResponse(res, result);
+            return  this.responsehandlerservice.sendSuccessResponse(res, result);
         } catch(err) {
             console.log(err);
-            return this.responsehandlderservice.sendErrorResponse(res, err);
+            return this.responsehandlerservice.sendErrorResponse(res, err);
         }
     }
 
@@ -66,10 +69,10 @@ export class FlightBookingController {
             }
 
             const result = await this.flightBookingService.bookFlightForNonLCC(reference_id,body);
-            return this.responsehandlderservice.sendSuccessResponse(res, result);
+            return this.responsehandlerservice.sendSuccessResponse(res, result);
         } catch (err) {
             console.log(err);
-            return this.responsehandlderservice.sendErrorResponse(res, err);
+            return this.responsehandlerservice.sendErrorResponse(res, err);
         }
     }
 
@@ -80,10 +83,10 @@ export class FlightBookingController {
     async flighticketAfterBooking(@Res() res: Response, @Body() body: TicketDto) {
         try {
             const result = await this.flightBookingService.bookTicket(body);
-            return this.responsehandlderservice.sendSuccessResponse(res, result);
+            return this.responsehandlerservice.sendSuccessResponse(res, result);
         } catch (error) {
             console.error("Ticket Error:", error);
-            return this.responsehandlderservice.sendErrorResponse(res, error);
+            return this.responsehandlerservice.sendErrorResponse(res, error);
         }
     }
 
@@ -100,10 +103,32 @@ export class FlightBookingController {
                 throw (`An error occurred while fetching the user. Please try again later.`);
             }
             const result = await this.flightBookingService.roundFlightBook(reference_id,body);
-            return this.responsehandlderservice.sendSuccessResponse(res,result);
+            return this.responsehandlerservice.sendSuccessResponse(res,result);
         }catch(error){
             console.error("Ticket Error:", error);
-            return this.responsehandlderservice.sendErrorResponse(res, error);
+            return this.responsehandlerservice.sendErrorResponse(res, error);
+        }
+    }
+
+    @Get(':id')
+    @UseGuards(TokenValidationGuard)
+    async getBookingById(@Param('id') id: string, @Res() res: Response) {
+        try {
+            const result = await this.flightBookingService.getBookingById(id);
+            return this.responsehandlerservice.sendSuccessResponse(res, result);
+        } catch (error) {
+            return this.responsehandlerservice.sendErrorResponse(res, error);
+        }
+    }
+
+    @Get()
+    @UseGuards(TokenValidationGuard)
+    async getAllBookings(@Query('userId') userId: string, @Res() res: Response) {
+        try {
+            const result = await this.flightBookingService.getAllBookings(userId);
+            return this.responsehandlerservice.sendSuccessResponse(res, result);
+        } catch (error) {
+            return this.responsehandlerservice.sendErrorResponse(res, error);
         }
     }
 

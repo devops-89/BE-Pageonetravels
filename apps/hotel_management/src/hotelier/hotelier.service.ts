@@ -4,7 +4,7 @@ import { ERROR_CODES } from "../../../../libs/constants/commonConstants";
 import { COMMON_MSG, LOGIN_MSG } from "../../../../libs/constants/autenticationConstants/messageConstants";
 import { UserRepositoryService } from "../../../../libs/database/src/repositories";
 import { ApiResponse } from '../../../../libs/interfaces/commonTypes/apiResponse.interface';
-import { LOGIN_BY, USER_ACCOUNT_STATUS, USER_TYPE } from "libs/constants/autenticationConstants/userContants";
+import { LOGIN_BY, USER_ACCOUNT_STATUS, USER_TYPE } from "../../../../libs/constants/autenticationConstants/userContants";
 import { checkPasswordHash } from '../utils/bcryptUtil';
 import { TOKEN_TYPE } from "../../../../libs/constants/commonConstants";
 import { SESSION_STATUS } from "../../../../libs/constants/autenticationConstants/userContants";

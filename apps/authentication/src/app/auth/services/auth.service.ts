@@ -431,7 +431,7 @@ export class AuthService {
     ): Promise<ApiResponse.ApiOK> {
         try {
            
-            if(![USER_TYPE.USER, USER_TYPE.HOTEL].includes(user.user_type)) {
+            if(![USER_TYPE.USER, USER_TYPE.HOTEL, USER_TYPE.ADMIN].includes(user.user_type)) {
                 throw {  
                     message: "You are not authorized to access the website.", 
                     statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 

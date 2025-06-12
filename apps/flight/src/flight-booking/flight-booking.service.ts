@@ -540,5 +540,34 @@ export class FlightBookingService {
     }
    
     
-    
+    async getBookingById(bookingId: string) {
+        try {
+            const booking = await this.bookingrepository.getBookingById(bookingId);
+            if (!booking) {
+                throw Error("Booking not found");
+            }
+            return {
+                status: true,
+                message: 'Booking details retrieved successfully',
+                data: booking
+            };
+        } catch (error) {
+            console.log("Error in get Booking By Id:", error);
+            throw error;
+        }
+    }
+
+    async getAllBookings(userId?: string) {
+        try {
+            const bookings = await this.bookingrepository.getAllBookings(userId);
+            return {
+                status: true,
+                message: 'Bookings retrieved successfully',
+                data: bookings
+            };
+        } catch (error) {
+            console.log("Error in get All Bookings:", error);
+            throw error;
+        }
+    }
 }
