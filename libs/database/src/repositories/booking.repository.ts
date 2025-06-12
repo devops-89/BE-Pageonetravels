@@ -119,4 +119,9 @@ export class BookingRepositoryService {
             throw error;
         }
     }
+
+    async getAllFlightBookings() {
+        return await this.bookingRepository.find()
+    }
+
 }
