@@ -29,7 +29,8 @@ async function bootstrap() {
 
     const config = new ConfigService()
     config.loadFromEnv()
-    const port = config.get().servicePorts.payment_service || 3009;
+    // const port = config.get().servicePorts.payment_service || 3009;
+    const port=5009;
     await app.listen(port);
     Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`);
 

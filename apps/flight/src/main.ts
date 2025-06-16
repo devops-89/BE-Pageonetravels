@@ -42,7 +42,8 @@ async function bootstrap() {
     // const config_service = new TBO_CredentialsService(a,b)
     // await TBO_CredentialsService.getSettingValues();
     config.loadFromEnv()
-    const port = config.get().servicePorts.flight || 3002;
+    // const port = config.get().servicePorts.flight || 3002;
+    const port=5002;
     await app.listen(port);
     Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`);
 }
