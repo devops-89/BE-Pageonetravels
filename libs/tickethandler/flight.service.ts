@@ -34,6 +34,14 @@ export class FlightService {
             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
             const payload = JSON.parse(order_request);
             console.log(">>>>>>>>>  hello",payload);
+            console.log("order_id",order_id);
+            console.log("custom_order_id",custom_order_id);
+            console.log("journey_type",journey_type);
+            console.log("journey",journey);
+            console.log("isLCC",isLCC);
+            console.log("is_LCC_round",is_LCC_round);
+            console.log("trace_id",trace_id);
+            
             const userDetails = await this.userRepositoryService.getUserByUserId(user);
             
             const payloadSecond = JSON.parse(order_request_second);
@@ -42,6 +50,7 @@ export class FlightService {
                 if(journey == JOURNEY.DOMESTIC){ 
                     if(isLCC == true){ 
                         const url = tbo_credentials.FLIGHT_TICKET_FORLCC;
+                        console.log("isLCC URL:",url);
                         let result = await this.httpAPICall(url, payload);
         
                         if(result.data.Response.ResponseStatus === 1){
