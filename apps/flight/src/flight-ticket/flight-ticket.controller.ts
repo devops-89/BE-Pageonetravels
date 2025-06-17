@@ -17,45 +17,45 @@ export class FlightTicketController {
             private readonly  flightTicketService:FlightTicketService
         ){}
 
-    @Post('/payment-init')
-    @UseGuards(TokenValidationGuard)
-    async ticketLCC(@Body() body: LccTicketDto, @Req() req:Request, @Res() res:Response){
-        try{
+    // @Post('/payment-init')
+    // @UseGuards(TokenValidationGuard)
+    // async ticketLCC(@Body() body: LccTicketDto, @Req() req:Request, @Res() res:Response){
+    //     try{
             
-            const payload = req['userPayload'];
-            const {reference_id}= payload;
-            const refData = await this.userRepositoryService.getUserByUserId(reference_id);
-            if(!refData){
-                throw (`An error occurred while fetching the user. Please try again later.`);
-            }
-            const result = await this.flightTicketService.directTicket(reference_id,body);
-            console.log(result);
-            return this.responsehandlderservice.sendSuccessResponse(res,result);
+    //         const payload = req['userPayload'];
+    //         const {reference_id}= payload;
+    //         const refData = await this.userRepositoryService.getUserByUserId(reference_id);
+    //         if(!refData){
+    //             throw (`An error occurred while fetching the user. Please try again later.`);
+    //         }
+    //         const result = await this.flightTicketService.directTicket(reference_id,body);
+    //         console.log(result);
+    //         return this.responsehandlderservice.sendSuccessResponse(res,result);
 
-        }catch(error){
-            console.log(error);
-            return this.responsehandlderservice.sendErrorResponse(res, error);
-        }
-    }
+    //     }catch(error){
+    //         console.log(error);
+    //         return this.responsehandlderservice.sendErrorResponse(res, error);
+    //     }
+    // }
 
-    @Post('/ticket/verify')
-    @UseGuards(TokenValidationGuard)
-    async verifySignatue(@Req() req:Request,@Res() res:Response,@Body() body:VerifyDto){
-        try{
-            const payload = req['userPayload'];
-            const {reference_id}= payload;
-            const refData = await this.userRepositoryService.getUserByUserId(reference_id);
-            if(!refData){
-                throw (`An error occurred while fetching the user. Please try again later.`);
-            }
+    // @Post('/ticket/verify')
+    // @UseGuards(TokenValidationGuard)
+    // async verifySignatue(@Req() req:Request,@Res() res:Response,@Body() body:VerifyDto){
+    //     try{
+    //         const payload = req['userPayload'];
+    //         const {reference_id}= payload;
+    //         const refData = await this.userRepositoryService.getUserByUserId(reference_id);
+    //         if(!refData){
+    //             throw (`An error occurred while fetching the user. Please try again later.`);
+    //         }
             
-            const result = await this.flightTicketService.verifyTicket(body);
+    //         const result = await this.flightTicketService.verifyTicket(body);
            
-            return this.responsehandlderservice.sendSuccessResponse(res,result);
-        }catch(error){
-            return this.responsehandlderservice.sendErrorResponse(res, error);
-        }
-    }
+    //         return this.responsehandlderservice.sendSuccessResponse(res,result);
+    //     }catch(error){
+    //         return this.responsehandlderservice.sendErrorResponse(res, error);
+    //     }
+    // }
 
 
     
