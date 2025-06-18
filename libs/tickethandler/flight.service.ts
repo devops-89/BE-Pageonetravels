@@ -33,7 +33,7 @@ export class FlightService {
         try{ 
             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
             const payload = JSON.parse(order_request);
-            console.log(">>>>>>>>>  hello",payload);
+            console.log(">>>>>>>>>  hello present",payload);
             const userDetails = await this.userRepositoryService.getUserByUserId(user);
             
             const payloadSecond = JSON.parse(order_request_second);
@@ -43,6 +43,7 @@ export class FlightService {
                     if(isLCC == true){ 
                         const url = tbo_credentials.FLIGHT_TICKET_FORLCC;
                         let result = await this.httpAPICall(url, payload);
+                        console.log("++++++++++lcc domestic response+++++++++",result);
         
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
@@ -65,7 +66,7 @@ export class FlightService {
                         
                         const url = tbo_credentials.FLIGHT_BOOKING_API_FORNONLCC;
                         let result = await this.httpAPICall(url, payload);
-                        
+                        console.log("++++++++++nonlcc domestic response+++++++++",result);
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
                             const dataBooking = await this.orderRepositoryService.updatePaymentBooking(order_id,result.data);
@@ -85,7 +86,7 @@ export class FlightService {
                             
                             const urlticket = tbo_credentials.FLIGHT_TICKET_FORLCC;
                             let resultTicket = await this.httpAPICall(urlticket, payloadForTicket);
-                            
+                            console.log("++++++++++url ticket response+++++++++",resultTicket);
                             if(resultTicket.data.Response.ResponseStatus === 1){
                                 // try to ticket check status then save db success/fail
                                 await this.orderRepositoryService.updatePaymentSuccess(order_id,resultTicket.data);
@@ -118,6 +119,7 @@ export class FlightService {
                     if(isLCC == true){
                         const url = tbo_credentials.FLIGHT_TICKET_FORLCC;
                         let result = await this.httpAPICall(url, payload);
+                        console.log("++++++++++lcc international response+++++++++",result);
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
                             await this.orderRepositoryService.updatePaymentSuccess(order_id,result.data);
@@ -139,7 +141,7 @@ export class FlightService {
                     }else if(isLCC == false){
                         const url = tbo_credentials.FLIGHT_BOOKING_API_FORNONLCC;
                         let result = await this.httpAPICall(url, payload);
-                        
+                        console.log("++++++++++url ticket non lcc response+++++++++",result);
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
                             await this.orderRepositoryService.updatePaymentBooking(order_id,result.data);
@@ -160,6 +162,7 @@ export class FlightService {
 
                             const urlticket = tbo_credentials.FLIGHT_TICKET_FORLCC;
                             let resultTicket = await this.httpAPICall(urlticket, payloadForTicket);
+                            console.log("++++++++++url ticket lcc  response+++++++++",result);
                             if(resultTicket.data.Response.ResponseStatus === 1){
                                 // try to ticket check status then save db success/fail
                                 await this.orderRepositoryService.updatePaymentSuccess(order_id,resultTicket.data);
@@ -193,6 +196,7 @@ export class FlightService {
                         // isLCC
                         const url = tbo_credentials.FLIGHT_TICKET_FORLCC;
                         let result = await this.httpAPICall(url, payload);
+                        console.log("++++++++++lcc roundtrip domestic response+++++++++",result);
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
                             await this.orderRepositoryService.updatePaymentSuccess(order_id,result.data);
@@ -206,6 +210,7 @@ export class FlightService {
                             await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
                             // is LCC True hit second API
                             let resultSecond = await this.httpAPICall(url, payloadSecond);
+                            console.log("++++++++++result second response+++++++++",result);
                             if(resultSecond.data.Response.ResponseStatus === 1){
                                 // try to ticket check status then save db success/fail 
                                 await this.orderRepositoryService.updatePaymentSuccess(order_id,resultSecond.data);
@@ -238,6 +243,7 @@ export class FlightService {
                         // isLCC
                         const url = tbo_credentials.FLIGHT_TICKET_FORLCC;
                         let result = await this.httpAPICall(url, payload);
+                        console.log("++++++++++lcc round-false response+++++++++",result);
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
                             await this.orderRepositoryService.updatePaymentSuccess(order_id,result.data);
@@ -253,6 +259,7 @@ export class FlightService {
                             
                             const urlNonLCC = tbo_credentials.FLIGHT_BOOKING_API_FORNONLCC;
                             let resultSecond = await this.httpAPICall(urlNonLCC, payloadSecond);
+                            console.log("++++++++++url nonlcc  response+++++++++",result);
                             if(resultSecond.data.Response.ResponseStatus === 1){
                                 // try to ticket check status then save db success/fail
                                 const dataBooking = await this.orderRepositoryService.updatePaymentBooking(order_id,resultSecond.data);
@@ -272,6 +279,7 @@ export class FlightService {
                         
                                 const urlticket = tbo_credentials.FLIGHT_TICKET_FORLCC;
                                 let resultTicket = await this.httpAPICall(urlticket, payloadForTicket);
+                                console.log("++++++++++result ticket for lcc response+++++++++",result);
                                 if(resultTicket.data.Response.ResponseStatus === 1){
                                     // try to ticket check status then save db success/fail
                                     await this.orderRepositoryService.updatePaymentSuccess(order_id,resultTicket.data);

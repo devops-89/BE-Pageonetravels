@@ -14,7 +14,9 @@ export class TBO_CredentialsService {
     async getSettingValues(){
         try {
           const result = await this.settingRepo.getFlightKeysAndValues();
+         
           const flightConfig = result.value as any;
+        
           const hotel_result = await this.settingRepo.getHotelKeysAndValues();
           const hotelConfig = hotel_result.value as any
 
