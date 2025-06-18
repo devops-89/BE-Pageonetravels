@@ -152,6 +152,7 @@ export class FlightDetailService {
                 console.log("flight format url+++++: ",response);
                 
                 response = await this.httptboapiservice.flightFormat(response);
+                console.log("flight format url+++++: ",response);
                 await this.addImage(response);
                 
                 ssrResponse = await this.httptboapiservice.ssr(base_url_ssr, payload_request);

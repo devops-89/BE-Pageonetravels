@@ -130,6 +130,7 @@ export class FlightService {
                     if(isLCC == true){
                         const url = tbo_credentials.FLIGHT_TICKET_FORLCC;
                         let result = await this.httpAPICall(url, payload);
+                        console.log("+++++Internation lcc++++++:",result);
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
                             await this.orderRepositoryService.updatePaymentSuccess(order_id,result.data);
@@ -151,6 +152,7 @@ export class FlightService {
                     }else if(isLCC == false){
                         const url = tbo_credentials.FLIGHT_BOOKING_API_FORNONLCC;
                         let result = await this.httpAPICall(url, payload);
+                         console.log("+++++Internation nonlcc++++++:",result);
                         
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
