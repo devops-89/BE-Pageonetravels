@@ -33,7 +33,7 @@ export class FlightService {
         try{ 
             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
             const payload = JSON.parse(order_request);
-            console.log(">>>>>>>>>  hello",payload);
+            console.log(">>>>>>>>>  hello response",payload);
             console.log("order_id",order_id);
             console.log("custom_order_id",custom_order_id);
             console.log("journey_type",journey_type);
@@ -52,6 +52,7 @@ export class FlightService {
                         const url = tbo_credentials.FLIGHT_TICKET_FORLCC;
                         console.log("isLCC URL:",url);
                         let result = await this.httpAPICall(url, payload);
+                        console.log("+++++++++++++lcc one way response+++++++++ ",result);
         
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
@@ -74,6 +75,7 @@ export class FlightService {
                         
                         const url = tbo_credentials.FLIGHT_BOOKING_API_FORNONLCC;
                         let result = await this.httpAPICall(url, payload);
+                         console.log("+++++++++++++non lcc one way response+++++++++ ",result);
                         
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
@@ -94,6 +96,7 @@ export class FlightService {
                             
                             const urlticket = tbo_credentials.FLIGHT_TICKET_FORLCC;
                             let resultTicket = await this.httpAPICall(urlticket, payloadForTicket);
+                             console.log("+++++++++++++ticket for lcc one way response+++++++++ ",result);
                             
                             if(resultTicket.data.Response.ResponseStatus === 1){
                                 // try to ticket check status then save db success/fail
