@@ -71,10 +71,13 @@ export class FlightDetailService {
 
             // Generate token and get TBO credentials
             const { token } = await this.generateTokenService.getToken(ip_address);
+            console.log("++++++++++++++Token in flight Deatil:",token);
             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
-            // console.log(">>>>>>>>>>  > >",tbo_credentials);
+            console.log(">>>>>>>>>> tbo credentials > >",tbo_credentials);
             const base_url_ssr = tbo_credentials.FLIGHT_SSR;
             const base_url = tbo_credentials.FLIGHT_FAREQUOTE;
+            console.log("++++++++++++baseUrl ssr:++++++++",base_url_ssr)
+             console.log("++++++++++++baseUrl fare quoter:++++++++",base_url)
 
             const flightType = `FLIGHT_${journey_type}_${journey}` as COMMISSION_TYPE;
 
@@ -133,8 +136,8 @@ export class FlightDetailService {
                 ssr_ib = await this.httptboapiservice.flightFormat(ssr_ib);
                 
                 
-                let response_ob = [respons_ob, ssr_ob];
-                let  response_ib = [respons_ib, ssr_ib];
+                const response_ob = [respons_ob, ssr_ob];
+                const  response_ib = [respons_ib, ssr_ib];
 
                 response = [response_ob, response_ib, commissiontype, { journey_type: journey_type, journey: journey }];
             } else {
@@ -146,11 +149,13 @@ export class FlightDetailService {
                 };
                 
                 response = await this.httptboapiservice.fareRule(base_url, payload_request);
+                console.log("flight format url+++++: ",response);
                 
                 response = await this.httptboapiservice.flightFormat(response);
                 await this.addImage(response);
                 
                 ssrResponse = await this.httptboapiservice.ssr(base_url_ssr, payload_request);
+                console.log("+++++ssr response:++++++",ssrResponse);
                 ssrResponse.Response.isLCC = response.Results.IsLCC     
                           
                 if(journey_type === "ONEWAY"){

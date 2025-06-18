@@ -2,6 +2,7 @@ import { Controller, Post, Req, Res, ValidationPipe, Body } from '@nestjs/common
 import { FlightDetailService } from './flightdetail.service';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { FlightDetailRequestDto,FlightRuleDto } from '../../../../libs/dtos/flight/flight-detail.dto';
+import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 
 
 @Controller('flightdetail')
@@ -30,7 +31,7 @@ export class FlightdetailController {
             return this.responseHandler.sendSuccessResponse(res, result);
         } catch (error) {
             console.log("Internal Server Error", error);
-            return this.responseHandler.sendErrorResponse(res, error);
+            return this.responseHandler.sendErrorResponse(res, ERROR_CODES.INVALID_BASE_URL);
         }
     }
 
