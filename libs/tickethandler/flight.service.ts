@@ -33,14 +33,7 @@ export class FlightService {
         try{ 
             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
             const payload = JSON.parse(order_request);
-            console.log(">>>>>>>>>  hello response",payload);
-            console.log("order_id",order_id);
-            console.log("custom_order_id",custom_order_id);
-            console.log("journey_type",journey_type);
-            console.log("journey",journey);
-            console.log("isLCC",isLCC);
-            console.log("is_LCC_round",is_LCC_round);
-            console.log("trace_id",trace_id);
+            
             
             const userDetails = await this.userRepositoryService.getUserByUserId(user);
             
@@ -130,7 +123,10 @@ export class FlightService {
                     if(isLCC == true){
                         const url = tbo_credentials.FLIGHT_TICKET_FORLCC;
                         let result = await this.httpAPICall(url, payload);
-                        console.log("+++++Internation lcc++++++:",result);
+                        console.log(">>>>>>>>>>>>payload print:", payload);
+
+
+                       console.log("************Flight Ticket Response:****************",result);
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
                             await this.orderRepositoryService.updatePaymentSuccess(order_id,result.data);
@@ -144,6 +140,7 @@ export class FlightService {
                             await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
                         }else if(result.data.Response.ResponseStatus != 1){
                             // status fail 
+                            console.log("flight booking failed");
                             await this.orderRepositoryService.updatePaymentFail(order_id,result.data);
                             await this.orderRepositoryService.updatePaymentFail(order_id,result.data);
                             const failTemplate = paymentSuccessTicketFailureTemplate(custom_order_id);
@@ -725,7 +722,7 @@ export class FlightService {
 
     async httpAPICall(baseURL: string, payload: object) {
               const result = await axios.post(baseURL, payload);
-              console.log(result.data);
+             
                return result;
     }
     

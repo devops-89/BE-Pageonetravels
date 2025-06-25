@@ -40,6 +40,27 @@ export class FlightBookingController {
             }
             
             const result = await this.flightBookingService.bookFlight(reference_id,body);
+            // let flightItinerary = null;
+            // if (result?.response?.order_response) {
+            //     try {
+            //         const tboResponse = JSON.parse(result.response.order_response);
+            //         flightItinerary = tboResponse?.Response?.Response?.FlightItinerary;
+            //     } catch (e) {
+            //         console.error('Error parsing order_response:', e);
+            //     }
+            // }
+            // if (flightItinerary) {
+            //     console.log('FlightItinerary:', JSON.stringify(flightItinerary, null, 2));
+            //     // Expand and log Ticket object for each passenger
+            //     if (Array.isArray(flightItinerary.Passenger)) {
+            //         flightItinerary.Passenger.forEach((p, idx) => {
+            //             console.log(`Passenger[${idx}].Ticket:`, JSON.stringify(p.Ticket, null, 2));
+            //         });
+            //     }
+            // } else {
+            //     console.log('No FlightItinerary found in response.');
+            // }
+           
          
             return  this.responsehandlerservice.sendSuccessResponse(res, result);
         } catch(err) {
