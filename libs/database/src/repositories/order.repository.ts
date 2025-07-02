@@ -15,6 +15,14 @@ export class OrderRepositoryService {
         private readonly orderRepository: Repository<Order>,
     ){}
 
+    createQueryBuilder(alias: string) {
+        return this.orderRepository.createQueryBuilder(alias);
+      }
+      
+      save(order: Order) {
+        return this.orderRepository.save(order);
+      }
+
     async insertBooking(reference_id,order_type,payload,amount,is_LCC,journey,journey_type,commtype,commpercentage):Promise<Order | null>{
         try{
             
@@ -48,7 +56,9 @@ export class OrderRepositoryService {
             });
             
             return order;
-        }else if(order_type == ORDER_TYPE.HOTEL){
+        }
+        
+        else if(order_type == ORDER_TYPE.HOTEL){
             var orderId = `${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 999)}-${Math.floor(1000 + Math.random() * 9000)}`;
             const newOrder = this.orderRepository.create({
                 custom_order_id : orderId, 
@@ -255,5 +265,38 @@ export class OrderRepositoryService {
             console.log(error);
         }
     }
+
+    async findAll(userId?: string): Promise<Order[]> {
+        try {
+          const query = this.orderRepository.createQueryBuilder('order')
+            .leftJoinAndSelect('order.user', 'user');
+      
+          if (userId) {
+            query.where('user.id = :userId', { userId });
+          }
+      
+          return await query.getMany();
+        } catch (error) {
+          console.error('Error fetching all orders:', error);
+          throw error;
+        }
+      }
+      
+
+      async find(orderId?: string): Promise<Order[]> {
+        try {
+          const query = this.orderRepository.createQueryBuilder('order')
+            .leftJoinAndSelect('order.user', 'user');
+      
+          if (orderId) {
+            query.where('user.id = :userId', { orderId });
+          }
+      
+          return await query.getMany();
+        } catch (error) {
+          console.error('Error fetching all orders:', error);
+          throw error;
+        }
+      }
 
 }

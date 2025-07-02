@@ -12,6 +12,7 @@ import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-se
 import { ResponseHandlerModule } from '../../../../libs/response-handler/response-handler.module';
 import { EmailService } from '../../../../libs/email-service/email.service';
 import {PDFGenerateService} from '../../../../libs/pdf-generate/pdf-generate.service';
+import { HttpModule } from '@nestjs/axios';
 
 
 @Module({
@@ -23,7 +24,8 @@ import {PDFGenerateService} from '../../../../libs/pdf-generate/pdf-generate.ser
       FlightService,
       ConfigService
     ]),
-    ResponseHandlerModule
+    ResponseHandlerModule,
+    HttpModule
   ],
   controllers: [WebhookController],
   providers: [WebhookService,FlightService,TBO_CredentialsService,HTTPSTboAPIService, EmailService,PDFGenerateService],

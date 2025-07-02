@@ -54,7 +54,14 @@ export const DEFAULT_CONFIG: ConfigData = {
         FLIGHT_TICKET_FORLCC : '',
         FLIGHT_BOOKING_DETAILS : '',
         FLIGHT_CALENDER_DETAILS : '',
-      
+        FLIGHT_RELEASE_PNR : '',
+        FLIGHT_GET_CANCELLATION_CHARGES : '',
+        FLIGHT_SEND_CHANGE_REQUEST : '',
+        FLIGHT_GET_CHANGE_REQUEST : '',
+        FLIGHT_CANCEL_TICKET : '',
+        FLIGHT_PARTIAL_CANCELLATION : '',
+        FLIGHT_BOOK_TICKET : '',
+        FLIGHT_ROUND_BOOKING : '',
       
         FLIGHT_CLIENT_ID :  '',
         FLIGHT_USERNAME :  '',

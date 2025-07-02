@@ -7,6 +7,7 @@ import * as redisStore from 'cache-manager-redis-store';
 import { FlightdetailModule } from '../flightdetail/flightdetail.module';
 import { FlightBookingModule } from '../flight-booking/flight-booking.module';
 import { FlightTicketModule } from '../flight-ticket/flight-ticket.module';
+import { DBModule } from '../../../../libs/database/src';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { FlightTicketModule } from '../flight-ticket/flight-ticket.module';
     FlightdetailModule,
     FlightBookingModule,
     FlightTicketModule,
+    DBModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

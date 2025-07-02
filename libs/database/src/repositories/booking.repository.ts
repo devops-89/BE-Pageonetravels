@@ -120,8 +120,10 @@ export class BookingRepositoryService {
         }
     }
 
-    async getAllFlightBookings() {
-        return await this.bookingRepository.find()
-    }
+
+    //unwanted code
+    // async getAllFlightBookings() {
+    //     return await this.bookingRepository.find()
+    // }
 
 }

@@ -14,6 +14,10 @@ import { flightTicketPdfTemplate } from '../../libs/templates/ticket';
 import { paymentSuccessTicketFailureTemplate } from '../../libs/templates/ticketfail.template';
 import axios from "axios";
 import * as fs from "fs";
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+import { tbo_credentials } from '../constants/tboCredentials';
+import { cancellationConfirmationTemplate } from '../templates/cancellationTemplate';
 
 @Injectable()
 export class FlightService {
@@ -26,14 +30,15 @@ export class FlightService {
         private readonly userRepositoryService:UserRepositoryService,
         private readonly orderRepositoryService:OrderRepositoryService,
         private readonly EmailService: EmailService,
-        private readonly configService: ConfigService 
+        private readonly configService: ConfigService,
+        private readonly httpService: HttpService
     ) {}
 
     async flightHandler(order_id,custom_order_id,journey_type, journey, isLCC, is_LCC_round , trace_id, order_request, order_request_second,user){
         try{ 
             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
-            const payload = JSON.parse(order_request);
-            console.log(">>>>>>>>>  hello",payload);
+            const payload = JSON.parse(order_request)
+
             const userDetails = await this.userRepositoryService.getUserByUserId(user);
             
             const payloadSecond = JSON.parse(order_request_second);
@@ -42,8 +47,10 @@ export class FlightService {
                 if(journey == JOURNEY.DOMESTIC){ 
                     if(isLCC == true){ 
                         const url = tbo_credentials.FLIGHT_TICKET_FORLCC;
+                        console.log("url",url);
                         let result = await this.httpAPICall(url, payload);
-        
+                        console.log("result",result);
+
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
                             await this.orderRepositoryService.updatePaymentSuccess(order_id,result.data);
@@ -708,13 +715,87 @@ export class FlightService {
         }
     }
 
+    async cancelFlightTicket(bookingId: string, requestType: number = 1, userEmail?: string) {
+        try {
+            const payload = {
+                EndUserIp: tbo_credentials.FLIGHT_ENDUSERIP,
+                TokenId: await this.getToken(),
+                RequestType: requestType, // 1 for FullCancellation
+                BookingId: bookingId,
+                BookingMode: 5 // API mode
+            };
+
+            const url = 'http://api.tektravels.com/BookingEngineService_Air/AirService.svc/rest/GetCancellationCharges';
+            const result = await this.httpAPICall(url, payload);
+
+            if (result.data.Response.ResponseStatus === 1) {
+                // If successful, proceed with cancellation
+                const cancelPayload = {
+                    ...payload,
+                    CancellationCharges: result.data.Response.CancellationCharge,
+                    RefundAmount: result.data.Response.RefundAmount,
+                    Remarks: result.data.Response.Remarks
+                };
+
+                const cancelUrl = 'http://api.tektravels.com/BookingEngineService_Air/AirService.svc/rest/Cancel';
+                const cancelResult = await this.httpAPICall(cancelUrl, cancelPayload);
+
+                const response = {
+                    success: cancelResult.data.Response.ResponseStatus === 1,
+                    data: cancelResult.data.Response,
+                    cancellationCharges: result.data.Response
+                };
+
+                // Send cancellation confirmation email if user email is provided
+                if (userEmail && response.success) {
+                    const emailTemplate = cancellationConfirmationTemplate(response, 'Guest');
+                    await this.EmailService.sendEmail(
+                        userEmail,
+                        'Flight Ticket Cancellation Confirmation',
+                        emailTemplate
+                    );
+                }
+
+                return response;
+            }
+
+            return {
+                success: false,
+                data: result.data.Response,
+                error: 'Failed to get cancellation charges'
+            };
+        } catch (error) {
+            throw Error(`Failed to cancel flight ticket: ${error.message}`);
+        }
+    }
 
     async httpAPICall(baseURL: string, payload: object) {
               const result = await axios.post(baseURL, payload);
-              console.log(result.data);
+              console.log(result.data.Response.ResponseStatus);
+              console.log(result.data.Response.Response.PNR);
+              console.log(result.data.Response.Response.BookingId);
+              console.log(result.data.Response.Response.BookingStatus);
+              console.log(result.data.Response.Response.TicketStatus);
+              console.log(result.data.Response.Response.TicketNumber);
+              console.log(result.data.Response.Response.ticketIds);
+              console.log(result.data.Response.Response.TicketId);
                return result;
     }
     
-
-
+    private async getToken() {
+        try {
+            const payload = {
+                ClientId: tbo_credentials.FLIGHT_CLIENT_ID,
+                UserName: tbo_credentials.FLIGHT_USERNAME,
+                Password: tbo_credentials.FLIGHT_PASSWORD,
+                EndUserIp: tbo_credentials.FLIGHT_ENDUSERIP
+            };
+            const response = await firstValueFrom(
+                this.httpService.post(tbo_credentials.FLIGHT_AUTHENTICATION, payload)
+            );
+            return response.data.TokenId;
+        } catch (error) {
+            throw Error(`Failed to get authentication token: ${error.message}`);
+        }
+    }
 }

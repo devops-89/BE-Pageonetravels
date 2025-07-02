@@ -43,6 +43,13 @@ export class WebhookController {
 
       try{
         const result = await this.webhookService.getPaymentDetails(paymentId);
+        console.log("result",result);
+        console.log("result",result.order_id);
+        const order = await this.orderRepositoryService.findOne(result.order_id);
+        console.log("order",order);
+        if(order){
+          //const payment = await this.orderRepositoryService.findOne(order.payment.payment_id);
+        }
         return this.responsehandlderservice.sendSuccessResponse(res,result);
       }catch(error){
         console.log(error);
@@ -54,7 +61,7 @@ export class WebhookController {
     async handleWebhookData(@Req() req:Request, @Headers('x-razorpay-signature') signature: string,@Body() body:any){
           const webhookSecret = this.configService.get().RAZORPAY_CREDENTIAL.RAZORPAY_WEBHOOK_SECRET;
           const resposne = req.body; 
-          console.log(">>>>>>>> resposne" ,resposne); 
+          console.log(">>>>>>>>Anshu resposne" ,resposne); 
           const expectedSignature = crypto
                                   .createHmac('sha256', webhookSecret)
                                   .update(JSON.stringify(body))
