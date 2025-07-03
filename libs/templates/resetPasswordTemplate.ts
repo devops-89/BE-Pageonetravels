@@ -1,7 +1,7 @@
 import { LOGO } from '../constants/commonConstants'; // Adjust path as needed
 
 // Function to generate the reset password email content
-export const resetPassword = function (otp: string, firstName: string) {
+export const resetPassword = function (otp: string, full_name: string) {
     // HTML content for the email
     const html = `
     <!DOCTYPE html>
@@ -89,7 +89,7 @@ export const resetPassword = function (otp: string, firstName: string) {
                 <table style="width: 100%;" width="100%" cellpadding="0" cellspacing="0" role="presentation">
                   <tr>
                     <td style="background-color: #ffffff; border-radius: 4px; font-size: 14px; line-height: 24px; padding: 48px; text-align: left; color: #626262;">
-                      <p style="font-weight: 600; font-size: 18px; margin: 10px 0;">Hey ${firstName},</p>
+                      <p style="font-weight: 600; font-size: 18px; margin: 10px 0;">Hey ${full_name || 'User'},</p>
                       <p style="margin: 0 0 24px;">
                         This is the password reset OTP you requested from Page One Travels. Use it to reset your Page One Travels account password.
                       </p>
