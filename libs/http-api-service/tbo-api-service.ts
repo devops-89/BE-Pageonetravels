@@ -5,6 +5,8 @@ import { IFareRule, IFlightSearch, ISearchFlight } from "../interfaces/flight/se
 import { JOURNEY_TYPE } from "../../libs/constants/flightConstant";
 import { TicketDto } from "libs/dtos/flight/booking-flight.dto";
 import { ERROR_CODES } from "libs/constants/commonConstants";
+import { CancellationChargesRequestDto } from "libs/dtos/flight/flight-cancellation.dto";
+import { CancellationChargesResponse } from "libs/interfaces/flight/cancellation.interface";
 
 @Injectable()
 export class HTTPSTboAPIService {
@@ -329,6 +331,18 @@ export class HTTPSTboAPIService {
         } catch (error) {
             console.log(error);
             throw error
+        }
+    }
+
+
+    // cancellation api http service method 
+    async getCancellationCharges(baseURL: string, payload: CancellationChargesRequestDto): Promise<CancellationChargesResponse> {
+        try {
+            const result = await this.httpAPICall(baseURL, payload);
+            return result;
+        } catch (error) {
+            console.error("Error in getCancellationCharges:", error);
+            throw error;
         }
     }
 }

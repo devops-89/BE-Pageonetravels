@@ -1,4 +1,6 @@
-import { Controller, Post, Req, Res, ValidationPipe, Body } from '@nestjs/common';
+import { Controller, Post,Get,
+    
+    Req, Res, ValidationPipe, Body } from '@nestjs/common';
 import { FlightDetailService } from './flightdetail.service';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { FlightDetailRequestDto,FlightRuleDto } from '../../../../libs/dtos/flight/flight-detail.dto';
@@ -9,6 +11,7 @@ import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 export class FlightdetailController {
     constructor(private readonly flightdetailservice: FlightDetailService,
         private readonly responseHandler: ResponseHandlerService,
+
     ) { }
 
     @Post('/farerule')
@@ -45,6 +48,35 @@ export class FlightdetailController {
             return this.responseHandler.sendSuccessResponse(res, result);
         } catch (error) {
             console.log("Internal Server Error", error);
+            return this.responseHandler.sendErrorResponse(res, error);
+        }
+    }
+
+    // ===================================== flight canncellation routes ============================================
+     // to fetch airline types before cancellation
+    @Get('airline-types')
+    async getAirlineTypes(@Res() res: Response) {
+        try {
+            const result = await this.flightdetailservice.getAirlineTypes();
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch (error) {
+            return this.responseHandler.sendErrorResponse(res, error);
+        }
+    }
+
+    // to fetch getCancellation charges
+    @Post('get-cancellation-charges')
+    async getCancellationCharges(@Body() body: {
+        bookingId: string;
+        requestType: string;
+        bookingMode: string;
+        endUserIp: string;
+        tokenId: string;
+    }, @Res() res: Response) {
+        try {
+            const result = await this.flightdetailservice.getCancellationCharges(body);
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch (error) {
             return this.responseHandler.sendErrorResponse(res, error);
         }
     }

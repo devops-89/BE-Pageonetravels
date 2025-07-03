@@ -325,6 +325,64 @@ export class FlightDetailService {
         return response;
     }
 
+    //============================================== flight cancellation services ================================
+
+     // fetch airline types before cancellation
+    async getAirlineTypes() {
+        const NDC_AIRLINES = [
+            { code: 'EK', name: 'Emirates', type: 'NDC' },
+            { code: 'LH', name: 'Lufthansa', type: 'NDC' },
+            { code: 'WY', name: 'Oman Air', type: 'NDC' },
+            { code: 'EY', name: 'Etihad Airways', type: 'NDC' },
+            { code: 'GF', name: 'Gulf Air', type: 'NDC' }
+        ];
+        const LCC_AIRLINES = [
+            { code: '6E', name: 'IndiGo', type: 'LCC' },
+            { code: 'IX', name: 'Air India Express', type: 'LCC' },
+            { code: 'SG', name: 'SpiceJet', type: 'LCC' },
+            { code: 'FZ', name: 'FlyDubai', type: 'LCC' },
+            { code: 'QP', name: 'Akasa Air', type: 'LCC' }
+        ];
+        return {
+            ndc: NDC_AIRLINES,
+            lcc: LCC_AIRLINES,
+            message: "Airline types retrieved successfully"
+        };
+    }
+
+    // fetch get cancellation charges
+    async getCancellationCharges(body: {
+        bookingId: string;
+        requestType: string;
+        bookingMode: string;
+        endUserIp: string;
+        tokenId: string;
+    }) {
+        try {
+            const tbo_credentials = await this.tboConfigService.getTBOCredentials();
+            const base_url = tbo_credentials.FLIGHT_GET_CANCELLATION_CHARGES;
+            const payload = {
+                BookingId: body.bookingId,
+                RequestType: body.requestType,
+                BookingMode: body.bookingMode,
+                EndUserIp: body.endUserIp,
+                TokenId: body.tokenId
+            };
+            const result = await this.httptboapiservice.getCancellationCharges(base_url, payload);
+            return {
+                success: result.Response.ResponseStatus === 1,
+                data: result.Response,
+                cancellationCharges: result.Response,
+                refundAmount: result.Response.RefundAmount,
+                cancellationCharge: result.Response.CancellationCharge,
+                error: result.Response.ResponseStatus !== 1 ? 'Failed to get cancellation charges' : undefined
+            };
+        } catch (error) {
+            console.error("Error in getCancellationCharges:", error);
+            throw Error(`Failed to get cancellation charges: ${error.message}`);
+        }
+    }
+
     
 
 }

@@ -28,6 +28,7 @@ export class TBO_CredentialsService {
             FLIGHT_TICKET_FORLCC : flightConfig.FLIGHT_TICKET,
             FLIGHT_BOOKING_DETAILS : flightConfig.FLIGHT_BOOKING_DETAILS,
             FLIGHT_CALENDER_DETAILS : flightConfig.FLIGHT_CALENDER_DETAILS,
+            FLIGHT_GET_CANCELLATION_CHARGES: flightConfig.FLIGHT_GET_CANCELLATION_CHARGES,
     
     
             FLIGHT_CLIENT_ID :  flightConfig.FLIGHT_CLIENT_ID,
