@@ -1,26 +1,47 @@
 import { Module } from '@nestjs/common';
 import { FlightdetailController } from './flightdetail.controller';
 import { FlightDetailService } from './flightdetail.service';
+import { DBModule, Order, OrderRepositoryService, User, UserRepositoryService } from '../../../../libs/database/src';
 import { ConfigModule } from '../../../../libs/config/config.module';
-import { DBModule } from '../../../../libs/database/src/database.module'
+import { SearchFlightModule } from '../search-flight/search-flight.module';
 import { ResponseHandlerModule } from '../../../../libs/response-handler/response-handler.module';
+import { RedisCacheServiceModule } from '../../../../libs/redis-cache-service/redis-cache-module';
 import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.module';
 import { GenerateTokenService } from '../search-flight/generateToken.service';
-import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
 import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
-import { SearchFlightModule } from '../search-flight/search-flight.module';
-import { RedisCacheServiceModule } from '../../../../libs/redis-cache-service/redis-cache-module';
+import { RazorpayModule } from '../../../../libs/paymentgateway/razorpay.module'
+import { RazorpayService } from "../../../../libs/paymentgateway/razorpay.service";
+import { TypeOrmModule } from '@nestjs/typeorm/dist/typeorm.module';
+import { TransactionManager } from '../../../../libs/database/src/repositories/utils';
+import { JwtService } from '../../../../libs/jwt-service/jwt.service';
+import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMiddleware';
+import { EmailService } from '../../../../libs/email-service/email.service';
+
 
 @Module({
-    imports:[
-         DBModule.forRoot(),
-         ConfigModule,
-         SearchFlightModule,
-         ResponseHandlerModule,
-         RedisCacheServiceModule,
-         TBOConfigModule.register(),    
+    imports: [
+        DBModule.forRoot(),
+        TypeOrmModule.forFeature([
+             //BookingRepositoryService,
+             OrderRepositoryService,
+             //Booking,
+             Order,
+             User,
+             TransactionManager,
+             JwtService,
+             TokenValidationMiddleware,
+             EmailService              
+        ]),
+        ConfigModule,
+        RazorpayModule,
+        SearchFlightModule,
+        ResponseHandlerModule,
+        RedisCacheServiceModule,
+        TBOConfigModule.register(),    
     ],
     controllers: [FlightdetailController],
-    providers:[FlightDetailService,GenerateTokenService, TBO_CredentialsService, HTTPSTboAPIService]
+    providers: [FlightDetailService, GenerateTokenService, Order, OrderRepositoryService, TransactionManager, HTTPSTboAPIService, RazorpayService, UserRepositoryService, JwtService, TokenValidationMiddleware,EmailService],
 })
-export class FlightdetailModule {}
+
+
+export class FlightDetailModule{} 

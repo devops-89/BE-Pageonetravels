@@ -28,10 +28,8 @@ import { EmailService } from '../../../../libs/email-service/email.service';
              Order,
              User,
              TransactionManager,
-             JwtService,
-             TokenValidationMiddleware,
+             UserRepositoryService,
              EmailService
-              
         ]),
         ConfigModule,
         RazorpayModule,
@@ -41,7 +39,7 @@ import { EmailService } from '../../../../libs/email-service/email.service';
         TBOConfigModule.register(),    
     ],
     controllers: [FlightBookingController],
-    providers: [FlightBookingService, GenerateTokenService, Booking, Order, OrderRepositoryService, TransactionManager, HTTPSTboAPIService, RazorpayService,BookingRepositoryService,UserRepositoryService, JwtService, TokenValidationMiddleware,EmailService],
+    providers: [FlightBookingService,EmailService, GenerateTokenService, Booking, Order, OrderRepositoryService, TransactionManager, HTTPSTboAPIService, RazorpayService,BookingRepositoryService,UserRepositoryService, JwtService, TokenValidationMiddleware],
 })
 
 

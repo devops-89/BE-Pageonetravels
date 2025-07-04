@@ -6,6 +6,9 @@ import { ORDER_STATUS } from '../../../../libs/constants/bookingContant';
 import { ORDER_TYPE } from '../../../../libs/constants/orderConstant';
 import { ApiResponse } from '../../../../libs/interfaces/commonTypes/apiResponse.interface';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
+import { PaginationDto } from '../../../../libs/dtos/authentication/user.dto';
+import { BookingFilterDto } from '../../../../libs/dtos/common/bookingFilter.dto';
+import { IPaginationObject } from '../../../../libs/interfaces/commonTypes/custom.interface';
 
 @Injectable()
 export class OrderRepositoryService {
@@ -56,9 +59,7 @@ export class OrderRepositoryService {
             });
             
             return order;
-        }
-        
-        else if(order_type == ORDER_TYPE.HOTEL){
+        }else if(order_type == ORDER_TYPE.HOTEL){
             var orderId = `${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 999)}-${Math.floor(1000 + Math.random() * 9000)}`;
             const newOrder = this.orderRepository.create({
                 custom_order_id : orderId, 
@@ -154,6 +155,7 @@ export class OrderRepositoryService {
             throw error;
         }
     }
+    
 
     // update order 
     async updateOrder(orderId:string,body:any){
@@ -266,6 +268,56 @@ export class OrderRepositoryService {
         }
     }
 
+    async getUserBookingsWithFilters(
+      userId: string,
+      pagination: PaginationDto,
+      filter: BookingFilterDto
+    ): Promise<IPaginationObject> {
+      try {
+        const { search, journey, orderType } = filter;
+        const { page = 1, limit = 10 } = pagination;
+        const queryBuilder = this.orderRepository.createQueryBuilder('o');
+        queryBuilder
+          .leftJoinAndSelect('o.user', 'u')
+          .where('o.user_id = :userId', { userId })
+          .orderBy('o.created_at', 'DESC')
+          .skip((page - 1) * limit)
+          .take(limit);
+        if (search) {
+          queryBuilder.andWhere(
+            `(
+              payment.payment_status = :paymentStatus OR
+              u.full_name ILIKE :search OR
+              u.email ILIKE :search OR
+              CAST(o.order_type AS TEXT) ILIKE :search OR
+              CAST(o.journey AS TEXT) ILIKE :search OR
+              o.custom_order_id ILIKE :search
+            )`,
+            { search: `%${search}%` }
+          );
+        }
+        if(journey) {
+          queryBuilder.andWhere(`CAST(o.journey AS TEXT) = :journey`, { journey });
+        }
+        if (orderType) {
+          queryBuilder.andWhere(`CAST(o.order_type AS TEXT) = :orderType`, { orderType });
+        }
+        const [orders, count] = await queryBuilder.getManyAndCount();
+        const paginateObject: IPaginationObject = {
+          docs: orders,
+          limit,
+          totalDocs: count,
+          totalPages: Math.ceil(count / limit),
+          hasPrevPage: page > 1,
+          hasNextPage: page * limit < count,
+        };
+        return paginateObject;
+      } catch (error) {
+        console.error('Error in getUserBookingsWithFilters:', error);
+        throw error;
+      }
+    }
+
     async findAll(userId?: string): Promise<Order[]> {
         try {
           const query = this.orderRepository.createQueryBuilder('order')
@@ -298,5 +350,4 @@ export class OrderRepositoryService {
           throw error;
         }
       }
-
 }

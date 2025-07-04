@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { SearchFlightModule } from '../search-flight/search-flight.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
-import { FlightdetailModule } from '../flightdetail/flightdetail.module';
+import { FlightDetailModule } from '../flightdetail/flightdetail.module';
 import { FlightBookingModule } from '../flight-booking/flight-booking.module';
 import { FlightTicketModule } from '../flight-ticket/flight-ticket.module';
 import { DBModule } from '../../../../libs/database/src';
@@ -20,7 +20,7 @@ import { DBModule } from '../../../../libs/database/src';
       // no 'max' option in newer versions
     }),
     SearchFlightModule,
-    FlightdetailModule,
+    FlightDetailModule,
     FlightBookingModule,
     FlightTicketModule,
     DBModule.forRoot(),

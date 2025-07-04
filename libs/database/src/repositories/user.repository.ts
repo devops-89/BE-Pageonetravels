@@ -309,7 +309,7 @@ export class UserRepositoryService {
                 .getOne();
                
             //const user = await this.userRepository.findOne({where :{ id : user_id, verify_status : USER_VERIFY_STATUS.VERIFIED}})
-            console.log("User  found", user);
+            //console.log("User  found", user);
                 if (!user) {
                     console.log("User not found");
                     return null;

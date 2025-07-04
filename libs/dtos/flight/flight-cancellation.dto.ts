@@ -8,17 +8,16 @@ export class ReleasePNRRequestDto {
 
     @IsString()
     @IsNotEmpty()
-    TokenId: string;
-
-    @IsString()
-    @IsNotEmpty()
     BookingId: string;
 
     @IsString()
     @IsNotEmpty()
+    TokenId: string;
+   
+    @IsString()
+    @IsNotEmpty()
     Source: string;
 }
-
 export class CancellationChargesRequestDto {
     @IsString()
     @IsNotEmpty()
@@ -40,7 +39,6 @@ export class CancellationChargesRequestDto {
     @IsNotEmpty()
     TokenId: string;
 }
-
 export class SendChangeRequestDto {
     @IsString()
     @IsNotEmpty()
@@ -76,17 +74,14 @@ export class SendChangeRequestDto {
     @IsNotEmpty()
     TokenId: string;
 }
-
 export class SectorDto {
     @IsString()
     @IsNotEmpty()
     Origin: string;
-
     @IsString()
     @IsNotEmpty()
     Destination: string;
 }
-
 export class GetChangeRequestDto {
     @IsString()
     @IsNotEmpty()
@@ -100,7 +95,6 @@ export class GetChangeRequestDto {
     @IsNotEmpty()
     TokenId: string;
 }
-
 export class CancelFlightTicketDto {
     @IsString()
     @IsNotEmpty()
@@ -123,17 +117,14 @@ export class CancelFlightTicketDto {
     @ValidateNested({ each: true })
     @Type(() => SectorDto)
     sectors?: SectorDto[];
-
     @IsArray()
     @IsOptional()
     ticketIds?: number[];
 }
-
 export class PartialCancellationDto {
     @IsString()
     @IsNotEmpty()
     bookingId: string;
-
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => SectorDto)
@@ -150,7 +141,6 @@ export class PartialCancellationDto {
     @IsOptional()
     userEmail?: string;
 }
-
 export class GetCancellationChargesDto {
     @IsString()
     @IsNotEmpty()

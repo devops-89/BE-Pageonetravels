@@ -8,7 +8,6 @@ export interface ReleasePNRResponse {
         };
     };
 }
-
 export interface CancellationChargesResponse {
     Response: {
         ResponseStatus: number;
@@ -19,7 +18,6 @@ export interface CancellationChargesResponse {
         Currency: string;
     };
 }
-
 export interface TicketCRInfo {
     ChangeRequestId: number;
     TicketId?: number;
@@ -34,7 +32,6 @@ export interface TicketCRInfo {
     CreditNoteNo?: string;
     CreditNoteCreatedOn?: string;
 }
-
 export interface SendChangeRequestResponse {
     Response: {
         B2B2BStatus: boolean;
@@ -43,7 +40,6 @@ export interface SendChangeRequestResponse {
         TraceId: string;
     };
 }
-
 export interface GetChangeRequestResponse {
     ResponseStatus: number;
     Error: any;
@@ -54,7 +50,6 @@ export interface GetChangeRequestResponse {
     ServiceTaxOnRAF: number;
     ChangeRequestStatus: number;
 }
-
 export interface CancellationResult {
     success: boolean;
     data: any;
@@ -64,13 +59,11 @@ export interface CancellationResult {
     cancellationCharge?: number;
     error?: string;
 }
-
 export interface AirlineType {
     code: string;
     name: string;
     type: 'NDC' | 'LCC' | 'GDS';
 }
-
 export interface CancellationRequest {
     bookingId: string;
     requestType: number; // 1: Full, 2: Partial

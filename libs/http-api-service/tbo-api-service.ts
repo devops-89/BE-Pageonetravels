@@ -3,7 +3,6 @@ import axios from "axios";
 import { SearchFlightDto } from "../dtos/flight/search-flights.dto";
 import { IFareRule, IFlightSearch, ISearchFlight } from "../interfaces/flight/search.interface";
 import { JOURNEY_TYPE } from "../../libs/constants/flightConstant";
-import { TicketDto } from "libs/dtos/flight/booking-flight.dto";
 import { ERROR_CODES } from "libs/constants/commonConstants";
 import { ReleasePNRRequestDto, CancellationChargesRequestDto, SendChangeRequestDto, GetChangeRequestDto } from "../dtos/flight/flight-cancellation.dto";
 import { ReleasePNRResponse, CancellationChargesResponse, SendChangeRequestResponse, GetChangeRequestResponse } from "../interfaces/flight/cancellation.interface";
