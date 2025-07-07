@@ -15,6 +15,7 @@ import { TypeOrmModule } from '@nestjs/typeorm/dist/typeorm.module';
 import { TransactionManager } from '../../../../libs/database/src/repositories/utils';
 import { JwtService } from '../../../../libs/jwt-service/jwt.service';
 import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMiddleware';
+import { EmailService } from '../../../../libs/email-service/email.service';
 
 
 @Module({
@@ -27,7 +28,8 @@ import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMidd
              Order,
              User,
              TransactionManager,
-             UserRepositoryService
+             UserRepositoryService,
+             EmailService
         ]),
         ConfigModule,
         RazorpayModule,
@@ -37,7 +39,7 @@ import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMidd
         TBOConfigModule.register(),    
     ],
     controllers: [FlightBookingController],
-    providers: [FlightBookingService, GenerateTokenService, Booking, Order, OrderRepositoryService, TransactionManager, HTTPSTboAPIService, RazorpayService,BookingRepositoryService,UserRepositoryService, JwtService, TokenValidationMiddleware],
+    providers: [FlightBookingService,EmailService, GenerateTokenService, Booking, Order, OrderRepositoryService, TransactionManager, HTTPSTboAPIService, RazorpayService,BookingRepositoryService,UserRepositoryService, JwtService, TokenValidationMiddleware],
 })
 
 

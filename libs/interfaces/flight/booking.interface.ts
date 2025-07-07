@@ -37,4 +37,28 @@ export class ITransaction {
     created_at: Date
     updated_at: Date
 }
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+export interface FLIGHT_BOOKING_INPUT {
+    reference_id: string;
+    order_type: string;
+    payload: any;
+    amount: number;
+    is_LCC: boolean;
+    journey: string;
+    journey_type: string;
+    commtype: string;
+    commpercentage: number;
+}
 
+
+export interface FLIGHT_BOOKING_INPUT {
+    reference_id: string;
+    order_type: string;
+    payload: any;
+    amount: number;
+    is_LCC: boolean;
+    journey: string;
+    journey_type: string;
+    commtype: string;
+    commpercentage: number;
+}

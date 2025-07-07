@@ -1,4 +1,6 @@
 import { Injectable } from "@nestjs/common";
+//import { InjectRepository } from "@nestjs/typeorm";
+//import { Repository } from "typeorm";
 import { BookingDto, BookingNonLccDto, TicketDto } from "../../../../libs/dtos/flight/booking-flight.dto";
 import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
 import { GenerateTokenService } from "../search-flight/generateToken.service";
@@ -6,13 +8,14 @@ import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-c
 import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 import { CommissionRepositoryService } from '../../../../libs/database/src';
 import { RazorpayService } from "../../../../libs/paymentgateway/razorpay.service";
-import { BookingRepositoryService, UserRepositoryService,OrderRepositoryService } from "../../../../libs/database/src";
+import { BookingRepositoryService, UserRepositoryService, OrderRepositoryService} from "../../../../libs/database/src";
 import {  processPassengers,procesPassengers } from '../../../../libs/utils/fareUtils';
 import {  calculateTotalPrice } from '../../../../libs/utils/passengerUtils';
 import { COMMISSION_TYPE } from "../../../../libs/constants/autenticationConstants/userContants";
 import { ERROR_CODES } from "../../../../libs/constants/commonConstants";
 import { RoundDto } from "../../../../libs/dtos/flight/round-flight.dto";
-
+//import { ORDER_TYPE } from "../../../../libs/constants/orderConstant";
+import { EmailService } from "../../../../libs/email-service/email.service";
 
 @Injectable()
 export class FlightBookingService {
@@ -25,9 +28,11 @@ export class FlightBookingService {
         private readonly razorpayservice: RazorpayService,
         private readonly tboConfigService: TBO_CredentialsService,
         private readonly bookingrepository: BookingRepositoryService,
+        private readonly EmailService: EmailService,
         private readonly orderRepository: OrderRepositoryService,
         private readonly userrepositoryservice: UserRepositoryService
     ) {
+
     }
 
     async bookFlight(reference_id,body: BookingDto) {
@@ -82,7 +87,7 @@ export class FlightBookingService {
                 ...procesPassengers(passenger_details.infant || [], 3, fareBreakdown, fare, additionalData)
             ];
             
-        // console.log(">>>>>>>>>> >>>>>>> >>>> >",passengers);
+            // console.log(">>>>>>>>>> >>>>>>> >>>> >",passengers);
             const { token, TBO_data } = await this.generateTokenService.getToken(ip_address);
             
             const payload = {
@@ -538,36 +543,20 @@ export class FlightBookingService {
         const response = {payload, amount, is_LCC, journey,journey_type, commissionType};
         return response;
     }
-   
-    
-    async getBookingById(bookingId: string) {
-        try {
-            const booking = await this.bookingrepository.getBookingById(bookingId);
-            if (!booking) {
-                throw Error("Booking not found");
-            }
-            return {
-                status: true,
-                message: 'Booking details retrieved successfully',
-                data: booking
-            };
-        } catch (error) {
-            console.log("Error in get Booking By Id:", error);
-            throw error;
-        }
-    }
-
-    async getAllBookings(userId?: string) {
-        try {
-            const bookings = await this.bookingrepository.getAllBookings(userId);
-            return {
-                status: true,
-                message: 'Bookings retrieved successfully',
-                data: bookings
-            };
-        } catch (error) {
-            console.log("Error in get All Bookings:", error);
-            throw error;
-        }
-    }
+    // async getBookingById(bookingId: string) {
+    //     try {
+    //         const booking = await this.bookingrepository.getBookingById(bookingId);
+    //         if (!booking) {
+    //             throw Error("Booking not found");
+    //         }
+    //         return {
+    //             status: true,
+    //             message: 'Booking details retrieved successfully',
+    //             data: booking
+    //         };
+    //     } catch (error) {
+    //         console.log("Error in get Booking By Id:", error);
+    //         throw error;
+    //     }
+    // }
 }

@@ -14,11 +14,17 @@ export class TBO_CredentialsService {
     async getSettingValues(){
         try {
           const result = await this.settingRepo.getFlightKeysAndValues();
+          console.log("this code run here for flight config",result);
           const flightConfig = result.value as any;
+          console.log("flightConfig",flightConfig);
           const hotel_result = await this.settingRepo.getHotelKeysAndValues();
           const hotelConfig = hotel_result.value as any
 
             this.configService.setTBOConfig({
+              FLIGHT_CANCEL_TICKET : flightConfig.FLIGHT_CANCEL_TICKET,
+            FLIGHT_PARTIAL_CANCELLATION : flightConfig.FLIGHT_PARTIAL_CANCELLATION,
+            FLIGHT_BOOK_TICKET : flightConfig.FLIGHT_BOOK_TICKET,
+            FLIGHT_ROUND_BOOKING : flightConfig.FLIGHT_ROUND_BOOKING,
             FLIGHT_AUTHENTICATION : flightConfig.FLIGHT_AUTHENTICATION,
             FLIGHT_SEARCH : flightConfig.FLIGHT_SEARCH,
             FLIGHT_FARERULE : flightConfig.FLIGHT_FARERULE,
@@ -28,8 +34,10 @@ export class TBO_CredentialsService {
             FLIGHT_TICKET_FORLCC : flightConfig.FLIGHT_TICKET,
             FLIGHT_BOOKING_DETAILS : flightConfig.FLIGHT_BOOKING_DETAILS,
             FLIGHT_CALENDER_DETAILS : flightConfig.FLIGHT_CALENDER_DETAILS,
-    
-    
+            FLIGHT_RELEASE_PNR : flightConfig.FLIGHT_RELEASE_PNR,
+            FLIGHT_GET_CANCELLATION_CHARGES : flightConfig.FLIGHT_GET_CANCELLATION_CHARGES,
+            FLIGHT_SEND_CHANGE_REQUEST : flightConfig.FLIGHT_SEND_CHANGE_REQUEST,
+            FLIGHT_GET_CHANGE_REQUEST : flightConfig.FLIGHT_GET_CHANGE_REQUEST,
             FLIGHT_CLIENT_ID :  flightConfig.FLIGHT_CLIENT_ID,
             FLIGHT_USERNAME :  flightConfig.FLIGHT_USERNAME,
             FLIGHT_PASSWORD : flightConfig.FLIGHT_PASSWORD,
@@ -44,6 +52,7 @@ export class TBO_CredentialsService {
             HOTEL_BOOK : hotelConfig.HOTEL_BOOK,
             HOTEL_BOOKING_DETAILS : hotelConfig.HOTEL_BOOKING_DETAILS,
             GET_HOTELSTATICDATA : hotelConfig.GET_HOTELSTATICDATA,
+  
  
       })
 

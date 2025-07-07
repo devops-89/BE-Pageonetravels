@@ -6,6 +6,9 @@ import { ORDER_STATUS } from '../../../../libs/constants/bookingContant';
 import { ORDER_TYPE } from '../../../../libs/constants/orderConstant';
 import { ApiResponse } from '../../../../libs/interfaces/commonTypes/apiResponse.interface';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
+import { PaginationDto } from '../../../../libs/dtos/authentication/user.dto';
+import { BookingFilterDto } from '../../../../libs/dtos/common/bookingFilter.dto';
+import { IPaginationObject } from '../../../../libs/interfaces/commonTypes/custom.interface';
 
 @Injectable()
 export class OrderRepositoryService {
@@ -14,6 +17,14 @@ export class OrderRepositoryService {
         @InjectRepository(Order)
         private readonly orderRepository: Repository<Order>,
     ){}
+
+    createQueryBuilder(alias: string) {
+        return this.orderRepository.createQueryBuilder(alias);
+      }
+      
+      save(order: Order) {
+        return this.orderRepository.save(order);
+      }
 
     async insertBooking(reference_id,order_type,payload,amount,is_LCC,journey,journey_type,commtype,commpercentage):Promise<Order | null>{
         try{
@@ -144,6 +155,7 @@ export class OrderRepositoryService {
             throw error;
         }
     }
+    
 
     // update order 
     async updateOrder(orderId:string,body:any){
@@ -256,4 +268,86 @@ export class OrderRepositoryService {
         }
     }
 
+    async getUserBookingsWithFilters(
+      userId: string,
+      pagination: PaginationDto,
+      filter: BookingFilterDto
+    ): Promise<IPaginationObject> {
+      try {
+        const { search, journey, orderType } = filter;
+        const { page = 1, limit = 10 } = pagination;
+        const queryBuilder = this.orderRepository.createQueryBuilder('o');
+        queryBuilder
+          .leftJoinAndSelect('o.user', 'u')
+          .where('o.user_id = :userId', { userId })
+          .orderBy('o.created_at', 'DESC')
+          .skip((page - 1) * limit)
+          .take(limit);
+        if (search) {
+          queryBuilder.andWhere(
+            `(
+              payment.payment_status = :paymentStatus OR
+              u.full_name ILIKE :search OR
+              u.email ILIKE :search OR
+              CAST(o.order_type AS TEXT) ILIKE :search OR
+              CAST(o.journey AS TEXT) ILIKE :search OR
+              o.custom_order_id ILIKE :search
+            )`,
+            { search: `%${search}%` }
+          );
+        }
+        if(journey) {
+          queryBuilder.andWhere(`CAST(o.journey AS TEXT) = :journey`, { journey });
+        }
+        if (orderType) {
+          queryBuilder.andWhere(`CAST(o.order_type AS TEXT) = :orderType`, { orderType });
+        }
+        const [orders, count] = await queryBuilder.getManyAndCount();
+        const paginateObject: IPaginationObject = {
+          docs: orders,
+          limit,
+          totalDocs: count,
+          totalPages: Math.ceil(count / limit),
+          hasPrevPage: page > 1,
+          hasNextPage: page * limit < count,
+        };
+        return paginateObject;
+      } catch (error) {
+        console.error('Error in getUserBookingsWithFilters:', error);
+        throw error;
+      }
+    }
+
+    async findAll(userId?: string): Promise<Order[]> {
+        try {
+          const query = this.orderRepository.createQueryBuilder('order')
+            .leftJoinAndSelect('order.user', 'user');
+      
+          if (userId) {
+            query.where('user.id = :userId', { userId });
+          }
+      
+          return await query.getMany();
+        } catch (error) {
+          console.error('Error fetching all orders:', error);
+          throw error;
+        }
+      }
+      
+
+      async find(orderId?: string): Promise<Order[]> {
+        try {
+          const query = this.orderRepository.createQueryBuilder('order')
+            .leftJoinAndSelect('order.user', 'user');
+      
+          if (orderId) {
+            query.where('user.id = :userId', { orderId });
+          }
+      
+          return await query.getMany();
+        } catch (error) {
+          console.error('Error fetching all orders:', error);
+          throw error;
+        }
+      }
 }

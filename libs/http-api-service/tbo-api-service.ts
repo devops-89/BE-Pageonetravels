@@ -3,8 +3,9 @@ import axios from "axios";
 import { SearchFlightDto } from "../dtos/flight/search-flights.dto";
 import { IFareRule, IFlightSearch, ISearchFlight } from "../interfaces/flight/search.interface";
 import { JOURNEY_TYPE } from "../../libs/constants/flightConstant";
-import { TicketDto } from "libs/dtos/flight/booking-flight.dto";
 import { ERROR_CODES } from "libs/constants/commonConstants";
+import { ReleasePNRRequestDto, CancellationChargesRequestDto, SendChangeRequestDto, GetChangeRequestDto } from "../dtos/flight/flight-cancellation.dto";
+import { ReleasePNRResponse, CancellationChargesResponse, SendChangeRequestResponse, GetChangeRequestResponse } from "../interfaces/flight/cancellation.interface";
 
 @Injectable()
 export class HTTPSTboAPIService {
@@ -12,13 +13,18 @@ export class HTTPSTboAPIService {
     constructor() { }
 
     async httpAPICall(baseURL: string, payload: object) {
-        try { 
-            const result = await axios.post(baseURL, payload);
-            console.log(result.data);
-            return result.data;
+        try {
+            const response = await axios.post(baseURL, payload, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            return response.data;
         } catch (error) {
-            console.error("Error in AXIOS api call", error.message);
-            throw error.message;
+            // console.error("Error in AXIOS api call", error.message);
+            // throw error.message;
+            console.error("Error in HTTP API call:", error);
+            throw error;
         }
     }
 
@@ -329,6 +335,48 @@ export class HTTPSTboAPIService {
         } catch (error) {
             console.log(error);
             throw error
+        }
+    }
+
+    // Flight Cancellation API Methods
+
+    async releasePNR(baseURL: string, payload: ReleasePNRRequestDto): Promise<ReleasePNRResponse> {
+        try {
+            const result = await this.httpAPICall(baseURL, payload);
+            return result;
+        } catch (error) {
+            console.error("Error in releasePNR:", error);
+            throw error;
+        }
+    }
+
+    async getCancellationCharges(baseURL: string, payload: CancellationChargesRequestDto): Promise<CancellationChargesResponse> {
+        try {
+            const result = await this.httpAPICall(baseURL, payload);
+            return result;
+        } catch (error) {
+            console.error("Error in getCancellationCharges:", error);
+            throw error;
+        }
+    }
+
+    async sendChangeRequest(baseURL: string, payload: SendChangeRequestDto): Promise<SendChangeRequestResponse> {
+        try {
+            const result = await this.httpAPICall(baseURL, payload);
+            return result;
+        } catch (error) {
+            console.error("Error in sendChangeRequest:", error);
+            throw error;
+        }
+    }
+
+    async getChangeRequestStatus(baseURL: string, payload: GetChangeRequestDto): Promise<GetChangeRequestResponse> {
+        try {
+            const result = await this.httpAPICall(baseURL, payload);
+            return result;
+        } catch (error) {
+            console.error("Error in getChangeRequestStatus:", error);
+            throw error;
         }
     }
 }

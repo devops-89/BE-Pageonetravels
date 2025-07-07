@@ -118,9 +118,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Address } from '../../../../lobs/src/dto/entities/address.entity';
-import { User } from './entities/user.entity';
-import { InvoiceDetailsDto } from './dto/invoice-details.dto';
+import { Address } from '../../../../libs/database/src/dto/entities/address.entity';
+import { User } from '../../../../libs/database/src/entities/user.entity';
+import { InvoiceDetailsDto } from '../../../../libs/database/src/dto/invoice-details.dto';
 
 @Injectable()
 export class InvoiceService {

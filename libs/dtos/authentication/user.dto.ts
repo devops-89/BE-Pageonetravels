@@ -1,7 +1,7 @@
 import { IsString, IsEmail, IsNumber, Min, Max, Matches, IsOptional, IsNotEmpty, MinLength, IsEnum, isEmail, IsInt } from 'class-validator';
 import { LOGIN_BY, USER_ACCOUNT_STATUS, USER_TYPE } from '../../constants/autenticationConstants/userContants';
 import { DEVICE_TYPE } from '../../constants/commonConstants';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class LoginDto {
   @IsNotEmpty()
@@ -42,17 +42,20 @@ export class UserQueryDto {
   @IsString()
   search?: string;
 }
+
 export class PaginationDto {
   @IsOptional()
-  @IsNumber()
-  @Min(1)
+  @Type(() => Number)
+  @IsNumber({}, { message: 'Invalid page - page must be a number' })
+  @Min(1, { message: 'Invalid page - must be >= 1' })
   page?: number;
-
   @IsOptional()
-  @IsNumber()
-  @Min(1)
+  @Type(() => Number)
+  @IsNumber({}, { message: 'Invalid limit - limit must be a number' })
+  @Min(1, { message: 'Invalid limit - must be >= 1' })
   limit?: number;
 }
+
 export class UserFilterDto {
   @IsOptional() 
   @IsEnum(USER_TYPE)

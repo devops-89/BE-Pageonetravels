@@ -14,6 +14,7 @@ export declare namespace UserI {
     }
 
     interface UserSchema {
+        [x: string]: any;
         id: string,
         full_name: string,
         avatar: string,
