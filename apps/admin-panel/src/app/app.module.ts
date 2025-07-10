@@ -7,10 +7,10 @@ import { HomeModule } from './home/home.module';
 import { HotelierModule } from '../hotelier/hotelier.module';
 import { PackageModule } from '../package/package.module';
 import { CustomerModule } from '../customer/customer.module';
-import { FlightsModule } from '../flights/flights.module';
+
 
 @Module({
-    imports: [CommissionModule, HomeModule, HotelierModule, PackageModule, CustomerModule, FlightsModule],
+    imports: [CommissionModule, HomeModule, HotelierModule, PackageModule, CustomerModule],
     controllers: [AppController],
     providers: [AppService],
 })
