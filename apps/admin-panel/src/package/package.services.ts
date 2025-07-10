@@ -7,6 +7,7 @@ import { PackageDayRepositoryService } from '../../../../libs/database/src/repos
 import { PackageRepositoryService } from '../../../../libs/database/src/repositories/package.repository';
 import { CreatePackageAmeniteDto , UpdatePackageAmeniteDto } from '../../../../libs/dtos/package/package-amenites.dto';
 import { CreatePackageDayDto, UpdatePackageDayDto } from '../../../../libs/dtos/package/package-days.dto';
+import { PaginationDto } from "../../../../libs/dtos/authentication/user.dto";
 
 
 @Injectable()
@@ -55,16 +56,19 @@ export class PackageService {
     }
 
     // Get Package List
-
-    async getPackage(){
-        try{
-            const result = await this.packageRepositoryService.getPackageList();
-            return {message:`Package list fetch Successfully.`,data:result}
-        }catch(error){
-            console.log("Package list service Error",error);
-            throw error;
+    async getPackage(page: PaginationDto, search?: string) {
+        try {
+          const result = await this.packageRepositoryService.getPackageList(page, search);
+          return {
+            message: `Package list fetched successfully.`,
+            data: result,
+          };
+        } catch (error) {
+          console.log("Package list service error", error);
+          throw error;
         }
-    }
+      }
+      
 
     async pkgUpdate(id,body:any){
         try{    

@@ -7,6 +7,7 @@ import { CreatePackageDto ,PkgId } from '../../../../libs/dtos/package/package-c
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { imageFileFilter } from '../../../../libs/utils/fileUpload';
+import { PaginationDto } from "../../../../libs/dtos/authentication/user.dto";
 
 
 @Controller('package')
@@ -40,14 +41,18 @@ export class PackageController {
     } 
 
     @Get('list')
-    async getPackageList(@Res() res:Response,@Req() req:Request){
-        try{
-            const result = await this.packageService.getPackage();
-            return this.responseHandlerService.sendSuccessResponse(res,result);
-        }catch(error){
-            console.log("Get Package List Error",error);
-            return this.responseHandlerService.sendErrorResponse(res,error);
-        }
+    async getPackageList(
+      @Query() pagination: PaginationDto,
+      @Query('search') search: string,
+      @Res() res: Response
+    ) {
+        try {
+        const result = await this.packageService.getPackage(pagination, search);
+        return this.responseHandlerService.sendSuccessResponse(res, result);
+      } catch (error) {
+        console.log("Get Package List Error", error);
+        return this.responseHandlerService.sendErrorResponse(res, error);
+      }
     }
     
     
@@ -57,7 +62,7 @@ export class PackageController {
         try{
             
             const result = await this.packageService.pkgUpdate(id.id,body);
-            // return this.responseHandlerService.sendSuccessResponse
+            return this.responseHandlerService.sendSuccessResponse(res, result);
         }catch(error){
             console.log("Update Package Error",error);
             return this.responseHandlerService.sendErrorResponse(res,error);
