@@ -1,4 +1,4 @@
-import { Body, Controller, Get,  Post, Query, Req, Res, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get,  Post, Query, Res, Req, UploadedFiles, UseInterceptors, Param } from "@nestjs/common";
 import { PackageService } from "./package.services";
 import { CreatePackageCategoryDto,UpdatePackageCategoryDto } from '../../../../libs/dtos/package/package-category.dto';
 import { CreatePackageAmeniteDto , UpdatePackageAmeniteDto ,AmeniteIdParams } from '../../../../libs/dtos/package/package-amenites.dto';
@@ -218,6 +218,27 @@ export class PackageController {
         }
     }
 
+    @Get('details/:id')
+    async getPackageDetailsById(@Res() res: Response, @Param('id') id: string) {
+        try {
+            const result = await this.packageService.getPackageById(id);
+            return this.responseHandlerService.sendSuccessResponse(res, result);
+        } catch (error) {
+            console.log("Get Package Details By ID Error", error);
+            return this.responseHandlerService.sendErrorResponse(res, error);
+        }
+    }
+
+    @Post('book')
+    async bookPackage(@Res() res: Response, @Body() body: unknown) {
+        try {
+            const result = await this.packageService.bookPackage(body);
+            return this.responseHandlerService.sendSuccessResponse(res, result);
+        } catch (error) {
+            console.log('Book Package Error', error);
+            return this.responseHandlerService.sendErrorResponse(res, error);
+        }
+    }
 
 
 }

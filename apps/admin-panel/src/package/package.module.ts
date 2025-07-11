@@ -7,7 +7,7 @@ import { ResponseHandlerModule } from '../../../../libs/response-handler/respons
 import { TransactionManager } from '../../../../libs/database/src/repositories/utils';
 import { JwtService } from '../../../../libs/jwt-service/jwt.service';
 import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMiddleware';
-import { DBModule, User, UserRepositoryService } from '../../../../libs/database/src';
+import { Booking, DBModule, User, UserRepositoryService } from '../../../../libs/database/src';
 import { PackageCategoryRepositoryService } from '../../../../libs/database/src/repositories/packagecategory.repository';
 import { PackageDayRepositoryService } from '../../../../libs/database/src/repositories/packageday.repository';
 import { PackageRepositoryService } from '../../../../libs/database/src/repositories/package.repository';
@@ -16,6 +16,7 @@ import { PackageAmenite } from '../../../../libs/database/src/entities/packageAm
 import { PackageDay } from '../../../../libs/database/src/entities/packageDay.entity'; // Make sure to import your entity
 import { Package } from '../../../../libs/database/src/entities/package.entity'; // Make sure to import your entity
 import { PackageAmeniteRepositoryService } from '../../../../libs/database/src/repositories/packageamenite.repository';
+import { BookingRepositoryService } from '../../../../libs/database/src/repositories/booking.repository';
 @Module({
   imports: [
     DBModule.forRoot(),
@@ -25,6 +26,7 @@ import { PackageAmeniteRepositoryService } from '../../../../libs/database/src/r
       PackageAmenite,
       PackageDay,
       Package,
+      Booking,
     ]),
     ConfigModule,
     ResponseHandlerModule,
@@ -40,6 +42,7 @@ import { PackageAmeniteRepositoryService } from '../../../../libs/database/src/r
     PackageAmeniteRepositoryService,
     PackageDayRepositoryService,
     PackageRepositoryService,
+    BookingRepositoryService,
   ],
   exports: [PackageService], // Export if needed by other modules
 })

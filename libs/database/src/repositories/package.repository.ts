@@ -111,5 +111,18 @@ export class PackageRepositoryService {
         }
     }
 
+    async getPackageById(id: string) {
+        try {
+            const pkg = await this.pkgRepository.findOne({ where: { id } });
+            if (!pkg) {
+                throw { message: "Package not found.", statusCode: ERROR_CODES.BAD_REQUEST };
+            }
+            return pkg;
+        } catch (error) {
+            console.log("Get Package By ID Repository Error.", error);
+            throw error;
+        }
+    }
+
 }
 

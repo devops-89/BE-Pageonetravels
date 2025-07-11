@@ -8,6 +8,7 @@ import { PackageRepositoryService } from '../../../../libs/database/src/reposito
 import { CreatePackageAmeniteDto , UpdatePackageAmeniteDto } from '../../../../libs/dtos/package/package-amenites.dto';
 import { CreatePackageDayDto, UpdatePackageDayDto } from '../../../../libs/dtos/package/package-days.dto';
 import { PaginationDto } from "../../../../libs/dtos/authentication/user.dto";
+import { BookingRepositoryService } from '../../../../libs/database/src/repositories/booking.repository';
 
 
 @Injectable()
@@ -17,7 +18,8 @@ export class PackageService {
         private readonly packageDayRepositoryService: PackageDayRepositoryService,
         private readonly packageRepositoryService:PackageRepositoryService,
         private readonly packageCategoryRepositoryService:PackageCategoryRepositoryService,
-        private readonly packageAmeniteRepositoryService:PackageAmeniteRepositoryService
+        private readonly packageAmeniteRepositoryService:PackageAmeniteRepositoryService,
+        private readonly bookingRepositoryService: BookingRepositoryService
     ){}
 
 
@@ -171,6 +173,27 @@ export class PackageService {
             return {message:`Package Day's Updated Successfully.`,data:result}
         }catch(error){
             console.log("Package Day's Update service Error.",error);
+            throw error;
+        }
+    }
+
+    async getPackageById(id: string) {
+        try {
+            const result = await this.packageRepositoryService.getPackageById(id);
+            return { message: `Package details fetched successfully.`, data: result };
+        } catch (error) {
+            console.log("Get Package By ID Service Error.", error);
+            throw error;
+        }
+    }
+
+    async bookPackage(bookingDto: unknown) {
+        try {
+            // bookingDto should contain userId, packageId, payment details, etc.
+            const result = await this.bookingRepositoryService.createBookingService(bookingDto);
+            return { message: 'Package booked successfully.', data: result };
+        } catch (error) {
+            console.log('Book Package Service Error.', error);
             throw error;
         }
     }
