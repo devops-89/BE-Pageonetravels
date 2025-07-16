@@ -152,7 +152,9 @@ export class FlightDetailService {
                     "ResultIndex": result_index
                 };
                 
+                console.log("+++++++++++++++++base url api calling++++++++++++++++++");
                 response = await this.httptboapiservice.fareRule(base_url, payload_request);
+                console.log("fare rule api calling url:", base_url)
                 console.log("flight format url+++++: ",response);
                 
                 response = await this.httptboapiservice.flightFormat(response);

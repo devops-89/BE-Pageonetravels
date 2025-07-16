@@ -23,7 +23,7 @@ export class PackageRepositoryService {
         try{
            const checkPkgType  =  await this.packageDayRepositoryService.findDayExist(body.package_day);
            const checkCategory = await this.packageCategoryRepositoryService.findCategory(body.package_type);
-           const fetchAmenites = await this.packageAmeniteRepositoryService.checkAmenite(body.amenities);
+          //  const fetchAmenites = await this.packageAmeniteRepositoryService.checkAmenite(body.amenities);
 
            const upload = body.gallery_image;
            const originalNames = upload.map(file =>file.path).join(', ');
@@ -37,7 +37,6 @@ export class PackageRepositoryService {
                     banner_image:body.banner_image[0].path,
                     package_slug:body.package_slug,
                     package_day:body.package_day,
-                    package_no_of_person:body.package_no_of_person,
                     package_price:body.package_price,
                     selling_price:body.selling_price,
                     package_destination:body.package_destination,
@@ -48,10 +47,11 @@ export class PackageRepositoryService {
                     state:body.state,
                     country:body.country,
                     zip:body.zip,
-                    monthYear:body.monthYear,
                     package_type:body.package_type,
                     status:body.status,
-                    highlight:body.highlight
+                    highlight:body.highlight,
+                    amenities:body.amenities,
+                    rating:body.rating || 0
            });
            console.log(">>>>>>>>>>>>@#$@#$ ...",pkgData);
            const result = await this.pkgRepository.save(pkgData);

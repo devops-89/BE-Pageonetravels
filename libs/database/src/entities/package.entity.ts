@@ -45,9 +45,7 @@ export class Package {
   @Column()
   package_day: string;
 
-  @Column()
-  package_no_of_person: number;
-
+ 
   // @Column({ type: 'decimal', precision: 10, scale: 2 })
   // customize_day_price: number;
 
@@ -78,14 +76,20 @@ export class Package {
   @Column()
   state: string;
 
+@Column({ type: 'jsonb', nullable: true })
+amenities: PackageAmenite[];
+
+
+   @Column({ type: 'int', default: 1 })
+  rating: number;
+
   @Column()
   country: string;
 
   @Column()
   zip: string;
 
-  @Column()
-  monthYear: string;
+ 
 
   @Column()
   package_type: string;

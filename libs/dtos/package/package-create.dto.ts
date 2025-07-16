@@ -9,6 +9,7 @@ import {
   IsNotEmptyObject,
   IsNotEmpty,
   IsUUID,
+  Min,Max
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -62,8 +63,7 @@ export class CreatePackageDto {
   @IsString()
   package_day: string;
 
-  @IsNumber()
-  package_no_of_person: number;
+  
 
   @IsNumber()
   package_price: number;
@@ -98,9 +98,6 @@ export class CreatePackageDto {
   zip: string;
 
   @IsString()
-  monthYear: string;
-
-  @IsString()
   package_type: string;
 
   @IsBoolean()
@@ -118,6 +115,13 @@ export class CreatePackageDto {
   @IsArray()
   @IsOptional()
   amenities?: string[];
+
+   
+  @IsNumber()
+  @Min(0)
+  @Max(5)
+  @IsOptional()
+  rating?: number;
 }
 
 
