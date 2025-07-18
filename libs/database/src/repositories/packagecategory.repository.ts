@@ -13,22 +13,20 @@ export class PackageCategoryRepositoryService {
             private readonly pkgCatRepository: Repository<PackageCategory>,
     ) {}
 
-    async insertCategory(input:InsertCategory){
-        try{
-            
-            const mainImage = input.category_image[0].path;
-            
-            const details = this.pkgCatRepository.create({
-                category_name : input.category_name,
-                category_image : mainImage
-            });
-            const result = await this.pkgCatRepository.save(details);
-            return result;
-        }catch(error){
-            console.log(">>>>>>",error);
-            throw error;
-        }
-    }
+  async insertCategory(input: InsertCategory) {
+  try {
+    const details = this.pkgCatRepository.create({
+      category_name: input.category_name,
+      category_image: input.category_image, // ✅ Now a simple string URL from S3
+    });
+
+    const result = await this.pkgCatRepository.save(details);
+    return result;
+  } catch (error) {
+    console.log("Insert Category Error >>>>>>", error);
+    throw error;
+  }
+}
 
     async getAllCategory(){
         try{
@@ -43,31 +41,34 @@ export class PackageCategoryRepositoryService {
         }
     }
 
-    async updateCategory(id,body:UpdateCategory ){
-        try{
-            // First check if the category exists
-            const existingCategory = await this.pkgCatRepository.findOne({
-                where: { category_id: id }
-            });
+  async updateCategory(id: string, body: UpdateCategory) {
+  try {
+    // 1. Check if the category exists
+    const existingCategory = await this.pkgCatRepository.findOne({
+      where: { category_id: id },
+    });
 
-            if (!existingCategory) {
-                throw { message: "Category ID Not Exist. Please Provide Valid Category ID", statusCode: ERROR_CODES.BAD_REQUEST };
-            }
-
-            // Update the category with new data
-            const updatedCategory = await this.pkgCatRepository.save({
-                                        ...existingCategory,
-                                        category_name: body.category_name,
-                                        ...(body.category_image?.path && { category_image: body.category_image.path }),
-                                    });
-
-
-            return updatedCategory;
-        }catch(error){
-            console.log(">>>>>>",error);
-            throw error;
-        }
+    if (!existingCategory) {
+      throw {
+        message: "Category ID Not Exist. Please Provide Valid Category ID",
+        statusCode: ERROR_CODES.BAD_REQUEST,
+      };
     }
+
+    // 2. Build updated category
+    const updatedCategory = await this.pkgCatRepository.save({
+      ...existingCategory,
+      category_name: body.category_name,
+      ...(body.category_image && { category_image: body.category_image }), // ✅ use S3 string
+    });
+
+    return updatedCategory;
+  } catch (error) {
+    console.log("Update Category Error >>>>>>", error);
+    throw error;
+  }
+}
+
 
     async findCategory(package_type:string){
         try{

@@ -10,6 +10,7 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "baseUrl": "./",
+     "types": ["node", "express", "multer"],
     "paths": {
       "//constants": [
         "libs/constants/src"

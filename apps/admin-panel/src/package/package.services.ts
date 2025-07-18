@@ -9,6 +9,8 @@ import { CreatePackageAmeniteDto , UpdatePackageAmeniteDto } from '../../../../l
 import { CreatePackageDayDto, UpdatePackageDayDto } from '../../../../libs/dtos/package/package-days.dto';
 import { PaginationDto } from "../../../../libs/dtos/authentication/user.dto";
 import { BookingRepositoryService } from '../../../../libs/database/src/repositories/booking.repository';
+import {S3FileService} from "../../../../libs/S3-Service/s3File.service";
+
 
 
 @Injectable()
@@ -19,7 +21,8 @@ export class PackageService {
         private readonly packageRepositoryService:PackageRepositoryService,
         private readonly packageCategoryRepositoryService:PackageCategoryRepositoryService,
         private readonly packageAmeniteRepositoryService:PackageAmeniteRepositoryService,
-        private readonly bookingRepositoryService: BookingRepositoryService
+        private readonly bookingRepositoryService: BookingRepositoryService,
+        private readonly s3FileService: S3FileService
     ){}
 
 
@@ -83,8 +86,15 @@ export class PackageService {
     }
     
     // add-category
-    async addCategory(input: CreatePackageCategoryDto){
+    async addCategory(input: CreatePackageCategoryDto,file?){
         try{
+            if(file){
+                const filePath=`categories/${Date.now()}-${file.originalname}`;
+                const s3Url=await this.s3FileService.s3FileUpload(file.buffer,filePath);
+                input.category_image=s3Url;
+
+
+            }
             const result = await this.packageCategoryRepositoryService.insertCategory(input);
             return { message: `Package Category Created Successfully`, data: result };
         }catch(error){
@@ -104,15 +114,22 @@ export class PackageService {
         }
     }
 
-    async updateCategory(id,body:UpdatePackageCategoryDto){
-        try{
-            const result = await this.packageCategoryRepositoryService.updateCategory(id,body);
-            return {message:`Package Category Updated Successfully.`,data:result}
-        }catch(error){
-            console.log(error);
-            throw error;
-        }
+  async updateCategory(id: string, body: UpdatePackageCategoryDto, file?) {
+  try {
+    if (file) {
+      const filePath = `categories/${Date.now()}-${file.originalname}`;
+      const s3Url = await this.s3FileService.s3FileUpload(file.buffer, filePath);
+      body.category_image = s3Url; // ✅ Replace old image with new S3 URL
     }
+
+    const result = await this.packageCategoryRepositoryService.updateCategory(id, body);
+    return { message: `Package Category Updated Successfully.`, data: result };
+  } catch (error) {
+    console.log("Update Category Service Error:", error);
+    throw error;
+  }
+}
+
 
     // Amenites
     async addAmenites(body:CreatePackageAmeniteDto){

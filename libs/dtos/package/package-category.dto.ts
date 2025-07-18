@@ -6,16 +6,17 @@ export class CreatePackageCategoryDto {
   @IsString()
   category_name: string;
 
-  @IsNotEmpty()
-  category_image: CustomFile;
+ @IsOptional()
+ @IsString()
+  category_image?: string;
 }
 
-
 export class UpdatePackageCategoryDto {
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   category_name: string;
 
   @IsOptional()
-  category_image: CustomFile;
+  @IsString()
+  category_image?: string; 
 }

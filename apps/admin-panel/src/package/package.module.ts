@@ -17,6 +17,7 @@ import { PackageDay } from '../../../../libs/database/src/entities/packageDay.en
 import { Package } from '../../../../libs/database/src/entities/package.entity'; // Make sure to import your entity
 import { PackageAmeniteRepositoryService } from '../../../../libs/database/src/repositories/packageamenite.repository';
 import { BookingRepositoryService } from '../../../../libs/database/src/repositories/booking.repository';
+import {S3Module} from "../../../../libs/S3-Service/s3.module";
 @Module({
   imports: [
     DBModule.forRoot(),
@@ -30,6 +31,7 @@ import { BookingRepositoryService } from '../../../../libs/database/src/reposito
     ]),
     ConfigModule,
     ResponseHandlerModule,
+     S3Module.forRoot()
   ],
   controllers: [PackageController],
   providers: [

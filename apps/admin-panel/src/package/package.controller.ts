@@ -18,7 +18,7 @@ export class PackageController {
     ){}
 
     @Get('pkglistdata')
-    async getPkgListData(@Res() res:Response,@Req() req:Request){
+    async getPkgListData(@Res() res:Response){
         try{
             const result = await this.packageService.getPkgListData();
             return this.responseHandlerService.sendSuccessResponse(res,result);
@@ -87,12 +87,17 @@ export class PackageController {
         [
           { name: 'category_image', maxCount: 1 }
         ],
-        { fileFilter: imageFileFilter }
+       {
+        fileFilter: imageFileFilter,
+        limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+      }
       )
     )
     async addCategory(@Res() res:Response,@Req() req:Request, @UploadedFiles() files,@Body() body:CreatePackageCategoryDto){
         try{
-            const result = await this.packageService.addCategory(body);
+            const imageFile=files?.category_image?.[0];
+
+            const result = await this.packageService.addCategory(body,imageFile);
             return this.responseHandlerService.sendSuccessResponse(res,result);
         }catch(error){
             console.log("Add Category Error",error);
@@ -101,7 +106,7 @@ export class PackageController {
     }
 
     @Get('category/getAll')
-    async getAllPkgCategory(@Res() res:Response,@Req() req:Request){
+    async getAllPkgCategory(@Res() res:Response){
         try{
             const result = await this.packageService.getAllCategory();
             return this.responseHandlerService.sendSuccessResponse(res,result);
@@ -112,23 +117,28 @@ export class PackageController {
     }
 
     @Post('category/update')
-    @UseInterceptors(
-      FileFieldsInterceptor(
-        [
-          { name: 'category_image', maxCount: 1 }
-        ],
-        { fileFilter: imageFileFilter }
-      )
-    ) 
-    async updatePkgCategory(@Res() res:Response,@Req() req:Request, @Query('id') id: string,@Body() body:UpdatePackageCategoryDto){
-        try{
-            const result = await this.packageService.updateCategory(id,body);
-            return this.responseHandlerService.sendSuccessResponse(res,result);
-        }catch(error){
-            console.log("Update Category Error",error);
-            return this.responseHandlerService.sendErrorResponse(res,error);
-        }
-    }
+@UseInterceptors(
+  FileFieldsInterceptor(
+    [{ name: 'category_image', maxCount: 1 }],
+    { fileFilter: imageFileFilter }
+  )
+)
+async updatePkgCategory(
+  @Res() res: Response,
+  @Req() req: Request,
+  @Query('id') id: string,
+  @UploadedFiles() files,
+  @Body() body: UpdatePackageCategoryDto
+) {
+  try {
+    const imageFile = files?.category_image?.[0]; // ✅ Get file if present
+    const result = await this.packageService.updateCategory(id, body, imageFile); // ✅ Pass it to service
+    return this.responseHandlerService.sendSuccessResponse(res, result);
+  } catch (error) {
+    console.log("Update Category Error", error);
+    return this.responseHandlerService.sendErrorResponse(res, error);
+  }
+}
 
     // Amenite -Add
     @Post('amenities/add')
@@ -153,7 +163,7 @@ export class PackageController {
 
     // Amenite -Get
     @Get('amenities/getAll')
-    async getPkgAmenites(@Res() res:Response,@Req() req:Request){
+    async getPkgAmenites(@Res() res:Response){
         try{
             const result = await this.packageService.getAmenites();
             return this.responseHandlerService.sendSuccessResponse(res,result);
