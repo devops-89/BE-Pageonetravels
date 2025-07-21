@@ -140,25 +140,31 @@ export class SearchHotelController {
   }
 
 
-  @Post('/hotelBooking')
-  @UseGuards(TokenValidationGuard)
-  async hotelBooking(@Req() req:Request, @Res() res:Response, @Body() body:CreateHotelBookingDto){
-    try{
-      const payload = req['userPayload'];
-      console.log(payload);
-      const {reference_id}= payload;
-      const refData = await this.userRepositoryService.getUserByUserId(reference_id);
-      if(!refData){
-          throw (`An error occurred while fetching the user. Please try again later.`);
-      }
-      const result = await this.searchHotelService.bookingHotel(body,reference_id);
-      console.log("??????",result);
-      
-      //return this.responseHandler.sendSuccessResponse(res, result);
-    }catch(error){
-      return this.responseHandler.sendErrorResponse(res,error);
+ @Post('/hotelBooking')
+@UseGuards(TokenValidationGuard)
+async hotelBooking(
+  @Req() req: Request,
+  @Res() res: Response,
+  @Body() body: CreateHotelBookingDto
+) {
+  try {
+    const payload = req['userPayload'];
+    const { reference_id } = payload;
+
+    const refData = await this.userRepositoryService.getUserByUserId(reference_id);
+    if (!refData) {
+      throw 'An error occurred while fetching the user. Please try again later.';
     }
+
+    const bookingResult = await this.searchHotelService.bookingHotel(body, reference_id);
+    console.log('✅ Booking API Result:', bookingResult);
+
+    return this.responseHandler.sendSuccessResponse(res, bookingResult);
+  } catch (error) {
+    return this.responseHandler.sendErrorResponse(res, error);
   }
+}
+
 
   @Post('/getBookingDetails')
   async hotelBookingDetails(@Req() req:Request,@Res() res:Response,@Body() body:CreateBookingDto){

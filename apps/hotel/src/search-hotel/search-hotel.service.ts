@@ -261,30 +261,43 @@ export class SearchHotelService {
     }
   }
 
-  async bookingHotel(body:CreateHotelBookingDto,reference_id:string){
-    try{ 
-      console.log(">>>",body);
-      const order_type = "HOTEL";
-            const amount = "10";
-            const is_LCC = "";
-            const journey = "";
-            const journey_type = "";
-            let commissionType: {
-              "commission_type": "FIXED",
-              "percentage": "350.00"
-            }
-            console.log(commissionType);
-            const result  = await this.orderRepository.insertBooking(reference_id,order_type,body,amount,is_LCC,journey,journey_type,"FIXED","350.00");
-            console.log(">>>>>>>>>>>",result);
-      
-      // const url = 'https://HotelBE.tektravels.com/hotelservice.svc/rest/book/';
-      // const result = await this.hotelTBOAPIService.hotelBook(url,body);
-      return ;
-    }catch(error){
-      console.log(error);
-      throw error;
-    }
+ async bookingHotel(body: CreateHotelBookingDto, reference_id: string) {
+  try {
+    console.log('📦 Booking Request Payload:', body);
+
+    // 1. Insert booking request to DB first (for logging/tracking)
+    const order_type = 'HOTEL';
+    const amount = body.NetAmount.toString();
+    const is_LCC = '';
+    const journey = '';
+    const journey_type = '';
+
+    const savedOrder = await this.orderRepository.insertBooking(
+      reference_id,
+      order_type,
+      body,
+      amount,
+      is_LCC,
+      journey,
+      journey_type,
+      'FIXED',
+      '350.00'
+    );
+    console.log('💾 Order Saved:', savedOrder);
+
+    // 2. Call TBO Booking API
+    const url = 'https://HotelBE.tektravels.com/hotelservice.svc/rest/book/';
+    const tboBookingResponse = await this.hotelTBOAPIService.hotelBook(url, body); //  actual booking API call
+
+    // 3. Return the response from TBO
+    return tboBookingResponse;
+
+  } catch (error) {
+    console.error('❌ Booking failed:', error);
+    throw error;
   }
+}
+
 
   async bookingDetails(body:CreateBookingDto){
     try{
