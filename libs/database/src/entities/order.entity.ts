@@ -21,9 +21,11 @@ export class Order {
     user: User; 
 
     @Column({ nullable: true })
+    @IsOptional()
     commission_type: string;
 
-    @Column()
+    @Column({nullable:true})
+    @IsOptional()
     @IsString()
     commission: string;
 
@@ -35,13 +37,15 @@ export class Order {
     order_type: ORDER_TYPE;
     
 
-    @Column()
+    @Column({nullable:true})
     @IsString()
+    @IsOptional()
     journey_type: string;
 
 
-    @Column()
+    @Column({nullable:true})
     @IsString()
+    @IsOptional()
     journey: string;
 
     @Column({ type: 'boolean', nullable: true }) // <- important!

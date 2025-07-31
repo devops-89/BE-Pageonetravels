@@ -3,9 +3,11 @@ import { RazorpayService } from './razorpay.service';
 import { RazorpayController } from './razorpay.controller';
 import { DBModule } from '../../../../libs/database/src';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import {Payment,Order,User} from "../../../../libs/database/src/entities";
 import { ConfigModule } from '../../../../libs/config/config.module';
 import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMiddleware';
 import { JwtService } from '../../../../libs/jwt-service/jwt.service';
+import { OrderRepositoryService,UserRepositoryService } from '../../../../libs/database/src/repositories';
 import { ResponseHandlerModule } from '../../../../libs/response-handler/response-handler.module';
 import { RazorpayService as RazorpayPaymentService } from '../../../../libs/paymentgateway/razorpay.service';
 
@@ -14,14 +16,14 @@ import { RazorpayService as RazorpayPaymentService } from '../../../../libs/paym
       DBModule.forRoot(),
       TypeOrmModule.forFeature([
           //  BookingRepositoryService,
-          //  Payment,
+           Payment,
           //  FlightTicketRepositoryService,
-          //  OrderRepositoryService,
+           OrderRepositoryService,
           //  Booking,
-          //  Order,
-          //  User,
+           Order,
+           User,
           //  TransactionManager,
-          //  UserRepositoryService
+           UserRepositoryService
       ]),
       ConfigModule,
       ResponseHandlerModule,
