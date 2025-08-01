@@ -76,6 +76,10 @@ export class RazorpayController {
                   customer:{
                     email:refData.email
                   },
+                  notes: {
+                    module: 'hotel',
+                    order_id: orderResponse.order_id,
+                },
                    callback_url: 'https://page1-fe.vercel.app/payment/success'
             });
 
@@ -91,16 +95,7 @@ export class RazorpayController {
                                 userRef.id = user;
                                 
                                 console.log(10);
-                                // Create the new payment order object
-                                // await this.paymentRepository.insert(this.paymentRepository.create({
-                                //     razorpay_link_response: JSON.stringify(paymentLink),
-                                //     user: userRef,
-                                //     order: orderRef,
-                                //     // razorpay_order_id: data.id,
-                                //     payment_gateway: "Razorpay",
-                                //     payment_status: paymentLink.status,
-                                //     status: PAYMENT_STATUS.IN_PROGRESS, // Ensure PAYMENT_STATUS is defined elsewhere
-                                // }));
+                              
 
                                             // Create the payment entity
                         const paymentEntity = this.paymentRepository.create({

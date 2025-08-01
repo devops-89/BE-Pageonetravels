@@ -147,13 +147,14 @@ async updatePkgCategory(
         [
           { name: 'amenite_image', maxCount: 1 }
         ],
-        { fileFilter: imageFileFilter }
+        { fileFilter: imageFileFilter,limits: { fileSize: 2 * 1024 * 1024 } }
       )
     ) 
     async addPkgAmenities(@Res() res:Response,@Req() req:Request,@Body() body:CreatePackageAmeniteDto , @UploadedFiles() files ){
         try{
             // console.log(">>>>>>> amenite >",files);
-            const result = await this.packageService.addAmenites(body);
+            const imageFile=files?.amenite_image?.[0];
+            const result = await this.packageService.addAmenites(body,imageFile);
             return this.responseHandlerService.sendSuccessResponse(res,result);
         }catch(error){
             console.log("Add Pkg Amenities Error",error);

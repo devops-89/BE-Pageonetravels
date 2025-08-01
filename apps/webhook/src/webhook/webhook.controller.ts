@@ -116,6 +116,20 @@ export class WebhookController {
 
   if (body && body.payload) {
     const event = body.event;
+
+    // extarcting the entity to get the additional information
+       console.log("+++++++++++++++++++ Webhook Payload Response +++++++++++++++++++++++++++");
+          const notes = body?.payload?.payment?.entity?.notes;
+
+    console.log('Notes from webhook:', notes);
+         const entity=body.payload.payment.entity;
+         console.log("Received Razorpay Event: ", event);
+         console.log("Razorpay Entity Id: ",entity.id);
+         console.log("Payment Link Id: ",entity.payment_link_id);
+         console.log("Payment Link Reference Id(custom_order_id): ",entity.payment_link_reference_id);
+         console.log("Payment Status: ",entity.status);
+   console.log("+++++++++++++++++++ Webhook Payload Response +++++++++++++++++++++++++++");
+
     if (event === 'payment.captured') {
       await this.webhookService.handlePaymentdata(body);
     } else if (event === 'payment.failed') {

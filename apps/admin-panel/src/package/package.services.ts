@@ -132,8 +132,13 @@ export class PackageService {
 
 
     // Amenites
-    async addAmenites(body:CreatePackageAmeniteDto){
+    async addAmenites(body:CreatePackageAmeniteDto,file?){
         try{
+            if(file){
+                     const filePath=`amenities/${Date.now()}-${file.originalname}`;
+                    const s3Url=await this.s3FileService.s3FileUpload(file.buffer,filePath);
+                    body.amenite_image=s3Url;
+            }
             const result = await this.packageAmeniteRepositoryService.insetAmenites(body);
             return { message: `Package Amenites Created Successfully`, data: result };
         }catch(error){

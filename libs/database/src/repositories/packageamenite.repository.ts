@@ -16,10 +16,10 @@ export class PackageAmeniteRepositoryService {
 
       async insetAmenites(input:InsertAmenites){
         try{
-            const mainImage = input.amenite_image[0].path;
+           
             const details = this.pkgAmeniteRepository.create({
                 amenite_name : input.amenite_name,
-                amenite_image : mainImage
+                amenite_image :input.amenite_image
             });
             const result = await this.pkgAmeniteRepository.save(details);
             return result;
