@@ -1,39 +1,12 @@
-// import { Injectable } from '@nestjs/common';
-// import { ConfigService } from '../../../../libs/config/config.service';
-// import Razorpay from 'razorpay';
-
-// @Injectable()
-// export class WebhookService {
-//     private razorpay: Razorpay;
-//     private key: string;
-//     private secret: string;
-
-//     constructor(private readonly configService: ConfigService) {
-//         this.key = this.configService.get().RAZORPAY_CREDENTIAL.RAZORPAY_KEY;
-//         this.secret = this.configService.get().RAZORPAY_CREDENTIAL.RAZORPAY_KEY_SECRET;
-
-//         try {
-//             this.razorpay = new Razorpay({
-//                 key_id: this.key,
-//                 key_secret: this.secret,
-//             });
-//         } catch (error) {
-//             console.error('Failed to initialize Razorpay:', error);
-//             throw new Error('Razorpay initialization failed');
-//         }
-//     }
-
-//     getInstance(): Razorpay {
-//         return this.razorpay;
-//     }
-// }
 
 import { Injectable  } from '@nestjs/common';
 import axios from 'axios';
 import { ConfigService } from '../../../../libs/config/config.service';
 import { OrderRepositoryService } from '../../../../libs/database/src/repositories/order.repository';
 import { FlightTicketRepositoryService } from '../../../../libs/database/src/repositories/flightticket.repository';
+import {HotelPaymentRepositoryService} from "../../../../libs/database/src/repositories/hotelPayment.repository";
 import { FlightService } from '../../../../libs/tickethandler/flight.service';
+import {HotelService} from "../../../../libs/hotelbookinghandler/hotel.service";
 
 @Injectable()
 export class WebhookService {
@@ -42,7 +15,9 @@ export class WebhookService {
       private readonly configService: ConfigService,
       private readonly orderRepositoryService:OrderRepositoryService,
       private readonly flightTicketRepositoryService:FlightTicketRepositoryService,
-      private readonly flightService:FlightService
+      private readonly hotelPaymentRepositoryService:HotelPaymentRepositoryService,
+      private readonly flightService:FlightService,
+      private readonly hotelService:HotelService
     ){
     }
   // Handle different Razorpay events
@@ -108,7 +83,7 @@ async getPaymentDetails(paymentId: string): Promise<any> {
     }
   }
 
-   async handlePaymentdata(body: any) {
+   async handleFlightPaymentdata(body: any) {
         try { 
             const orderid = body.payload.payment.entity.order_id;
             const response =await this.getPayment(orderid);
@@ -127,6 +102,30 @@ async getPaymentDetails(paymentId: string): Promise<any> {
             throw error;
         }
     }
+
+       async handleHotelPaymentdata(body: any) {
+        try { 
+            const orderid = body.payload.payment.entity.order_id;
+            const response =await this.getPayment(orderid);
+            const orderdetails = await this.orderRepositoryService.findOne(response);
+            console.log("id based on the order id for razorpay: ",response);
+          
+            console.log("=============webhook handlePayment Order Details Fetched: ",orderdetails);
+            console.log("modify order body:", body);
+            const modifyOrder = await this.orderRepositoryService.updateOrder(response,body);
+            console.log("modified order Repository:",modifyOrder);
+            const updatedPayment = await this.hotelPaymentRepositoryService.findAndUpdate(modifyOrder,body);
+            console.log("updated Payment:",updatedPayment);
+           
+            if(orderdetails){  
+              await this.hotelService.hotelHandler(orderdetails.order_id,orderdetails.custom_order_id,orderdetails.order_request,orderdetails.user,orderdetails.payment);
+            }
+        } catch (error) {
+            console.log("Error inside handlePaymentCaptured:", error);
+            throw error;
+        }
+    }
+
 
     
   

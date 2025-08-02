@@ -3,6 +3,7 @@ import { ConfigService } from '../../config/config.service';
 import { ConfigModule } from '../../config/config.module';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigDatabase } from '../../config/config.interface';
+import { HotelPaymentRepositoryService } from './repositories/hotelPayment.repository';
 import {
   LoginSessionService,
   OtpVerificationService,
@@ -14,6 +15,7 @@ import {
   BookingRepositoryService,
   OrderRepositoryService,
   FlightTicketRepositoryService,
+ 
   Payment,
   HotelCountryRepositoryService,
   HotelCityRepositoryService,
@@ -168,6 +170,7 @@ export class DBModule {
                 BookingRepositoryService,
                 OrderRepositoryService,
                 FlightTicketRepositoryService,
+                HotelPaymentRepositoryService,
                 HotelCountryRepositoryService,
                 HotelCityRepositoryService,
                 HotelDetailsRepositoryService,
@@ -193,6 +196,7 @@ export class DBModule {
                 BookingRepositoryService,
                 OrderRepositoryService,
                 FlightTicketRepositoryService,
+                HotelPaymentRepositoryService,
                 HotelCountryRepositoryService,
                 HotelCityRepositoryService,
                 HotelDetailsRepositoryService,

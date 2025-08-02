@@ -5,6 +5,7 @@ import { WebhookController } from './webhook.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '../../../../libs/config/config.module';
 import { FlightService } from '../../../../libs/tickethandler/flight.service';
+import { HotelService } from '../../../../libs/hotelbookinghandler/hotel.service';
 import   {TBO_CredentialsService} from '../../../../libs/loadtbo-db-config/tbo-config.service';
 import { ConfigService } from "../../../../libs/config/config.service";
 import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.module';
@@ -22,13 +23,14 @@ import { HttpModule } from '@nestjs/axios';
     ConfigModule,
     TypeOrmModule.forFeature([
       FlightService,
-      ConfigService
+      ConfigService,
+      HotelService
     ]),
     ResponseHandlerModule,
     HttpModule
   ],
   controllers: [WebhookController],
-  providers: [WebhookService,FlightService,TBO_CredentialsService,HTTPSTboAPIService, EmailService,PDFGenerateService],
+  providers: [WebhookService,FlightService,HotelService,TBO_CredentialsService,HTTPSTboAPIService, EmailService,PDFGenerateService],
 })
 
 

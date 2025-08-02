@@ -117,21 +117,33 @@ export class WebhookController {
   if (body && body.payload) {
     const event = body.event;
 
-    // extarcting the entity to get the additional information
-       console.log("+++++++++++++++++++ Webhook Payload Response +++++++++++++++++++++++++++");
-          const notes = body?.payload?.payment?.entity?.notes;
+       const entity = body.payload.payment.entity;
+    const notes = entity?.notes || {};
+    const module = notes?.module;
 
-    console.log('Notes from webhook:', notes);
-         const entity=body.payload.payment.entity;
-         console.log("Received Razorpay Event: ", event);
-         console.log("Razorpay Entity Id: ",entity.id);
-         console.log("Payment Link Id: ",entity.payment_link_id);
-         console.log("Payment Link Reference Id(custom_order_id): ",entity.payment_link_reference_id);
-         console.log("Payment Status: ",entity.status);
-   console.log("+++++++++++++++++++ Webhook Payload Response +++++++++++++++++++++++++++");
+       console.log("+++++++++++++++++++ Webhook Payload Response +++++++++++++++++++++++++++");
+    console.log('Module from webhook:', module);
+    console.log("Received Razorpay Event: ", event);
+    console.log("Razorpay Entity Id: ", entity.id);
+    console.log("Payment Link Id: ", entity.payment_link_id);
+    console.log("Payment Link Reference Id(custom_order_id): ", entity.payment_link_reference_id);
+    console.log("Payment Status: ", entity.status);
+    console.log("+++++++++++++++++++ Webhook Payload Response +++++++++++++++++++++++++++");
+
 
     if (event === 'payment.captured') {
-      await this.webhookService.handlePaymentdata(body);
+      if(module==="hotel")
+      {
+           await this.webhookService.handleHotelPaymentdata(body);
+      }
+      else if(module==="flight"){
+           await this.webhookService.handleFlightPaymentdata(body);
+      }
+      else {
+        console.warn('Unknown module type in webhook:', module);
+      }
+    
+     
     } else if (event === 'payment.failed') {
       console.log(`Payment failed for order ID: `);
     } else {
@@ -140,6 +152,8 @@ export class WebhookController {
 
     return { status: 'success' };
   }
+
+  return { status: 'ignored' };
 }
 }
    
