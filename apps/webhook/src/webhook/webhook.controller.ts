@@ -1,9 +1,9 @@
-import { Controller, Post, Req, Headers, HttpStatus, HttpException, Body, Get, Query, Param, Res   } from '@nestjs/common';
+import { Controller, Post, Req, Headers,  Body, Get, Query, Param, Res   } from '@nestjs/common';
 import { ConfigService } from '../../../../libs/config/config.service';
 import { OrderRepositoryService } from '../../../../libs/database/src/repositories/order.repository';
 import { WebhookService } from './webhook.service';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
-import * as crypto from 'crypto';
+
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 // import { Payment } from '../../../../libs/interfaces/payment/payment.interface';
 import { Response } from 'express';
@@ -100,61 +100,7 @@ export class WebhookController {
     @Post("/test")
     async handleWebhookData(@Req() req:Request, @Headers('x-razorpay-signature') signature: string,@Body() body:any){
 
-  const webhookSecret = this.configService.get().RAZORPAY_CREDENTIAL.RAZORPAY_WEBHOOK_SECRET;
-
-  const response = req.body;
-  console.log(">>>>>>>>Anshu response", response);
-
-  const expectedSignature = crypto
-    .createHmac('sha256', webhookSecret)
-    .update(JSON.stringify(body))
-    .digest('hex');
-
-  if (expectedSignature !== signature) {
-    throw new HttpException('Invalid signature', HttpStatus.BAD_REQUEST);
-  }
-
-  if (body && body.payload) {
-    const event = body.event;
-
-       const entity = body.payload.payment.entity;
-    const notes = entity?.notes || {};
-    const module = notes?.module;
-
-       console.log("+++++++++++++++++++ Webhook Payload Response +++++++++++++++++++++++++++");
-    console.log('Module from webhook:', module);
-    console.log("Received Razorpay Event: ", event);
-    console.log("Razorpay Entity Id: ", entity.id);
-    console.log("Payment Link Id: ", entity.payment_link_id);
-    console.log("Payment Link Reference Id(custom_order_id): ", entity.payment_link_reference_id);
-    console.log("Payment Status: ", entity.status);
-    console.log("+++++++++++++++++++ Webhook Payload Response +++++++++++++++++++++++++++");
-
-
-    if (event === 'payment.captured') {
-      if(module==="hotel")
-      {
-           await this.webhookService.handleHotelPaymentdata(body);
-      }
-      else if(module==="flight"){
-           await this.webhookService.handleFlightPaymentdata(body);
-      }
-      else {
-        console.warn('Unknown module type in webhook:', module);
-      }
-    
-     
-    } else if (event === 'payment.failed') {
-      console.log(`Payment failed for order ID: `);
-    } else {
-      console.log(`Unhandled event: ${event}`);
-    }
-
-    return { status: 'success' };
-  }
-
-  return { status: 'ignored' };
-}
+    return await this.webhookService.processWebhookEvent(signature, body)
 }
    
       
@@ -239,3 +185,4 @@ export class WebhookController {
 
 
 
+}

@@ -54,9 +54,13 @@ export class HotelService {
             console.log('Hotel Booking Response: ', result);
             if (result?.BookResult?.ResponseStatus === 1) {
                 console.log('Booking Success:', result.BookResult);
+                console.log("Result.data: ",result.data);
+                 await this.orderRepositoryService.updatePaymentSuccess(order_id,result?.data);
+                  return { success: true, bookingData: result.BookResult };
             } else {
                 console.error('Booking Failed:', result?.BookResult?.Error);
                 throw new Error(result?.BookResult?.Error?.ErrorMessage || 'Hotel booking failed');
+                
             }
         } catch (error) {
             console.error('Error in Hotel Handler', error?.message || error);

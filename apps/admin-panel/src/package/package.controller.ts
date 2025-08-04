@@ -29,10 +29,28 @@ export class PackageController {
     }
 
     @Post('create')
-    async addPackage(@Res() res:Response,@Req() req:Request,@Body() body:CreatePackageDto)
+  @UseInterceptors(
+    FileFieldsInterceptor(
+ [
+      { name: 'main_image', maxCount: 1 },
+      { name: 'gallery_image', maxCount: 3 },
+      { name: 'banner_image', maxCount: 1 },
+    ],
+     {
+      fileFilter: imageFileFilter,
+      limits: { fileSize: 5 * 1024 * 1024 }, 
+    }
+    )
+     
+  )
+    async addPackage(@Res() res:Response,@Req() req:Request,@Body() body:CreatePackageDto,@UploadedFiles() files:{
+    main_image?,
+    gallery_image?,
+    banner_image?
+  })
     {
         try{
-            const result = await this.packageService.createPackage(body);
+            const result = await this.packageService.createPackage(body,files);
             return this.responseHandlerService.sendSuccessResponse(res,result);
         }catch(error){
             console.log("Create Package Error",error);

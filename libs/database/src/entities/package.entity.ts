@@ -30,13 +30,13 @@ export class Package {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ nullable: true })
+  @Column({type:'text', nullable: true })
   main_image: string;
 
-  @Column({ nullable: true })
-  gallery_image: string;
+  @Column({type:'text',array:true, nullable: true })
+  gallery_image: string[];
 
-  @Column({ nullable: true })
+  @Column({type:'text',nullable: true })
   banner_image: string;
 
   @Column({ unique: true })

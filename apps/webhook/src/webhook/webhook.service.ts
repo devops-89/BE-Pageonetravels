@@ -1,5 +1,6 @@
 
 import { Injectable  } from '@nestjs/common';
+import {  HttpStatus, HttpException  } from '@nestjs/common';
 import axios from 'axios';
 import { ConfigService } from '../../../../libs/config/config.service';
 import { OrderRepositoryService } from '../../../../libs/database/src/repositories/order.repository';
@@ -7,6 +8,9 @@ import { FlightTicketRepositoryService } from '../../../../libs/database/src/rep
 import {HotelPaymentRepositoryService} from "../../../../libs/database/src/repositories/hotelPayment.repository";
 import { FlightService } from '../../../../libs/tickethandler/flight.service';
 import {HotelService} from "../../../../libs/hotelbookinghandler/hotel.service";
+import { ORDER_STATUS,PAYMENT_STATUS } from '../../../../libs/constants/bookingContant';
+
+import * as crypto from 'crypto';
 
 @Injectable()
 export class WebhookService {
@@ -36,6 +40,76 @@ export class WebhookService {
         console.warn(`Unhandled event: ${event}`);
     }
   }
+
+  async processWebhookEvent(signature: string, body: any) {
+  const webhookSecret = this.configService.get().RAZORPAY_CREDENTIAL.RAZORPAY_WEBHOOK_SECRET;
+
+  const expectedSignature = crypto
+    .createHmac('sha256', webhookSecret)
+    .update(JSON.stringify(body))
+    .digest('hex');
+
+  if (expectedSignature !== signature) {
+    throw new HttpException('Invalid signature', HttpStatus.BAD_REQUEST);
+  }
+
+  if (!body?.payload) return { status: 'ignored' };
+
+  const event = body.event;
+  const entity = body.payload.payment.entity;
+  const notes = entity?.notes || {};
+  const module = notes?.module;
+
+  console.log("+++++++++++++++++++ Webhook Payload Response +++++++++++++++++++++++++++");
+  console.log('Module from webhook:', module);
+  console.log("Received Razorpay Event: ", event);
+  console.log("Razorpay Entity Id: ", entity.id);
+  console.log("Payment Link Id: ", entity.payment_link_id);
+  console.log("Payment Link Reference Id (custom_order_id): ", entity.payment_link_reference_id);
+  console.log("Payment Status: ", entity.status);
+  console.log("Payment Id (Razorpay Order ID):", entity.order_id);
+  console.log("+++++++++++++++++++ Webhook Payload Response +++++++++++++++++++++++++++");
+
+   const razorpayOrderId = entity.order_id;
+    const receipt = await this.getPayment(razorpayOrderId);
+    const order = await this.orderRepositoryService.findOne(receipt);
+
+  if (event === 'payment.captured') {
+  try {
+    if (module === 'hotel') {
+      await this.handleHotelPaymentdata(body);
+    } else if (module === 'flight') {
+      await this.handleFlightPaymentdata(body);
+    } else {
+      console.warn('Unknown module type in webhook:', module);
+      return { status: 'ignored' };
+    }
+
+    // ✅ Only mark payment success if booking handler completes
+    // await this.orderRepositoryService.updatePaymentStatus(order.order_id, PAYMENT_STATUS.SUCCESS);
+    return { status: 'success' };
+  } catch (error) {
+    console.error("❌ Booking handler failed after payment captured:", error);
+    
+    // Optional: update custom booking status or log error
+    return { status: 'payment_success_but_booking_failed', orderId: order.order_id };
+  }
+} else if (event === 'payment.failed') {
+    // 🔁 Get order receipt from Razorpay
+   
+
+    // ❌ Update payment status as FAILED
+    // order.payment_status = PAYMENT_STATUS.FAILED;
+    // await this.orderRepositoryService.save(order);
+    this.orderRepositoryService.updatePaymentStatus(order.order_id,PAYMENT_STATUS.FAILED);
+
+    console.log(`❌ Payment failed for order: ${receipt}`);
+    return { status: 'failed', orderId: receipt };
+  }
+
+  return { status: 'ignored' };
+}
+
 
   // Handle payment success
   async handlePaymentSuccess(payload: any) {
@@ -111,6 +185,7 @@ async getPaymentDetails(paymentId: string): Promise<any> {
             console.log("id based on the order id for razorpay: ",response);
           
             console.log("=============webhook handlePayment Order Details Fetched: ",orderdetails);
+            this.orderRepositoryService.updatePaymentStatus(orderdetails.order_id, PAYMENT_STATUS.SUCCESS);
             console.log("modify order body:", body);
             const modifyOrder = await this.orderRepositoryService.updateOrder(response,body);
             console.log("modified order Repository:",modifyOrder);

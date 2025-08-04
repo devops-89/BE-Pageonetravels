@@ -9,23 +9,24 @@ import {
   IsNotEmptyObject,
   IsNotEmpty,
   IsUUID,
-  Min,Max
+  Min,Max,
+  IsUrl
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
-class ImageDto {
-  @IsString()
-  @IsNotEmpty()
-  path: string;
 
-  @IsString()
-  @IsNotEmpty()
-  relativePath: string;
+// class ImageDto {
+//   @IsString()
+//   @IsNotEmpty()
+//   path: string;
 
-  @IsString()
-  @IsNotEmpty()
-  preview: string;
-}
+//   @IsString()
+//   @IsNotEmpty()
+//   relativePath: string;
+
+//   @IsString()
+//   @IsNotEmpty()
+//   preview: string;
+// }
 
 export class CreatePackageDto {
   @IsString()
@@ -39,23 +40,20 @@ export class CreatePackageDto {
   @IsOptional()
   description?: string;
 
-  @IsArray()
-//   @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => ImageDto)
-  main_image: ImageDto[];
 
-  @IsArray()
-  @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => ImageDto)
-  gallery_image?: ImageDto[];
+@IsOptional()
+@IsUrl()
+main_image?: string;
 
-  @IsArray()
-//   @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => ImageDto)
-  banner_image: ImageDto[];
+@IsArray()
+@IsOptional()
+@IsUrl({},{each: true})
+gallery_image?: string[];
+
+
+@IsOptional()
+@IsUrl()
+  banner_image: string;
 
   @IsString()
   package_slug: string;

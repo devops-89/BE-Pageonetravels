@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Order } from '../entities';
-import { ORDER_STATUS } from '../../../../libs/constants/bookingContant';
+import { ORDER_STATUS,PAYMENT_STATUS } from '../../../../libs/constants/bookingContant';
 import { ORDER_TYPE } from '../../../../libs/constants/orderConstant';
 import { ApiResponse } from '../../../../libs/interfaces/commonTypes/apiResponse.interface';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
@@ -317,6 +317,32 @@ export class OrderRepositoryService {
         throw error;
       }
     }
+
+    // for updating the payment status success or failed
+    async updatePaymentStatus(orderId: string, status: PAYMENT_STATUS): Promise<string> {
+  try {
+    const updatedOrder = await this.orderRepository.findOne({
+      where: { order_id: orderId },
+      loadRelationIds: true,
+    });
+
+    if (!updatedOrder) {
+      throw {
+        message: `Order with order_id : ${orderId} not found.`,
+        statusCode: ERROR_CODES.BAD_REQUEST
+      };
+    }
+
+    updatedOrder.payment_status = status;
+
+    await this.orderRepository.save(updatedOrder);
+
+    return updatedOrder.payment_status;
+  } catch (error) {
+    console.error("Error updating payment status:", error);
+    throw error;
+  }
+}
 
     async findAll(userId?: string): Promise<Order[]> {
         try {
