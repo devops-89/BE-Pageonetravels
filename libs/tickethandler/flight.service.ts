@@ -36,6 +36,10 @@ export class FlightService {
 
     async flightHandler(order_id,custom_order_id,journey_type, journey, isLCC, is_LCC_round , trace_id, order_request, order_request_second,user){
         try{ 
+
+            console.log("flight handler called..");
+            console.log("journey_type:",journey_type);
+            console.log("journey:",journey);
             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
             const payload = JSON.parse(order_request);
             
@@ -244,6 +248,8 @@ if (data?.Response?.Response) {
                     if(isLCC == true && is_LCC_round == true){ 
                         // isLCC
                         const url = tbo_credentials.FLIGHT_TICKET_FORLCC;
+                        console.log("url:",url);
+                        console.log("payload:",payload);
                         let result = await this.httpAPICall(url, payload);
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
@@ -260,6 +266,7 @@ if (data?.Response?.Response) {
                             let resultSecond = await this.httpAPICall(url, payloadSecond);
                             if(resultSecond.data.Response.ResponseStatus === 1){
                                 // try to ticket check status then save db success/fail 
+                                console.log("booking successfull");
                                 await this.orderRepositoryService.updatePaymentSuccess(order_id,resultSecond.data);
                                 const ticket = flightTicketPdfTemplate(resultSecond);
                                 const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
@@ -576,6 +583,7 @@ if (data?.Response?.Response) {
                             const urlticket = tbo_credentials.FLIGHT_TICKET_FORLCC;
                             let resultTicket = await this.httpAPICall(urlticket, payloadForTicket);
                             if(resultTicket.data.Response.ResponseStatus === 1){
+                                console.log("booking successfull.")
                                 // try to ticket check status then save db success/fail
                                 await this.orderRepositoryService.updatePaymentSuccess(order_id,resultTicket.data);
                                 const ticket = flightTicketPdfTemplate(resultTicket);

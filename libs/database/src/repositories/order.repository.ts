@@ -26,7 +26,7 @@ export class OrderRepositoryService {
         return this.orderRepository.save(order);
       }
 
-    async insertBooking(reference_id,order_type,payload,amount,is_LCC?,journey?,journey_type?,commtype?,commpercentage?):Promise<Order | null>{
+    async insertBooking(reference_id,order_type,payload,amount,is_LCC?,journey?,journey_type?,commtype?,commpercentage?,extraInfo?):Promise<Order | null>{
         try{
             
             if(order_type === ORDER_TYPE.FLIGHT){
@@ -66,11 +66,10 @@ export class OrderRepositoryService {
                 // commission_type: commtype,
                 // commission: commpercentage,
                 order_type:order_type,
-                // journey_type : journey_type,
-                // journey: journey,
                 order_request: payload,
-                user: { id: reference_id },  // Correct way to assign a relation
+                user: { id: reference_id },  
                 amount: amount,
+                order_request_second: extraInfo,
                 status: ORDER_STATUS.INIT
             });
             console.log(">>>>>>>>>>>>kkk",newOrder);
@@ -97,6 +96,8 @@ export class OrderRepositoryService {
     async roundinsertBooking(reference_id,order_type,payload,amount,is_LCC,journey,journey_type,commtype,commpercentage,payloadSecond,secondType):Promise<Order | null>{
         try{
             if(order_type === ORDER_TYPE.FLIGHT){
+
+              console.log("Payload second:",payloadSecond);
             // Create order instance
             var orderId = `${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 999)}-${Math.floor(1000 + Math.random() * 9000)}`;
             

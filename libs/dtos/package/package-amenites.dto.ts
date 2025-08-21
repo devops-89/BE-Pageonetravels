@@ -28,3 +28,24 @@ export class UpdatePackageAmeniteDto {
     amenite_image?: string;
 }
 
+//  this DTO for use in CreatePackageDto
+export class AmenityDto {
+  @IsString()
+  amenite_id: string;
+
+  @IsString()
+  amenite_name: string;
+
+  @IsString()
+  @IsOptional()
+  amenite_image?: string;
+
+  @IsOptional()
+  @IsString()
+  created_at?: string;
+
+  @IsOptional()
+  @IsString()
+  updated_at?: string;
+}
+

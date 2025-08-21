@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { ApiResponse } from 'libs/interfaces/commonTypes/apiResponse.interface';
+import { ApiResponse } from '../../../../libs/interfaces/commonTypes/apiResponse.interface';
 import { USER_ACCOUNT_STATUS, USER_TYPE } from '../../../../libs/constants/autenticationConstants/userContants';
-import { UserRepositoryService } from 'libs/database/src';
+import { UserRepositoryService } from '../../../../libs/database/src';
 
 @Injectable()
 export class CustomerService {

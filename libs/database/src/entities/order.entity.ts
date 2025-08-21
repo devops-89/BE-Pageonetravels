@@ -102,6 +102,7 @@ export class Order {
     @Column({
         type: 'enum',
         enum: ORDER_STATUS,
+          default: ORDER_STATUS.PENDING,
     })
     status: ORDER_STATUS;
 

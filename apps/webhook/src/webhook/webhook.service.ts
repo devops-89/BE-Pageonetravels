@@ -75,6 +75,8 @@ export class WebhookService {
     const order = await this.orderRepositoryService.findOne(receipt);
 
   if (event === 'payment.captured') {
+     // mark payment success 
+    await this.orderRepositoryService.updatePaymentStatus(order.order_id, PAYMENT_STATUS.SUCCESS);
   try {
     if (module === 'hotel') {
       await this.handleHotelPaymentdata(body);
@@ -85,8 +87,7 @@ export class WebhookService {
       return { status: 'ignored' };
     }
 
-    // ✅ Only mark payment success if booking handler completes
-    // await this.orderRepositoryService.updatePaymentStatus(order.order_id, PAYMENT_STATUS.SUCCESS);
+   
     return { status: 'success' };
   } catch (error) {
     console.error("❌ Booking handler failed after payment captured:", error);
@@ -163,6 +164,8 @@ async getPaymentDetails(paymentId: string): Promise<any> {
             const response =await this.getPayment(orderid);
             const orderdetails = await this.orderRepositoryService.findOne(response);
             console.log("=============webhook handlePayment Order Details Fetched: ",orderdetails);
+            // update payment success for flight
+            this.orderRepositoryService.updatePaymentStatus(orderdetails.order_id,PAYMENT_STATUS.SUCCESS)
             console.log("modify order body:", body);
             const modifyOrder = await this.orderRepositoryService.updateOrder(response,body);
             console.log("modified order Repository:",modifyOrder);
@@ -185,7 +188,7 @@ async getPaymentDetails(paymentId: string): Promise<any> {
             console.log("id based on the order id for razorpay: ",response);
           
             console.log("=============webhook handlePayment Order Details Fetched: ",orderdetails);
-            this.orderRepositoryService.updatePaymentStatus(orderdetails.order_id, PAYMENT_STATUS.SUCCESS);
+            // this.orderRepositoryService.updatePaymentStatus(orderdetails.order_id, PAYMENT_STATUS.SUCCESS);
             console.log("modify order body:", body);
             const modifyOrder = await this.orderRepositoryService.updateOrder(response,body);
             console.log("modified order Repository:",modifyOrder);
@@ -193,7 +196,7 @@ async getPaymentDetails(paymentId: string): Promise<any> {
             console.log("updated Payment:",updatedPayment);
            
             if(orderdetails){  
-              await this.hotelService.hotelHandler(orderdetails.order_id,orderdetails.custom_order_id,orderdetails.order_request,orderdetails.user,orderdetails.payment);
+              await this.hotelService.hotelHandler(orderdetails.order_id,orderdetails.custom_order_id,orderdetails.order_request,orderdetails.user,orderdetails.order_request_second);
             }
         } catch (error) {
             console.log("Error inside handlePaymentCaptured:", error);

@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsNotEmpty, IsNumber, IsOptional,ValidateIf, IsString,IsDateString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class HotelPassengerDto {
@@ -15,6 +15,7 @@ export class HotelPassengerDto {
   @IsString()
   LastName: string;
 
+  @ValidateIf((o) => o.Email !== null)
   @IsOptional()
   @IsString()
   Email?: string;
@@ -39,10 +40,11 @@ export class HotelPassengerDto {
   @IsOptional()
   @IsString()
   PassportExpDate?: string;
-
+  
+ @ValidateIf((o) => o.Phoneno !== null)
   @IsOptional()
   @IsString()
-  Phoneno?: string;
+  Phoneno?: string | null;
 
   @IsNumber()
   PaxId: number;
@@ -72,6 +74,7 @@ export class HotelPassengerDto {
   PAN?: string;
 }
 
+// used for Real Payload Sending to TBO API
 export class HotelRoomDetailDto {
   @IsArray()
   @ValidateNested({ each: true })
@@ -79,6 +82,46 @@ export class HotelRoomDetailDto {
   HotelPassenger: HotelPassengerDto[];
 }
 
+// Used for Email Response Sending
+export class ExtraInformationDto {
+  @IsString()
+  hotelName: string;
+
+  @IsString()
+  hotelAddress: string;
+
+  @IsString()
+  roomType: string;
+
+  @IsString()
+  firstName: string;
+
+  @IsString()
+  lastName: string;
+
+  @IsNumber()
+  rooms: number;
+
+  @IsNumber()
+  stayDuration: number;
+
+  @IsNumber()
+  basePrice: number;
+
+  @IsNumber()
+  tax: number;
+
+  @IsNumber()
+  serviceFees: number;
+
+  @IsString()
+  checkIn: string;  
+
+  @IsString()
+  checkOut: string;
+}
+
+// Main hotel booking dto
 export class CreateHotelBookingDto {
   @IsString()
   BookingCode: string;
@@ -102,6 +145,11 @@ export class CreateHotelBookingDto {
   @ValidateNested({ each: true })
   @Type(() => HotelRoomDetailDto)
   HotelRoomsDetails: HotelRoomDetailDto[];
+
+  @ValidateNested()
+  @IsOptional()
+  @Type(() => ExtraInformationDto)
+  extraInfo: ExtraInformationDto;
 }
 
 

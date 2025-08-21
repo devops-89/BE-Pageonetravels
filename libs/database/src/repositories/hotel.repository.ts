@@ -5,6 +5,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import {ICreateHotel} from '../../../../libs/interfaces/ourHotel/hotel.interface';
 import { ERROR_CODES } from "../../../../libs/constants/commonConstants";
 
+
 @Injectable()
 export class HotelRepositoryService { 
     constructor(
@@ -12,10 +13,12 @@ export class HotelRepositoryService {
         private readonly hotelRepo: Repository<Hotel>
     ){}
 
+
+    
     async createHotel(reference_id:string,input:ICreateHotel){
-        const upload = input.gallery_images;
-        const originalNames = upload.map(file =>file.path).join(', ');
-        const mainImage = input.main_image.path;
+
+        
+       
         
         const newHotel =  this.hotelRepo.create({
             name : input.name,
@@ -38,8 +41,8 @@ export class HotelRepositoryService {
             cancellation_policy : input.cancellation_policy,
             child_policy : input.child_policy,
             pet_policy : input.pet_policy,
-            main_image : "https://example.com/images/hotel-main.jpg",
-            gallery_images : originalNames,
+            main_image : input.main_image,
+            gallery_images : input.gallery_images,
             base_price : input.base_price,
             tax_percentage : input.tax_percentage,
             amenities : {

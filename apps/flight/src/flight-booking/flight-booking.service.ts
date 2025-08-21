@@ -411,13 +411,14 @@ export class FlightBookingService {
         //     throw { message: "Journey Details missing like journey_type,journey, flight type", statusCode: ERROR_CODES.BAD_REQUEST };
         // }
             
-        const {house_number,street,city,country_code,cell_country_code,nationality,gst_company_address,gst_company_contact_number,gst_company_email,gst_company_name,gst_number} = flight;
+        const {house_number,street,city,country_code,address,cell_country_code,nationality,gst_company_address,gst_company_contact_number,gst_company_email,gst_company_name,gst_number} = flight;
 
         // Store additional data in a single object to pass easily
         const additionalData = {
             house_number,
             street,
             city,
+            address,
             country_code,
             cell_country_code,
             nationality,

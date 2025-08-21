@@ -21,8 +21,8 @@ export interface ICreateHotel {
   cancellation_policy: string;
   child_policy?: string;
   pet_policy?: string;
-  main_image: CustomFile;
-  gallery_images?: CustomFile[];
+  main_image: string;
+  gallery_images?:string[];
   base_price: number;
   tax_percentage: number;
 

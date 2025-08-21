@@ -47,30 +47,38 @@ export class PackageService {
 
     // Create Package
 
-    async createPackage(body, files) {
+    async createPackage(body, mainImageFile, bannerImageFile, galleryImageFile) {
         try {
             // Upload main Images
-            if (files?.main_image?.[0]) {
-                const mainPath = `packages/main/${Date.now()}-${files.main_image[0].originalname}`;
-                body.main_image = await this.s3FileService.s3FileUpload(files.main_image[0].buffer, mainPath);
+            if (mainImageFile) {
+                const mainPath = `packages/main/${Date.now()}-${mainImageFile.originalname}`;
+                const s3path = await this.s3FileService.s3FileUpload(mainImageFile.buffer, mainPath);
+                console.log("main image:",s3path);
+                body.main_image = s3path;
             }
 
             // Upload banner Images
-            if (files?.banner_image?.[0]) {
-                const bannerPath = `packages/banner/${Date.now()}-${files.banner_image[0].originalname}`;
-                body.banner_image = await this.s3FileService.s3FileUpload(files.banner_image[0].buffer, bannerPath);
+            if (bannerImageFile) {
+                const bannerPath = `packages/banner/${Date.now()}-${bannerImageFile.originalname}`;
+                const s3path = await this.s3FileService.s3FileUpload(bannerImageFile.buffer, bannerPath);
+                console.log("banner image:",s3path);
+                body.banner_image = s3path;
             }
 
             // Upload Gallery Image
-            if (files?.gallery_image) {
-                const galleryImageUrl = await Promise.all(
-                    files.gallery_image.map((file) => {
+            if (galleryImageFile) {
+                const galleryImageUrls = await Promise.all(
+                    galleryImageFile.map((file) => {
                         const filePath = `packages/gallery/${Date.now()}-${file.originalname}`;
-                        return this.s3FileService.s3FileUpload(file.buffer, filePath);
+                        return this.s3FileService.s3FileUpload(file.buffer, filePath); // ✅ use file.buffer
                     })
                 );
-                body.gallery_image = galleryImageUrl;
+                console.log("gallery image:",galleryImageUrls);
+                body.gallery_image = galleryImageUrls; // ✅ correctly set array of URLs
             }
+
+
+            console.log('body Data: ', body);
 
             // now insert in the database the url string
             const result = await this.packageRepositoryService.insertPackage(body);

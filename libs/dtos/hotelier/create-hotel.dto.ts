@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsBoolean,
   IsInt,
+  IsArray,
   Matches,
   ValidateNested,
 } from 'class-validator';
@@ -152,13 +153,28 @@ export class CreateHotelDto {
   currency: string;
 
   // Nested amenities object
+   // ✅ Fixed amenities transformation for FormData
   @ValidateNested()
   @Type(() => AmenitiesDto)
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return {};
+      }
+    }
+    return value;
+  })
   amenities: AmenitiesDto;
 
   // File upload fields
-  main_image: CustomFile;
-
   @IsOptional()
-  gallery_images?: CustomFile[];
+  @IsString()
+  main_image: string;
+
+  @IsArray()
+  @IsOptional()
+  @IsString({each: true})
+  gallery_images?: string[];
 }

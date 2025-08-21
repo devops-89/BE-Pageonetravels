@@ -43,14 +43,19 @@ export class PackageController {
     )
      
   )
-    async addPackage(@Res() res:Response,@Req() req:Request,@Body() body:CreatePackageDto,@UploadedFiles() files:{
-    main_image?,
-    gallery_image?,
-    banner_image?
-  })
+    async addPackage(@Res() res:Response,@Req() req:Request,@Body() body:CreatePackageDto,@UploadedFiles() files)
     {
         try{
-            const result = await this.packageService.createPackage(body,files);
+         const mainImageFile = files?.main_image?.[0];
+      const bannerImageFile = files?.banner_image?.[0];
+      const galleryImageFiles = files?.gallery_image || [];
+
+      const result = await this.packageService.createPackage(
+        body,
+        mainImageFile,
+        bannerImageFile,
+        galleryImageFiles
+      );
             return this.responseHandlerService.sendSuccessResponse(res,result);
         }catch(error){
             console.log("Create Package Error",error);

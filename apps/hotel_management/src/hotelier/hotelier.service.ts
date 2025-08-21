@@ -1,24 +1,23 @@
-import { Injectable } from "@nestjs/common";
-import {LoginDto} from '../../../../libs/dtos/authentication/user.dto';
-import { ERROR_CODES } from "../../../../libs/constants/commonConstants";
-import { COMMON_MSG, LOGIN_MSG } from "../../../../libs/constants/autenticationConstants/messageConstants";
-import { UserRepositoryService } from "../../../../libs/database/src/repositories";
+import { Injectable } from '@nestjs/common';
+import { LoginDto } from '../../../../libs/dtos/authentication/user.dto';
+import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
+import { COMMON_MSG, LOGIN_MSG } from '../../../../libs/constants/autenticationConstants/messageConstants';
+import { UserRepositoryService } from '../../../../libs/database/src/repositories';
 import { ApiResponse } from '../../../../libs/interfaces/commonTypes/apiResponse.interface';
-import { LOGIN_BY, USER_ACCOUNT_STATUS, USER_TYPE } from "../../../../libs/constants/autenticationConstants/userContants";
+import { LOGIN_BY, USER_ACCOUNT_STATUS, USER_TYPE } from '../../../../libs/constants/autenticationConstants/userContants';
 import { checkPasswordHash } from '../utils/bcryptUtil';
-import { TOKEN_TYPE } from "../../../../libs/constants/commonConstants";
-import { SESSION_STATUS } from "../../../../libs/constants/autenticationConstants/userContants";
-import { LoginSessionI } from "../../../../libs/interfaces/authentication/loginSession.interface";
-import { getRandomString } from "../../../../libs/utils/basicUtils";
-import { JwtService } from "../../../../libs/jwt-service/jwt.service";
-import { LoginSessionService } from "../../../../libs/database/src";
+import { TOKEN_TYPE } from '../../../../libs/constants/commonConstants';
+import { SESSION_STATUS } from '../../../../libs/constants/autenticationConstants/userContants';
+import { LoginSessionI } from '../../../../libs/interfaces/authentication/loginSession.interface';
+import { getRandomString } from '../../../../libs/utils/basicUtils';
+import { JwtService } from '../../../../libs/jwt-service/jwt.service';
+import { LoginSessionService } from '../../../../libs/database/src';
 import { CreateHotelDto } from '../../../../libs/dtos/hotelier/create-hotel.dto';
 import { UpdateHotelDto } from '../../../../libs/dtos/hotelier/update-hotel.dto';
 import { HotelRepositoryService } from '../../../../libs/database/src/repositories/hotel.repository';
 import { HotelRoomRepositoryService } from '../../../../libs/database/src/repositories/hotelRoom.repository';
 import { CreateHotelRoomDto } from '../../../../libs/dtos/hotelier/hotel-room.dto';
-import { retry } from "rxjs";
-
+import { S3FileService } from '../../../../libs/S3-Service/s3File.service';
 
 @Injectable()
 export class HotelierService {
@@ -26,65 +25,57 @@ export class HotelierService {
         private readonly UserModel: UserRepositoryService,
         private readonly hotelRepositoryService: HotelRepositoryService,
         private readonly hotelRoomRepositoryService: HotelRoomRepositoryService,
-        private jwtService: JwtService, 
-        private LoginSessionModel: LoginSessionService
-    ){}
+        private jwtService: JwtService,
+        private LoginSessionModel: LoginSessionService,
+        private readonly s3FileService: S3FileService
+    ) {}
 
-    async loginWithEmail(input: LoginDto,device_type: string): Promise<ApiResponse.ApiOK>{
-        try{
+    async loginWithEmail(input: LoginDto): Promise<ApiResponse.ApiOK> {
+        try {
             input.identity = input.identity.toLowerCase();
-            const { identity, password, country_code } = input;
+            const { identity, password } = input;
             const user = await this.UserModel.getUserByOnlyEmail(identity);
-                if (!user) {
-                throw {  message: LOGIN_MSG.INVALID_EMAIL_PASSWORD,  statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER  };
-                }
-                return await this.loginWithPasswordHandler(user, identity, password, LOGIN_BY.EMAIL);
-                return { message: `Hotelier Login Successfully`, data: user };
-                //  return await this.loginWithPasswordHandler(user, identity, password, LOGIN_BY.EMAIL);
-        }catch(error){
-            console.error("Hotelier Error Login with email", error);
+            if (!user) {
+                throw { message: LOGIN_MSG.INVALID_EMAIL_PASSWORD, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
+            }
+            return await this.loginWithPasswordHandler(user, identity, password, LOGIN_BY.EMAIL);
+            return { message: `Hotelier Login Successfully`, data: user };
+            //  return await this.loginWithPasswordHandler(user, identity, password, LOGIN_BY.EMAIL);
+        } catch (error) {
+            console.error('Hotelier Error Login with email', error);
             throw error;
         }
     }
 
-    async loginWithPasswordHandler(   
-        user,
-        identity: string,
-        password: string,
-        loginBy: LOGIN_BY
-    ): Promise<ApiResponse.ApiOK> {
+    async loginWithPasswordHandler(user, identity: string, password: string, loginBy: LOGIN_BY): Promise<ApiResponse.ApiOK> {
         try {
-           
-            if(![USER_TYPE.HOTEL, USER_TYPE.HOTEL].includes(user.user_type)) {
-                throw {  
-                    message: "You are not authorized to access the website.", 
-                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
+            if (![USER_TYPE.HOTEL, USER_TYPE.HOTEL].includes(user.user_type)) {
+                throw {
+                    message: 'You are not authorized to access the website.',
+                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER,
                 };
             }
 
-            
             if (user.status === USER_ACCOUNT_STATUS.BLOCKED) {
-                throw { 
+                throw {
                     message: COMMON_MSG.BLOCKED_USER,
-                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
+                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER,
                 };
             }
 
             if (user.status != USER_ACCOUNT_STATUS.ACTIVE) {
-                throw { 
-                    message: LOGIN_MSG.INACTIVE_ACCOUNT, 
-                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
+                throw {
+                    message: LOGIN_MSG.INACTIVE_ACCOUNT,
+                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER,
                 };
             }
 
-            
             const isPasswordCorrect = await checkPasswordHash(password, user.password);
-            
-            if (!isPasswordCorrect) { 
-                
-                throw { 
-                    message: LOGIN_MSG.INVALID_CREDENTIALS, 
-                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
+
+            if (!isPasswordCorrect) {
+                throw {
+                    message: LOGIN_MSG.INVALID_CREDENTIALS,
+                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER,
                 };
             }
 
@@ -93,10 +84,10 @@ export class HotelierService {
                 login_identity: identity,
                 // permissionId: user.permission,
                 user_id: user.id,
-                user_type: USER_TYPE.HOTEL
+                user_type: USER_TYPE.HOTEL,
             };
             const { jwt_token, refresh_token } = await this.getLoginToken(token_data);
-            
+
             const data = {
                 access_token: jwt_token,
                 refresh_token,
@@ -106,98 +97,116 @@ export class HotelierService {
                 reference_id: user.id,
                 // phone_number:user.phone_number
             };
-    
-            return { 
-                message: LOGIN_MSG.LOGIN_SUCCESS, 
-                data 
+
+            return {
+                message: LOGIN_MSG.LOGIN_SUCCESS,
+                data,
             };
-            
         } catch (error) {
-            console.error("Error in loginWithPasswordHandler:", error);
+            console.error('Error in loginWithPasswordHandler:', error);
             throw error;
         }
     }
 
-
-    async getLoginToken(input: LoginSessionI.GetLoginToken) 
-    {
+    async getLoginToken(input: LoginSessionI.GetLoginToken) {
         try {
-            const { user_id, loginBy, login_identity, device_type, user_type } = input
-            const refresh_token = getRandomString(16, false, false); 
-            const expiryTimeStamp = Date.now() + 60 * 60 * 24 * 30 * 1000;   // 90 days
+            const { user_id, loginBy, login_identity, device_type, user_type } = input;
+            const refresh_token = getRandomString(16, false, false);
+            const expiryTimeStamp = Date.now() + 60 * 60 * 24 * 30 * 1000; // 90 days
 
             const loginSession: LoginSessionI.insertLoginSession = {
-                loginStatus: SESSION_STATUS.LOGGED_IN, refresh_token, refreshTokenExpiry: expiryTimeStamp, user_id, loginBy, login_identity ,device_type
-            }
+                loginStatus: SESSION_STATUS.LOGGED_IN,
+                refresh_token,
+                refreshTokenExpiry: expiryTimeStamp,
+                user_id,
+                loginBy,
+                login_identity,
+                device_type,
+            };
 
-            const session = await this.LoginSessionModel.insertLoginSession(loginSession); 
+            const session = await this.LoginSessionModel.insertLoginSession(loginSession);
             const jwt_token = await this.jwtService.generateJWTToken({
                 reference_id: user_id,
                 refresh_token,
                 // user_role: role_name,
                 session_id: session.id,
                 user_type,
-                token_type: TOKEN_TYPE.USER_LOGIN
+                token_type: TOKEN_TYPE.USER_LOGIN,
             });
 
             return { jwt_token, refresh_token };
-        }
-        catch (error) {
-            console.log("Error generate login token", error)
+        } catch (error) {
+            console.log('Error generate login token', error);
             throw error;
         }
     }
 
-
-    async addHotel(reference_id:string,body:CreateHotelDto){
-        try{
-            const result  = await this.hotelRepositoryService.createHotel(reference_id,body);
-            return { message: `Hotel Created Successfully`, data: result };
-        }catch(error){
-            console.log("Error in Add Hotel.", error);
-            throw error;
-        }
-    }
-
-    async updateHotel(reference_id:string,hotel_id: string, body: UpdateHotelDto) {
+    async addHotel(reference_id: string, body: CreateHotelDto, mainImageFile, galleryImageFile) {
         try {
-            const result = await this.hotelRepositoryService.updateHotel(reference_id,hotel_id, body);
+            if (mainImageFile) {
+                const mainPath = `hotelier/main/${Date.now()}-${mainImageFile.originalname}`;
+                const s3path = await this.s3FileService.s3FileUpload(mainImageFile.buffer, mainPath);
+                console.log('main image:', s3path);
+                body.main_image = s3path;
+            }
+
+            // Upload Gallery Image
+            if (galleryImageFile) {
+                const galleryImageUrls = await Promise.all(
+                    galleryImageFile.map((file) => {
+                        const filePath = `hotelier/gallery/${Date.now()}-${file.originalname}`;
+                        return this.s3FileService.s3FileUpload(file.buffer, filePath);
+                    })
+                );
+
+                body.gallery_images = galleryImageUrls;
+            }
+
+            const result = await this.hotelRepositoryService.createHotel(reference_id, body);
+            return { message: `Hotel Created Successfully`, data: result };
+        } catch (error) {
+            console.log('Error in Add Hotel.', error);
+            throw error;
+        }
+    }
+
+    async updateHotel(reference_id: string, hotel_id: string, body: UpdateHotelDto) {
+        try {
+            const result = await this.hotelRepositoryService.updateHotel(reference_id, hotel_id, body);
             return { message: `Hotel Updated Successfully`, data: result };
         } catch (error) {
-            console.log("Error in Update Hotel.", error);
+            console.log('Error in Update Hotel.', error);
             throw error;
         }
     }
 
-
-    async addRoom(body:CreateHotelRoomDto){
-        try{
-            const result = await this.hotelRoomRepositoryService.createRoom(body);
+    async addRoom(body: CreateHotelRoomDto) {
+        try {
+            await this.hotelRoomRepositoryService.createRoom(body);
             return { message: `Hotel Room Created Successfully`, data: body };
-        }catch(error){
+        } catch (error) {
             console.log(error);
             throw error;
         }
     }
 
-    async fetchHotelList(){
-        try{
+    async fetchHotelList() {
+        try {
             const result = await this.hotelRepositoryService.getAllHotel();
-            return {message: `Hotel List Fetch Successfully`,data:result}
-        }catch(error){
+            return { message: `Hotel List Fetch Successfully`, data: result };
+        } catch (error) {
             console.log(error);
             throw error;
         }
     }
 
-    async fetchHotelById(hotel_id:string){
-        try{
+    async fetchHotelById(hotel_id: string) {
+        try {
             const result = await this.hotelRepositoryService.getSingleHotel(hotel_id);
-            return {message: `Hotel Fetch Successfully`,data:result}
-        }catch(error){
+            return { message: `Hotel Fetch Successfully`, data: result };
+        } catch (error) {
             console.log(error);
             throw error;
         }
     }
-
 }

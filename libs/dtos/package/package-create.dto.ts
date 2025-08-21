@@ -12,21 +12,10 @@ import {
   Min,Max,
   IsUrl
 } from 'class-validator';
+import {Type,Transform} from "class-transformer";
+import { AmenityDto } from './package-amenites.dto';
 
 
-// class ImageDto {
-//   @IsString()
-//   @IsNotEmpty()
-//   path: string;
-
-//   @IsString()
-//   @IsNotEmpty()
-//   relativePath: string;
-
-//   @IsString()
-//   @IsNotEmpty()
-//   preview: string;
-// }
 
 export class CreatePackageDto {
   @IsString()
@@ -42,17 +31,17 @@ export class CreatePackageDto {
 
 
 @IsOptional()
-@IsUrl()
+@IsString()
 main_image?: string;
 
 @IsArray()
 @IsOptional()
-@IsUrl({},{each: true})
+@IsString({each: true})
 gallery_image?: string[];
 
 
 @IsOptional()
-@IsUrl()
+@IsString()
   banner_image: string;
 
   @IsString()
@@ -64,9 +53,11 @@ gallery_image?: string[];
   
 
   @IsNumber()
+  @Type(() => Number)
   package_price: number;
 
   @IsNumber()
+  @Type(() => Number)
   selling_price: number;
 
   @IsString()
@@ -110,15 +101,24 @@ gallery_image?: string[];
   @IsOptional()
   categories?: string[];
 
-  @IsArray()
-  @IsOptional()
-  amenities?: string[];
+@IsArray()
+@ValidateNested({ each: true })
+@Type(() => AmenityDto)
+@Transform(({ value }) => {
+  try {
+    return typeof value === 'string' ? JSON.parse(value) : value;
+  } catch {
+    return [];
+  }
+})
+amenities: AmenityDto[];
 
    
   @IsNumber()
   @Min(0)
   @Max(5)
   @IsOptional()
+  @Type(() => Number)
   rating?: number;
 }
 

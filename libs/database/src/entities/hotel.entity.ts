@@ -106,11 +106,11 @@ export class Hotel {
   @Column('text', { nullable: true })
   pet_policy: string;
 
-  @Column()
+ @Column({nullable: true })
   main_image: string;
 
-  @Column('simple-array', { nullable: true })
-  gallery_images: string;
+  @Column({  type: 'jsonb',  nullable: true })
+  gallery_images: string[];
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   base_price: number;

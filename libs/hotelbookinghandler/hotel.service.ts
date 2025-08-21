@@ -7,11 +7,12 @@ import { OrderRepositoryService } from '../../libs/database/src/repositories/ord
 import { EmailService } from '../../libs/email-service/email.service';
 import { PDFGenerateService } from '../../libs/pdf-generate/pdf-generate.service';
 import { UserRepositoryService } from '../../libs/database/src';
-import { bookingConfirmationTemplate } from '../../libs/templates/flightTemplate';
-import { bookingConTemplate } from '../../libs/templates/outbondTemplate';
-import { bookConfirmationTemplate } from '../../libs/templates/flightOutbond';
-import { flightTicketPdfTemplate } from '../../libs/templates/ticket';
-import { paymentSuccessTicketFailureTemplate } from '../../libs/templates/ticketfail.template';
+// import { bookingConfirmationTemplate } from '../../libs/templates/flightTemplate';
+// import { bookingConTemplate } from '../../libs/templates/outbondTemplate';
+// import { bookConfirmationTemplate } from '../../libs/templates/flightOutbond';
+// import { flightTicketPdfTemplate } from '../../libs/templates/ticket';
+// import { paymentSuccessTicketFailureTemplate } from '../../libs/templates/ticketfail.template';
+import { hotelBookingTemplate } from "../../libs/templates/hotelBookingConfirmation";
 import axios from 'axios';
 import * as fs from 'fs';
 import { HttpService } from '@nestjs/axios';
@@ -32,10 +33,11 @@ export class HotelService {
         private readonly httpService: HttpService
     ) {}
 
-    async hotelHandler(order_id, custom_order_id, order_request, user, payment) {
+    async hotelHandler(order_id, custom_order_id, order_request, user, order_request_second) {
         try {
             // const tbo_credentials = await this.tboConfigService.getTBOCredentials();
             const payload = JSON.parse(order_request);
+            const extraInfo=JSON.parse(order_request_second);
             console.log('payload: ', payload);
             const userDetails = await this.userRepositoryService.getUserByUserId(user);
             let url = 'https://HotelBE.tektravels.com/hotelservice.svc/rest/book/';
@@ -52,18 +54,26 @@ export class HotelService {
 
             let result = await this.httpAPICall(url, payload, headers);
             console.log('Hotel Booking Response: ', result);
+            console.log("+++++++++++++++++++++++++++++++++++++++++");
+            console.log("User Details:",userDetails);
             if (result?.BookResult?.ResponseStatus === 1) {
-                console.log('Booking Success:', result.BookResult);
-                console.log("Result.data: ",result.data);
-                 await this.orderRepositoryService.updatePaymentSuccess(order_id,result?.data);
+                console.log('Booking Success(result.BookResult):', result.BookResult);
+              
+                     this.orderRepositoryService.updatePaymentSuccess(order_id,result?.BookResult);
+
+                    //  Sending the confirmtion Email
+                   const bookingSuccessTemplate = await hotelBookingTemplate(result?.BookResult,userDetails?.full_name,extraInfo);
+                   await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', bookingSuccessTemplate);
                   return { success: true, bookingData: result.BookResult };
             } else {
                 console.error('Booking Failed:', result?.BookResult?.Error);
+                await this.orderRepositoryService.updatePaymentFail(order_id,result?.BookResult);
                 throw new Error(result?.BookResult?.Error?.ErrorMessage || 'Hotel booking failed');
                 
             }
         } catch (error) {
             console.error('Error in Hotel Handler', error?.message || error);
+              await this.orderRepositoryService.updatePaymentFail(order_id,error?.message);
             throw error;
         }
     }
