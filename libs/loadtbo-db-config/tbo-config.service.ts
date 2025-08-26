@@ -42,6 +42,7 @@ export class TBO_CredentialsService {
             FLIGHT_USERNAME :  flightConfig.FLIGHT_USERNAME,
             FLIGHT_PASSWORD : flightConfig.FLIGHT_PASSWORD,
             FLIGHT_ENDUSERIP : flightConfig.FLIGHT_ENDUSERIP,
+            FLIGHT_GET_AGENCY_BALANCE: "",
             
             HOTEL_SEARCH : hotelConfig.HOTEL_SEARCH,
             HOTEL_INFO : hotelConfig.HOTEL_INFO,

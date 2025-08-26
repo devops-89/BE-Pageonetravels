@@ -133,6 +133,7 @@ export interface FLIGHTDATA {
   FLIGHT_USERNAME :  string
   FLIGHT_PASSWORD : string
   FLIGHT_ENDUSERIP : string,
+  FLIGHT_GET_AGENCY_BALANCE: string;
   HOTEL_SEARCH: string;
   HOTEL_INFO: string;
   HOTEL_ROOM_INFO: string;

@@ -152,9 +152,9 @@ export class SearchHotelService {
     try {
       const allResponses = [];
       const city_hotel_details = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/TBOHotelCodeList';
-      console.log("body payload:",body);
+      console.log("++++++++++++++++++++++++++++body payload:",body);
       const hotel_details = await this.hotelTBOAPIService.fetchCityHotelDetails(city_hotel_details, body.CityCodes);
-      console.log("hotel_details:",hotel_details);
+      console.log("++++++++++++++++++++++++++++hotel_details:",hotel_details);
       const { CountryCode } = hotel_details.Hotels[0];
       const commissionType = await this.commissionRepositoryService.getCommissionbytype(
         CountryCode === "IN" ? COMMISSION_TYPE.HOTEL_DOMESTIC : COMMISSION_TYPE.HOTEL_INTERNATIONAL
@@ -335,6 +335,7 @@ export class SearchHotelService {
 
       const config = { headers };
       const result = await axios.post(baseURL,payload, config);
+      // console.log("++++++++++++++++++++++++++++++++++++++Hotel Search Data: ",result);
       return result.data;
 
     } catch (error) {

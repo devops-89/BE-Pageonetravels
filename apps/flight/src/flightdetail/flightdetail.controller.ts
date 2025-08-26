@@ -9,6 +9,7 @@ import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 export class FlightdetailController {
     constructor(private readonly flightdetailservice: FlightDetailService,
         private readonly responseHandler: ResponseHandlerService,
+      
 
     ) { }
 
@@ -35,6 +36,27 @@ export class FlightdetailController {
             return this.responseHandler.sendErrorResponse(res, ERROR_CODES.INVALID_BASE_URL);
         }
     }
+
+    // get Agency Balance
+    //  @Post('get-agency-balance')
+    // async getAgencyBalance(
+    //     @Body() body: {
+    //         ClientId: string;
+    //         TokenAgencyId: string;
+    //         TokenMemberId: string;
+    //         EndUserIp: string;
+    //         TokenId: string;
+    //     },
+    //     @Res() res: Response
+    // ) {
+    //     try {
+    //         const result = await this.flightdetailservice.getAgencyBalance(body);
+    //         return this.responseHandler.sendSuccessResponse(res, result);
+    //     } catch (error) {
+    //         return this.responseHandler.sendErrorResponse(res, error);
+    //     }
+    // }
+
 
 
     // this is not userful
@@ -66,11 +88,11 @@ export class FlightdetailController {
 
   @Post('get-cancellation-charges')
   async getCancellationCharges(@Body() body: {
-      bookingId: string;
-      requestType: string;
-      bookingMode: string;
-      endUserIp: string;
-      tokenId: string;
+      BookingId: string;
+      RequestType: string;
+      BookingMode: string;
+      EndUserIp: string;
+
   }, @Res() res: Response) {
       try {
           const result = await this.flightdetailservice.getCancellationCharges(body);
@@ -79,6 +101,29 @@ export class FlightdetailController {
           return this.responseHandler.sendErrorResponse(res, error);
       }
   }
+
+//   @Post('get-cancellation-charges')
+// async getCancellationCharges(
+//   @Body() body: { orderId: string; requestType: string; bookingMode: string; endUserIp: string },
+//   @Res() res: Response
+// ) {
+//   try {
+//     //const tokenId = await this.orderRepository.findTokenIdByOrderId(body.orderId);
+
+//     if (!tokenId) {
+//       return this.responseHandler.sendErrorResponse(res, 'Token ID not found in order_request');
+//     }
+
+//     const result = await this.flightdetailservice.getCancellationCharges({
+//       ...body
+//     });
+
+//     return this.responseHandler.sendSuccessResponse(res, result);
+//   } catch (error) {
+//     return this.responseHandler.sendErrorResponse(res, error);
+//   }
+// }
+
 
   @Post('send-change-request')
   async sendChangeRequest(@Body() body: {
@@ -109,38 +154,38 @@ export class FlightdetailController {
       }
   }
 
-  @Post('cancel-flight-ticket-new')
-  async cancelFlightTicketNew(@Body() body: {
-      bookingId: string;
-      requestType?: number;
-      userEmail?: string;
-      remarks?: string;
-      sectors?: Array<{ origin: string; destination: string }>;
-      ticketIds?: number[];
-  }, @Res() res: Response) {
-      try {
-          const result = await this.flightdetailservice.cancelFlightTicketNew(body);
-          return this.responseHandler.sendSuccessResponse(res, result);
-      } catch (error) {
-          return this.responseHandler.sendErrorResponse(res, error);
-      }
-  }
+//   @Post('cancel-flight-ticket-new')
+//   async cancelFlightTicketNew(@Body() body: {
+//       bookingId: string;
+//       requestType?: number;
+//       userEmail?: string;
+//       remarks?: string;
+//       sectors?: Array<{ origin: string; destination: string }>;
+//       ticketIds?: number[];
+//   }, @Res() res: Response) {
+//       try {
+//           const result = await this.flightdetailservice.cancelFlightTicketNew(body);
+//           return this.responseHandler.sendSuccessResponse(res, result);
+//       } catch (error) {
+//           return this.responseHandler.sendErrorResponse(res, error);
+//       }
+//   }
 
-  @Post('partial-cancellation')
-  async partialCancellation(@Body() body: {
-      bookingId: string;
-      sectors: Array<{ origin: string; destination: string }>;
-      ticketIds: number[];
-      remarks?: string;
-      userEmail?: string;
-  }, @Res() res: Response) {
-      try {
-          const result = await this.flightdetailservice.partialCancellation(body);
-          return this.responseHandler.sendSuccessResponse(res, result);
-      } catch (error) {
-          return this.responseHandler.sendErrorResponse(res, error);
-      }
-  }
+//   @Post('partial-cancellation')
+//   async partialCancellation(@Body() body: {
+//       bookingId: string;
+//       sectors: Array<{ origin: string; destination: string }>;
+//       ticketIds: number[];
+//       remarks?: string;
+//       userEmail?: string;
+//   }, @Res() res: Response) {
+//       try {
+//           const result = await this.flightdetailservice.partialCancellation(body);
+//           return this.responseHandler.sendSuccessResponse(res, result);
+//       } catch (error) {
+//           return this.responseHandler.sendErrorResponse(res, error);
+//       }
+//   }
 
   @Get('airline-types')
   async getAirlineTypes(@Res() res: Response) {

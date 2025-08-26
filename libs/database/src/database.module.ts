@@ -5,48 +5,51 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigDatabase } from '../../config/config.interface';
 import { HotelPaymentRepositoryService } from './repositories/hotelPayment.repository';
 import {
-  LoginSessionService,
-  OtpVerificationService,
-  UserRepositoryService,
-  AddressRepositoryService,
-  CommissionRepositoryService,
-  SettingRepositoryService,
-  SearchRepositoryService,
-  BookingRepositoryService,
-  OrderRepositoryService,
-  FlightTicketRepositoryService,
- 
-  Payment,
-  HotelCountryRepositoryService,
-  HotelCityRepositoryService,
-  HotelRepositoryService,
-  HotelDetailsRepositoryService, 
-  HotelRoom,
-  HotelRoomRepositoryService,
-  EnquiryRepositoryService,
-  Enquiry,
-  Package,
-  PackageAmenite,
-  PackageCategory,
-  PackageDay,
-  About,
-  Banner,
-  Faq,
-  Festival,
-  Footer,
-  Offer,
-  Social,
-  TabService,
-  Testimonial,
-
+    LoginSessionService,
+    OtpVerificationService,
+    UserRepositoryService,
+    AddressRepositoryService,
+    CommissionRepositoryService,
+    SettingRepositoryService,
+    SearchRepositoryService,
+    BookingRepositoryService,
+    OrderRepositoryService,
+    FlightTicketRepositoryService,
+    Payment,
+    HotelCountryRepositoryService,
+    HotelCityRepositoryService,
+    // HotelierRepositoryService,
+    HotelDetailsRepositoryService,
+    HotelRoomTypes,
+    // InventoryService,
+    HotelierRoomTypesRepositoryService,
+    EnquiryRepositoryService,
+    Enquiry,
+    Package,
+    PackageAmenite,
+    PackageCategory,
+    PackageDay,
+    About,
+    Banner,
+    Faq,
+    Festival,
+    Footer,
+    Offer,
+    Social,
+    TabService,
+    Testimonial,
+    RoomInventory,
+    HotelierBooking,
+    HotelierInventoryRepositoryService,
+    HotelierRepositoryService,
+//   PackageBookingRepositoryService,
+//   PackageBooking,
 } from './';
-import { User, OtpVerification, LoginSession,HotelCountry,HotelDetails, HotelCity ,Address, Setting,Commission, Airport,Booking, TransactionDetail, Passenger, Hotel,Order} from './';
+import { User, OtpVerification, LoginSession, HotelCountry, HotelDetails, HotelCity, Address, Setting, Commission, Airport, Booking, TransactionDetail, Passenger, Hotel, Order } from './';
 import { TransactionManager } from './repositories/utils';
 import { DataSource } from 'typeorm';
-
 @Module({})
 export class DBModule {
-
     private static getConnectionOptions(config: ConfigService): TypeOrmModuleOptions {
         const dbData = config.get().db;
         if (!dbData) {
@@ -82,23 +85,26 @@ export class DBModule {
                 HotelCity,
                 HotelDetails,
                 Enquiry,
-                HotelRoom,
+                HotelRoomTypes,
                 Footer,
                 Package,
                 PackageAmenite,
                 PackageCategory,
                 PackageDay,
+                RoomInventory,
+                HotelierBooking,
+                Hotel,
+                RoomInventory,
+                // PackageBooking
             ],
-            synchronize: true,
+            synchronize: false,
             logging: false,
-            migrationsRun: false
+            migrationsRun: false,
         };
     }
-
     private static getConnectionOptionsPostgres(dbData: ConfigDatabase): TypeOrmModuleOptions {
         const { database, entities, host, logging, password, port, synchronize, type, username, url } = dbData;
         // return {url, type:'postgres'}
-        
         return {
             database,
             entities,
@@ -111,7 +117,6 @@ export class DBModule {
             username,
         };
     }
-
     public static forRoot() {
         return {
             module: DBModule,
@@ -151,11 +156,15 @@ export class DBModule {
                     HotelCity,
                     HotelDetails,
                     Enquiry,
-                    HotelRoom,
+                    HotelRoomTypes,
                     Package,
                     PackageAmenite,
                     PackageCategory,
                     PackageDay,
+                    RoomInventory,
+                    HotelierBooking,
+                    // PackageBooking
+                    //HotelierRepositoryService, // Uncomment if needed
                 ]),
             ],
             controllers: [],
@@ -174,16 +183,17 @@ export class DBModule {
                 HotelCountryRepositoryService,
                 HotelCityRepositoryService,
                 HotelDetailsRepositoryService,
-                HotelRepositoryService,
-                HotelRoomRepositoryService,
+                HotelierRepositoryService,
+                // PackageBookingRepositoryService,
+                // InventoryService,
+                HotelierRoomTypesRepositoryService,
+                HotelierInventoryRepositoryService,
                 EnquiryRepositoryService,
                 {
                     provide: TransactionManager, // Register TransactionManager
                     useFactory: (dataSource: DataSource) => new TransactionManager(dataSource),
                     inject: [DataSource], // Inject DataSource
-                  },
-
-
+                },
             ],
             exports: [
                 UserRepositoryService,
@@ -200,11 +210,19 @@ export class DBModule {
                 HotelCountryRepositoryService,
                 HotelCityRepositoryService,
                 HotelDetailsRepositoryService,
-                HotelRepositoryService,
-                HotelRoomRepositoryService,
-                EnquiryRepositoryService
+                HotelierRepositoryService,
+                //InventoryService,
+                HotelierRoomTypesRepositoryService,
+                EnquiryRepositoryService,
+                HotelierInventoryRepositoryService,
+                // PackageBookingRepositoryService
             ],
         };
     }
-
 }
+
+
+
+
+
+

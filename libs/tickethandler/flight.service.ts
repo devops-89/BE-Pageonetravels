@@ -71,9 +71,11 @@ if (data?.Response?.Response) {
   console.error("❌ Malformed or unexpected LCC ticket response:", data);
 }
                         if(result.data.Response.ResponseStatus === 1){
+                            // success result runing with 1 status code
+                            console.log("+++++++++++++++result data printing:+++++++++++++++++",result?.data?.Response);
                             // try to ticket check status then save db success/fail
                             await this.orderRepositoryService.updatePaymentSuccess(order_id,result.data);
-                            const ticket = flightTicketPdfTemplate(result);
+                            const ticket = flightTicketPdfTemplate(result?.data);
                             // console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
                             //   console.log("+++++++++++++ticket for lcc one way domestic response+++++++++ ",result);
                             //   console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");

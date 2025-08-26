@@ -15,28 +15,55 @@ export class GenerateTokenService {
     }
 
 
-    async generateTBOToken(ip_address:string) {
-        try {
-            const tbo_credentials = await this.getTBOCredentials();
-            const base_url = tbo_credentials.FLIGHT_AUTHENTICATION;
+    // async generateTBOToken(ip_address:string) {
+    //     try {
+    //         const tbo_credentials = await this.getTBOCredentials();
+    //         const base_url = tbo_credentials.FLIGHT_AUTHENTICATION;
 
-            const payload = {
-                ClientId: tbo_credentials.FLIGHT_CLIENT_ID,
-                UserName: tbo_credentials.FLIGHT_USERNAME,
-                Password: tbo_credentials.FLIGHT_PASSWORD,
-                // EndUserIp: this.tbo_credentials.FLIGHT_ENDUSERIP,
-                EndUserIp: ip_address,
-            }
+    //         const payload = {
+    //             ClientId: tbo_credentials.FLIGHT_CLIENT_ID,
+    //             UserName: tbo_credentials.FLIGHT_USERNAME,
+    //             Password: tbo_credentials.FLIGHT_PASSWORD,
+    //             // EndUserIp: this.tbo_credentials.FLIGHT_ENDUSERIP,
+    //             EndUserIp: ip_address,
+    //         }
            
-            const result = await axios.post(base_url, payload);
-            await this.rediscacheservice.setCache(`tboToken:${ip_address}`,result.data.TokenId, 82800);
-            return this.tbo_token;
+    //         const result = await axios.post(base_url, payload);
+    //         await this.rediscacheservice.setCache(`tboToken:${ip_address}`,result.data.TokenId, 82800);
+    //         return this.tbo_token;
            
-        } catch (error) {
-            console.log("Error in the generate token", error);
-            throw error
+    //     } catch (error) {
+    //         console.log("Error in the generate token", error);
+    //         throw error
+    //     }
+    // }
+
+    async generateTBOToken(ip_address:string) {
+    try {
+        const tbo_credentials = await this.getTBOCredentials();
+        const base_url = tbo_credentials.FLIGHT_AUTHENTICATION;
+
+        const payload = {
+            ClientId: tbo_credentials.FLIGHT_CLIENT_ID,
+            UserName: tbo_credentials.FLIGHT_USERNAME,
+            Password: tbo_credentials.FLIGHT_PASSWORD,
+            EndUserIp: ip_address,
         }
+       
+        const result = await axios.post(base_url, payload);
+         console.log("Toeken Details:",result.data);
+        const token = result.data.TokenId;
+        await this.rediscacheservice.setCache(`tboToken:${ip_address}`, token, 82800);
+
+        this.tbo_token = token;   // store locally
+        return token;             // ✅ return actual token
+       
+    } catch (error) {
+        console.log("Error in the generate token", error);
+        throw error;
     }
+}
+
 
     async getTBOCredentials(){
         try {

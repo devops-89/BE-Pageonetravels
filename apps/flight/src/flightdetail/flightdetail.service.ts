@@ -55,6 +55,35 @@ export class FlightDetailService {
         }
     }
 
+    // get Agency Balance
+//      async getAgencyBalance(body: {
+//         ClientId: string;
+//         TokenAgencyId: string;
+//         TokenMemberId: string;
+//         EndUserIp: string;
+//         TokenId: string;
+//     }) {
+//         try {
+//             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
+//             const base_url = tbo_credentials.FLIGHT_GET_AGENCY_BALANCE || 'http://Sharedapi.tektravels.com/SharedData.svc/rest/GetAgencyBalance';
+//             const payload = {
+//                 ClientId: body.ClientId,
+//                 TokenAgencyId: body.TokenAgencyId,
+//                 TokenMemberId: body.TokenMemberId,
+//                 EndUserIp: body.EndUserIp,
+//                 TokenId: body.TokenId
+//             };
+//             const response = await this.httptboapiservice.httpAPICall(base_url, payload);
+//             console.log('Agency Balance API response:', response);
+//             // Store in Redis with a key based on AgencyId
+//             await this.redisCacheService.setCache(AgencyBalance:${body.TokenAgencyId}, JSON.stringify(response), 3600);
+//             return { message: 'Agency Balance fetched successfully', data: response };
+//         } catch (error) {
+//             console.error('Error in getAgencyBalance:', error);
+//             throw error;
+// }
+// }
+
 
 
     async FlightDetail(body: FlightDetailRequestDto) {
@@ -436,40 +465,46 @@ export class FlightDetailService {
         }
     }
 
-    async getCancellationCharges(body: {
-        bookingId: string;
-        requestType: string;
-        bookingMode: string;
-        endUserIp: string;
-        tokenId: string;
-    }) {
-        try {
-            const tbo_credentials = await this.tboConfigService.getTBOCredentials();
-            const base_url = tbo_credentials.FLIGHT_GET_CANCELLATION_CHARGES;
-            
-            const payload = {
-                BookingId: body.bookingId,
-                RequestType: body.requestType,
-                BookingMode: body.bookingMode,
-                EndUserIp: body.endUserIp,
-                TokenId: body.tokenId
-            };
+    
 
-            const result = await this.httptboapiservice.getCancellationCharges(base_url, payload);
-            
-            return {
-                success: result.Response.ResponseStatus === 1,
-                data: result.Response,
-                cancellationCharges: result.Response,
-                refundAmount: result.Response.RefundAmount,
-                cancellationCharge: result.Response.CancellationCharge,
-                error: result.Response.ResponseStatus !== 1 ? 'Failed to get cancellation charges' : undefined
-            };
-        } catch (error) {
-            console.error("Error in getCancellationCharges:", error);
-            throw Error(`Failed to get cancellation charges: ${error.message}`);
-        }
+    async getCancellationCharges(body: {
+    BookingId: string;
+    RequestType: string;
+    BookingMode: string;
+    EndUserIp: string;
+}) {
+    try {
+        const tbo_credentials = await this.tboConfigService.getTBOCredentials();
+        const base_url = tbo_credentials.FLIGHT_GET_CANCELLATION_CHARGES;
+
+        const { token,TBO_data } = await this.generateTokenService.getToken(body.EndUserIp);
+        const {  FLIGHT_ENDUSERIP: base_ip } = TBO_data;
+
+        console.log("generated token:",token);
+
+    const payload = {
+    BookingId: body.BookingId,
+    RequestType: body.RequestType,
+    BookingMode: body.BookingMode,
+    EndUserIp: base_ip,
+    TokenId: token,  // ✅ now always fresh & valid
+};
+        console.log("paylod",payload);
+
+        const result = await this.httptboapiservice.getCancellationCharges(base_url, payload);
+
+        return {
+            success: result.Response.ResponseStatus === 1,
+            data: result.Response,
+            refundAmount: result.Response.RefundAmount,
+            cancellationCharge: result.Response.CancellationCharge,
+            error: result.Response.ResponseStatus !== 1 ? 'Failed to get cancellation charges' : undefined
+        };
+    } catch (error) {
+        console.error("Error in getCancellationCharges:", error);
+        throw new Error(`Failed to get cancellation charges: ${error.message}`);
     }
+}
 
     async sendChangeRequest(body: {
         bookingId: string;
@@ -540,143 +575,143 @@ export class FlightDetailService {
         }
     }
 
-    async cancelFlightTicketNew(body: {
-        bookingId: string;
-        requestType?: number;
-        userEmail?: string;
-        remarks?: string;
-        sectors?: Array<{ origin: string; destination: string }>;
-        ticketIds?: number[];
-    }) {
-        try {
-            const { bookingId, requestType = 1, userEmail, remarks, sectors, ticketIds } = body;
+    // async cancelFlightTicketNew(body: {
+    //     bookingId: string;
+    //     requestType?: number;
+    //     userEmail?: string;
+    //     remarks?: string;
+    //     sectors?: Array<{ origin: string; destination: string }>;
+    //     ticketIds?: number[];
+    // }) {
+    //     try {
+    //         const { bookingId, requestType = 1, userEmail, remarks, sectors, ticketIds } = body;
             
-            // Step 1: Get cancellation charges
-            const chargesResult = await this.getCancellationCharges({
-                bookingId,
-                requestType: requestType.toString(),
-                bookingMode: "5",
-                endUserIp: tbo_credentials.FLIGHT_ENDUSERIP,
-                tokenId: await this.getToken()
-            });
+    //         // Step 1: Get cancellation charges
+    //         const chargesResult = await this.getCancellationCharges({
+    //             bookingId,
+    //             requestType: requestType.toString(),
+    //             bookingMode: "5",
+    //             endUserIp: tbo_credentials.FLIGHT_ENDUSERIP,
+    //             //tokenId: await this.generateTokenService.getToken(ip_address)
+    //         });
 
-            if (!chargesResult.success) {
-                return chargesResult;
-            }
+    //         if (!chargesResult.success) {
+    //             return chargesResult;
+    //         }
 
-            // Step 2: Send change request
-            const cancellationRequest = {
-                bookingId,
-                requestType,
-                cancellationType: 3, // Sector cancellation
-                sectors,
-                ticketIds,
-                remarks: remarks || "Flight cancellation request",
-                userEmail
-            };
+    //         // Step 2: Send change request
+    //         const cancellationRequest = {
+    //             bookingId,
+    //             requestType,
+    //             cancellationType: 3, // Sector cancellation
+    //             sectors,
+    //             ticketIds,
+    //             remarks: remarks || "Flight cancellation request",
+    //             userEmail
+    //         };
 
-            const changeRequestResult = await this.sendChangeRequest(cancellationRequest);
+    //         const changeRequestResult = await this.sendChangeRequest(cancellationRequest);
 
-            if (!changeRequestResult.success) {
-                return changeRequestResult;
-            }
+    //         if (!changeRequestResult.success) {
+    //             return changeRequestResult;
+    //         }
 
-            // Step 3: Send cancellation confirmation email if provided
-            if (userEmail && changeRequestResult.success) {
-                try {
-                    const cancellationTemplate = cancellationConfirmationTemplate(changeRequestResult, 'Guest');
-                    await this.EmailService.sendEmail(
-                        userEmail,
-                        'Flight Ticket Cancellation Confirmation',
-                        cancellationTemplate
-                    );
-                } catch (emailError) {
-                    console.error('Error sending cancellation confirmation email:', emailError);
-                }
-            }
+    //         // Step 3: Send cancellation confirmation email if provided
+    //         if (userEmail && changeRequestResult.success) {
+    //             try {
+    //                 const cancellationTemplate = cancellationConfirmationTemplate(changeRequestResult, 'Guest');
+    //                 await this.EmailService.sendEmail(
+    //                     userEmail,
+    //                     'Flight Ticket Cancellation Confirmation',
+    //                     cancellationTemplate
+    //                 );
+    //             } catch (emailError) {
+    //                 console.error('Error sending cancellation confirmation email:', emailError);
+    //             }
+    //         }
 
-            return {
-                success: true,
-                data: changeRequestResult.data,
-                cancellationCharges: chargesResult.cancellationCharges,
-                changeRequestId: changeRequestResult.changeRequestId,
-                refundAmount: chargesResult.refundAmount,
-                cancellationCharge: chargesResult.cancellationCharge
-            };
-        } catch (error) {
-            console.error("Error in cancel Flight Ticket", error);
-            throw Error(`Failed to cancel flight ticket: ${error.message}`);
-        }
-    }
+    //         return {
+    //             success: true,
+    //             data: changeRequestResult.data,
+    //             //cancellationCharges: chargesResult.cancellationCharges,
+    //             changeRequestId: changeRequestResult.changeRequestId,
+    //             refundAmount: chargesResult.refundAmount,
+    //             cancellationCharge: chargesResult.cancellationCharge
+    //         };
+    //     } catch (error) {
+    //         console.error("Error in cancel Flight Ticket", error);
+    //         throw Error(`Failed to cancel flight ticket: ${error.message}`);
+    //     }
+    // }
 
-    async partialCancellation(body: {
-        bookingId: string;
-        sectors: Array<{ origin: string; destination: string }>;
-        ticketIds: number[];
-        remarks?: string;
-        userEmail?: string;
-    }) {
-        try {
-            const tbo_credentials = await this.tboConfigService.getTBOCredentials();
-            const { bookingId, sectors, ticketIds, remarks, userEmail } = body;
+    // async partialCancellation(body: {
+    //     bookingId: string;
+    //     sectors: Array<{ origin: string; destination: string }>;
+    //     ticketIds: number[];
+    //     remarks?: string;
+    //     userEmail?: string;
+    // }) {
+    //     try {
+    //         const tbo_credentials = await this.tboConfigService.getTBOCredentials();
+    //         const { bookingId, sectors, ticketIds, remarks, userEmail } = body;
 
-            // Step 1: Get cancellation charges
-            const chargesResult = await this.getCancellationCharges({
-                bookingId,
-                requestType: "2", // Partial cancellation
-                bookingMode: "5",
-                endUserIp: tbo_credentials.FLIGHT_ENDUSERIP,
-                tokenId: await this.getToken()
-            });
+    //         // Step 1: Get cancellation charges
+    //         const chargesResult = await this.getCancellationCharges({
+    //             BookingId,
+    //             RequestType: "2", // Partial cancellation
+    //             BookingMode: "5",
+    //             EndUserIp: tbo_credentials.FLIGHT_ENDUSERIP,
+    //             //tokenId: await this.getToken()
+    //         });
 
-            if (!chargesResult.success) {
-                return chargesResult;
-            }
+    //         if (!chargesResult.success) {
+    //             return chargesResult;
+    //         }
 
-            // Step 2: Send change request
-            const cancellationRequest = {
-                bookingId,
-                requestType: 2, // Partial cancellation
-                cancellationType: 3, // Sector cancellation
-                sectors,
-                ticketIds,
-                remarks: remarks || "Partial cancellation request",
-                userEmail
-            };
+    //         // Step 2: Send change request
+    //         const cancellationRequest = {
+    //             BookingId,
+    //             requestType: 2, // Partial cancellation
+    //             cancellationType: 3, // Sector cancellation
+    //             sectors,
+    //             ticketIds,
+    //             remarks: remarks || "Partial cancellation request",
+    //             userEmail
+    //         };
 
-            const changeRequestResult = await this.sendChangeRequest(cancellationRequest);
+    //         const changeRequestResult = await this.sendChangeRequest(cancellationRequest);
 
-            if (!changeRequestResult.success) {
-                return changeRequestResult;
-            }
+    //         if (!changeRequestResult.success) {
+    //             return changeRequestResult;
+    //         }
 
-            // Step 3: Send cancellation confirmation email if provided
-            if (userEmail && changeRequestResult.success) {
-                try {
-                    const cancellationTemplate = cancellationConfirmationTemplate(changeRequestResult, 'Guest');
-                    await this.EmailService.sendEmail(
-                        userEmail,
-                        'Flight Ticket Partial Cancellation Confirmation',
-                        cancellationTemplate
-                    );
-                } catch (emailError) {
-                    console.error('Error sending cancellation confirmation email:', emailError);
-                }
-            }
+    //         // Step 3: Send cancellation confirmation email if provided
+    //         if (userEmail && changeRequestResult.success) {
+    //             try {
+    //                 const cancellationTemplate = cancellationConfirmationTemplate(changeRequestResult, 'Guest');
+    //                 await this.EmailService.sendEmail(
+    //                     userEmail,
+    //                     'Flight Ticket Partial Cancellation Confirmation',
+    //                     cancellationTemplate
+    //                 );
+    //             } catch (emailError) {
+    //                 console.error('Error sending cancellation confirmation email:', emailError);
+    //             }
+    //         }
 
-            return {
-                success: true,
-                data: changeRequestResult.data,
-                cancellationCharges: chargesResult.cancellationCharges,
-                changeRequestId: changeRequestResult.changeRequestId,
-                refundAmount: chargesResult.refundAmount,
-                cancellationCharge: chargesResult.cancellationCharge
-            };
-        } catch (error) {
-            console.error("Error in partialCancellation:", error);
-            throw new Error(`Failed to process partial cancellation: ${error.message}`);
-        }
-    }
+    //         return {
+    //             success: true,
+    //             data: changeRequestResult.data,
+    //             //cancellationCharges: chargesResult.cancellationCharges,
+    //             changeRequestId: changeRequestResult.changeRequestId,
+    //             refundAmount: chargesResult.refundAmount,
+    //             cancellationCharge: chargesResult.cancellationCharge
+    //         };
+    //     } catch (error) {
+    //         console.error("Error in partialCancellation:", error);
+    //         throw new Error(`Failed to process partial cancellation: ${error.message}`);
+    //     }
+    // }
 
     async getAirlineTypes() {
         const GDS_SYSTEMS = [

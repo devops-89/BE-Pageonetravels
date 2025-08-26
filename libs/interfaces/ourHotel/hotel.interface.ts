@@ -1,5 +1,4 @@
 import { CustomFile } from '../../../apps/hotel_management/src/utils/customtypes';
-
 export interface ICreateHotel {
   name: string;
   description: string;
@@ -21,13 +20,11 @@ export interface ICreateHotel {
   cancellation_policy: string;
   child_policy?: string;
   pet_policy?: string;
-  main_image: string;
-  gallery_images?:string[];
+  main_image?: string;
+  gallery_images?: string[];
   base_price: number;
   tax_percentage: number;
-
-
-  // ✅ Grouped amenities
+  // :white_tick: Grouped amenities
   amenities: {
     wifi: boolean;
     parking: boolean;
@@ -39,7 +36,6 @@ export interface ICreateHotel {
     bar: boolean;
     laundry: boolean;
   };
-
   // Optional: user_id (can be added if needed)
   // user_id: string;
 }

@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-
 import { ConfigModule } from '../../../../libs/config/config.module';
 import { HotelierController } from './hotelier.controller';
 import { HotelierService } from './hotelier.service';
@@ -9,8 +8,9 @@ import { TransactionManager } from '../../../../libs/database/src/repositories/u
 import { JwtService } from '../../../../libs/jwt-service/jwt.service';
 import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMiddleware';
 import { DBModule, Hotel, User, UserRepositoryService } from '../../../../libs/database/src';
-import { HotelRepositoryService } from '../../../../libs/database/src/repositories/hotel.repository';
+import { HotelierRepositoryService } from '../../../../libs/database/src/repositories/hotel.repository';
 import {S3Module} from "../../../../libs/S3-Service/s3.module";
+
 
 @Module({
     imports: [
@@ -24,8 +24,6 @@ import {S3Module} from "../../../../libs/S3-Service/s3.module";
         S3Module.forRoot()
     ],
     controllers: [HotelierController],
-    providers: [ TransactionManager,HotelierService,UserRepositoryService,HotelRepositoryService, JwtService, TokenValidationMiddleware],
+    providers: [ TransactionManager,HotelierService,UserRepositoryService,HotelierRepositoryService, JwtService, TokenValidationMiddleware],
 })
-
-
-export class HotelierModule {} 
+export class HotelierModule {}

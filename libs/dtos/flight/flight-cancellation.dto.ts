@@ -35,9 +35,9 @@ export class CancellationChargesRequestDto {
     @IsNotEmpty()
     EndUserIp: string;
 
-    @IsString()
-    @IsNotEmpty()
-    TokenId: string;
+    // @IsString()
+    // @IsNotEmpty()
+    // TokenId: string;
 }
 export class SendChangeRequestDto {
     @IsString()

@@ -1,6 +1,7 @@
 import { CustomFile } from '../../../apps/hotel_management/src/utils/customtypes';
 
 export interface ICreateHotelRoom {
+    max_guests?:number;
     hotel_id: string;
     room_type: string;
     room_title: string;

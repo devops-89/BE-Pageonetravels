@@ -29,5 +29,6 @@ import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-ca
     ],
     controllers: [SearchFlightController],
     providers: [SearchFlightService, GenerateTokenService, TBO_CredentialsService, HTTPSTboAPIService, RedisCacheService],
+    exports:[GenerateTokenService]
 })
 export class SearchFlightModule {}
