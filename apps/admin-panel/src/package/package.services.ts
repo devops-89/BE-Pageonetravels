@@ -8,8 +8,10 @@ import { PackageRepositoryService } from '../../../../libs/database/src/reposito
 import { CreatePackageAmeniteDto, UpdatePackageAmeniteDto } from '../../../../libs/dtos/package/package-amenites.dto';
 import { CreatePackageDayDto, UpdatePackageDayDto } from '../../../../libs/dtos/package/package-days.dto';
 import { PaginationDto } from '../../../../libs/dtos/authentication/user.dto';
-import { BookingRepositoryService } from '../../../../libs/database/src/repositories/booking.repository';
+
 import { S3FileService } from '../../../../libs/S3-Service/s3File.service';
+import { PackageFilterDto } from '../../../../libs/dtos/package/package.dto';
+
 
 @Injectable()
 export class PackageService {
@@ -19,7 +21,7 @@ export class PackageService {
         private readonly packageRepositoryService: PackageRepositoryService,
         private readonly packageCategoryRepositoryService: PackageCategoryRepositoryService,
         private readonly packageAmeniteRepositoryService: PackageAmeniteRepositoryService,
-        private readonly bookingRepositoryService: BookingRepositoryService,
+        
         private readonly s3FileService: S3FileService
     ) {}
 
@@ -90,18 +92,18 @@ export class PackageService {
     }
 
     // Get Package List
-    async getPackage(page: PaginationDto, search?: string) {
-        try {
-            const result = await this.packageRepositoryService.getPackageList(page, search);
-            return {
-                message: `Package list fetched successfully.`,
-                data: result,
-            };
-        } catch (error) {
-            console.log('Package list service error', error);
-            throw error;
-        }
-    }
+   async getPackage(page: PaginationDto, filters: PackageFilterDto) {
+  try {
+    const result = await this.packageRepositoryService.getPackageList(page, filters);
+    return {
+      message: "Package list fetched successfully.",
+      data: result,
+    };
+  } catch (error) {
+    console.log('Package list service error', error);
+    throw error;
+  }
+}
 
     async pkgUpdate(id, body: any) {
         try {
@@ -233,14 +235,78 @@ export class PackageService {
         }
     }
 
-    async bookPackage(bookingDto: unknown) {
-        try {
-            // bookingDto should contain userId, packageId, payment details, etc.
-            const result = await this.bookingRepositoryService.createBookingService(bookingDto);
-            return { message: 'Package booked successfully.', data: result };
-        } catch (error) {
-            console.log('Book Package Service Error.', error);
-            throw error;
-        }
-    }
+    // package booking service
+//     async PackageBooking(bookingDto: CreatePackageBookingDto) {
+//   try {
+//     const pkg = await this.packageRepositoryService.getPackageById(bookingDto.packageId);
+//     if (!pkg) {
+//       throw new NotFoundException('Package not found');
+//     }
+//     const bookingData = {
+//       package: pkg,
+//       title: bookingDto.title,
+//       first_name: bookingDto.first_name,
+//       last_name: bookingDto.last_name,
+//       DOB: bookingDto.DOB,
+//       passport_number: bookingDto.passport_number,
+//       passport_expiry: bookingDto.passport_expiry,
+//       email: bookingDto.email,
+//       mealType: bookingDto.mealType,
+//     };
+//     const booking = await this.packageBookingRepositoryService.createPackageBooking(bookingData);
+//     return {
+//       message: 'Package booked successfully.',
+//       data: booking,
+//     };
+//   } catch (error) {
+//     console.log('Book Package Service Error', error);
+//     throw error;
+//   }
+// }
+
+
+
+  /**
+   * Cancel a booking by ID
+   */
+  // async cancelBooking(id: string, reason: string) {
+  //   try {
+  //     const booking =
+  //       await this.packageBookingRepositoryService.cancelBooking(id, reason);
+
+  //     if (!booking) {
+  //       throw new NotFoundException('Booking not found');
+  //     }
+
+  //     return {
+  //       message: 'Booking cancelled successfully.',
+  //       data: booking,
+  //     };
+  //   } catch (error) {
+  //     console.log('Cancel Booking Service Error', error);
+  //     throw error;
+  //   }
+  // }
+
+  /**
+   * Find bookings by user ID
+   */
+  // async getUserBookings(userId: string) {
+  //   try {
+  //     const bookings =
+  //       await this.packageBookingRepositoryService.findBookingsByUser(userId);
+
+  //     return {
+  //       message: 'User bookings fetched successfully.',
+  //       data: bookings,
+  //     };
+  //   } catch (error) {
+  //     console.log('Get User Bookings Service Error', error);
+  //     throw error;
+  //   }
+  // }
 }
+
+
+
+

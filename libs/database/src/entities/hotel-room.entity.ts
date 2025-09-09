@@ -74,7 +74,7 @@ export class HotelRoom {
   @Column({ type: 'simple-array', nullable: true })
   gallery_images: string;
 
-  @Column({ type: 'jsonb' }) // Use 'json' or 'simple-json' for non-PostgreSQL DBs
+  @Column({ nullable:true,  type: 'jsonb' }) // Use 'json' or 'simple-json' for non-PostgreSQL DBs
   @IsObject()
   amenities: RoomAmenitiesDto;
 

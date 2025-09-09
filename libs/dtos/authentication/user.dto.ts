@@ -98,7 +98,7 @@ export class LoginOrRegisterDto {
 
 export class VerifyDto {
   @IsString()
-  @MinLength(6, { message: 'OTP Has 6 Characters ' })
+  @MinLength(6, { message: 'OTP Has 6 Characters' })
   otp: string;
 
   @IsString()

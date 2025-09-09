@@ -21,9 +21,9 @@ export class BookingsService {
       throw new NotFoundException('Hotel not found');
     }
     const roomType = await this.hotelRoomRepository.findById(dto.roomTypeId);
-    if (!roomType || roomType.hotel.id !== hotel.id) {
-      throw new BadRequestException('Room type does not belong to hotel');
-    }
+  if (!roomType || roomType.hotel.hotel_id !== hotel.hotel_id) { // ✅ use hotel_id
+  throw new BadRequestException('Room type does not belong to hotel');
+}
     // adjust inventory for the date range
     await this.inventoryRepository.adjustRangeWithLock(
       dto.roomTypeId,

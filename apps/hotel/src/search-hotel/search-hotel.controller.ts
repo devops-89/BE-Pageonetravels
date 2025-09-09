@@ -177,6 +177,39 @@ async hotelBooking(
     }
   }
 
+  @Post('/cancelBooking')
+  async cancelBooking(
+    @Body() body: { BookingId: number; Remarks: string; ip_address: string },
+    @Res() res: Response
+  ) {
+    try {
+      const result = await this.searchHotelService.sendChangeRequest(
+        body.BookingId,
+        body.Remarks,
+        body.ip_address
+      );
+      return this.responseHandler.sendSuccessResponse(res, result);
+    } catch (error) {
+      return this.responseHandler.sendErrorResponse(res, error);
+    }
+  }
+
+  // Check Cancellation Status
+  @Post('/cancelStatus')
+  async cancelStatus(
+    @Body() body: { ChangeRequestId: number; ip_address: string },
+    @Res() res: Response
+  ) {
+    try {
+      const result = await this.searchHotelService.getChangeRequestStatus(
+        body.ChangeRequestId,
+        body.ip_address
+      );
+      return this.responseHandler.sendSuccessResponse(res, result);
+    } catch (error) {
+      return this.responseHandler.sendErrorResponse(res, error);
+}
+}
 }
 
 

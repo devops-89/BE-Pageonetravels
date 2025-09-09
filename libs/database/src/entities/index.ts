@@ -36,7 +36,8 @@ export * from './packageAmenite.entity';
 export * from './packageCategory.entity';
 export * from './packageDay.entity';
 export * from './hotelier-room-inventory.entity';
-// export * from './package-booking.entity';
+export * from './package-booking.entity';
+
 
 
 

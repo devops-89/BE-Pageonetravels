@@ -9,12 +9,14 @@ import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 import { Response } from 'express';
 import { Request } from 'express';
 
+
 @Controller('webhook')
 export class WebhookController {
       
 
     constructor(
         private readonly responsehandlderservice:ResponseHandlerService,
+       
         private readonly webhookService: WebhookService,
         private readonly configService: ConfigService,
         private readonly orderRepositoryService:OrderRepositoryService
@@ -48,17 +50,9 @@ export class WebhookController {
 
       try{
         const result = await this.webhookService.getPaymentDetails(paymentId);
-        // console.log("Webhook result",result);
-        // console.log("Webhook result id",result.order_id);
-        // const order = await this.orderRepositoryService.findOne(result.order_id);
-        // console.log("order",order);
-
-        // if(order){
-        //   const payment = await this.orderRepositoryService.findOne(order.payment.payment_id);
-          
-        //   console.log("webhook payment info: ",payment);
-         
+       
         return this.responsehandlderservice.sendSuccessResponse(res,result);
+       
       }catch(error){
         console.log("Error in Webhook Api:", error);
         return this.responsehandlderservice.sendErrorResponse(res, error);

@@ -42,19 +42,28 @@ export class HotelRoomTypes {
     tax_percentage: number;
     @Column({ type: 'varchar', length: 10, default: 'INR' })
     currency: string;
-    @Column({ type: 'varchar', length: 255, nullable: true })
-    main_image: string;
-    @Column({ type: 'simple-array', nullable: true })
-    gallery_images: string;
-    @Column({ type: 'jsonb' }) // Use 'json' or 'simple-json' for non-PostgreSQL DBs
+    // @Column({ type: 'varchar', length: 255, nullable: true })
+    // main_image: string;
+    // @Column({ type: 'simple-array', nullable: true })
+    // gallery_images: string;
+
+     @Column({nullable: true })
+  main_image: string;
+
+  @Column({  type: 'jsonb',  nullable: true })
+  gallery_images: string[];
+  
+    @Column({ type: 'jsonb' }) 
     @IsObject()
     amenities: RoomAmenitiesDto;
+    
+  
     @Column({ type: 'int', default: 1 })
     number_of_rooms: number;
     @Column({ type: 'int', default: 1 })
     available_rooms: number;
-    @Column({nullable: true})
-    max_guests: number;
+    // @Column({nullable: true})
+    // max_guests: number;
     @OneToMany(() => RoomInventory, (ri) => ri.roomType) inventory: RoomInventory[];
     @OneToMany(() => HotelierBooking, (b) => b.roomType) bookings: HotelierBooking[];
     @CreateDateColumn()

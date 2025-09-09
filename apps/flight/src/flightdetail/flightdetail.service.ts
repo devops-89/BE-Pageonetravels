@@ -88,7 +88,7 @@ export class FlightDetailService {
 
     async FlightDetail(body: FlightDetailRequestDto) {
         try {
-            const guest_token = "1ABCD"; // Frontend will provide this
+            const guest_token = "1ABCD"; 
             const { ip_address, trace_id, result_index, journey_type, journey, result_index_ib } = body;
             
 
@@ -110,7 +110,7 @@ export class FlightDetailService {
             const base_url_ssr = tbo_credentials.FLIGHT_SSR;
             const base_url = tbo_credentials.FLIGHT_FAREQUOTE;
             console.log("++++++++++++baseUrl ssr:++++++++",base_url_ssr)
-             console.log("++++++++++++baseUrl fare quoter:++++++++",base_url)
+             console.log("++++++++++++baseUrl fare quote:++++++++",base_url)
 
             const flightType = `FLIGHT_${journey_type}_${journey}` as COMMISSION_TYPE;
 
@@ -181,16 +181,19 @@ export class FlightDetailService {
                     "ResultIndex": result_index
                 };
                 
-                console.log("+++++++++++++++++base url api calling++++++++++++++++++");
+                console.log("+++++++++++++++++Fare  api calling++++++++++++++++++");
                 response = await this.httptboapiservice.fareRule(base_url, payload_request);
-                console.log("fare rule api calling url:", base_url)
-                console.log("flight format url+++++: ",response);
+                console.log("fare Quote api calling url:", base_url);
+                console.log("Payload for Fare Quote API: ", payload_request);
+                console.log("flight Fare Quote url+++++: ",response);
                 
                 response = await this.httptboapiservice.flightFormat(response);
                 console.log("flight format url+++++: ",response);
                 await this.addImage(response);
                 
                 ssrResponse = await this.httptboapiservice.ssr(base_url_ssr, payload_request);
+                console.log("++++++++ssr url:++++++++",base_url_ssr);
+                console.log("++++++++++ssr payload: ++++++++++",payload_request);
                 console.log("+++++ssr response:++++++",ssrResponse);
                 ssrResponse.Response.isLCC = response.Results.IsLCC     
                           

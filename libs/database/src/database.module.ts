@@ -42,8 +42,10 @@ import {
     HotelierBooking,
     HotelierInventoryRepositoryService,
     HotelierRepositoryService,
-//   PackageBookingRepositoryService,
-//   PackageBooking,
+    PackageBookingRepositoryService,
+    PackageBooking,
+
+
 } from './';
 import { User, OtpVerification, LoginSession, HotelCountry, HotelDetails, HotelCity, Address, Setting, Commission, Airport, Booking, TransactionDetail, Passenger, Hotel, Order } from './';
 import { TransactionManager } from './repositories/utils';
@@ -70,7 +72,6 @@ export class DBModule {
                 Airport,
                 Headers,
                 TabService,
-                Booking,
                 TransactionDetail,
                 Passenger,
                 Hotel,
@@ -91,13 +92,13 @@ export class DBModule {
                 PackageAmenite,
                 PackageCategory,
                 PackageDay,
-                RoomInventory,
                 HotelierBooking,
                 Hotel,
                 RoomInventory,
-                // PackageBooking
+                PackageBooking,
+                Booking,
             ],
-            synchronize: false,
+            synchronize: true,
             logging: false,
             migrationsRun: false,
         };
@@ -163,7 +164,8 @@ export class DBModule {
                     PackageDay,
                     RoomInventory,
                     HotelierBooking,
-                    // PackageBooking
+                    PackageBooking,
+                    Booking,
                     //HotelierRepositoryService, // Uncomment if needed
                 ]),
             ],
@@ -184,7 +186,8 @@ export class DBModule {
                 HotelCityRepositoryService,
                 HotelDetailsRepositoryService,
                 HotelierRepositoryService,
-                // PackageBookingRepositoryService,
+                PackageBookingRepositoryService,
+                BookingRepositoryService,
                 // InventoryService,
                 HotelierRoomTypesRepositoryService,
                 HotelierInventoryRepositoryService,
@@ -215,14 +218,9 @@ export class DBModule {
                 HotelierRoomTypesRepositoryService,
                 EnquiryRepositoryService,
                 HotelierInventoryRepositoryService,
-                // PackageBookingRepositoryService
+                PackageBookingRepositoryService,
+                BookingRepositoryService
             ],
         };
     }
 }
-
-
-
-
-
-

@@ -6,6 +6,13 @@ export class Booking {
     @PrimaryGeneratedColumn('uuid')
     id: string
 
+  @Column({ type: "uuid" })
+  userId: string;   
+
+  @ManyToOne(() => User, (user) => user.booking, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "userId" })
+  user: User;   
+
     @Column({ nullable: true })
     flight_details: string
 
@@ -39,8 +46,6 @@ export class Booking {
     @Column({ type: 'timestamp', default: () => 'now()' })
     updated_at: Date
 
-    @OneToMany(() => User, u => u.id)
-    @JoinColumn({ name: "user_id" })
-    user: User
+ 
 
 }

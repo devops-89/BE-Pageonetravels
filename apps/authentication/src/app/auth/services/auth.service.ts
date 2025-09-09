@@ -338,6 +338,7 @@ export class AuthService {
                     status: USER_ACCOUNT_STATUS.INACTIVE,
                     verify_status: USER_VERIFY_STATUS.UNVERIFIED,
                     loginSource: USER_LOGIN_SOURCE.LOCAL,
+                    full_name: full_name,
                     user_type: user_type,
                     phone_number:phone_number,
                     country_code:country_code,
@@ -376,7 +377,7 @@ export class AuthService {
                 const emailTemplate = otpVerificationTemplate(OTP);
                 await this.EmailService.sendEmail(email, 'Email Verification', emailTemplate.html);
 
-                return { message: `${OTP_VERIFY_MSG.OTP_SEND} ${email}`, data: { reference_id: otpId, OTP, full_name } };
+                return { message: `${OTP_VERIFY_MSG.OTP_SEND} ${email}`, data: { reference_id: otpId, full_name } };
 
         } catch (error) {
             console.error("Error registering with email & password:", error);

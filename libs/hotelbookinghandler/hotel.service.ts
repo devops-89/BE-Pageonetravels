@@ -13,6 +13,7 @@ import { UserRepositoryService } from '../../libs/database/src';
 // import { flightTicketPdfTemplate } from '../../libs/templates/ticket';
 // import { paymentSuccessTicketFailureTemplate } from '../../libs/templates/ticketfail.template';
 import { hotelBookingTemplate } from "../../libs/templates/hotelBookingConfirmation";
+import { S3FileService } from '../../libs/S3-Service/s3File.service';
 import axios from 'axios';
 import * as fs from 'fs';
 import { HttpService } from '@nestjs/axios';
@@ -30,7 +31,8 @@ export class HotelService {
         private readonly orderRepositoryService: OrderRepositoryService,
         private readonly EmailService: EmailService,
         private readonly configService: ConfigService,
-        private readonly httpService: HttpService
+        private readonly httpService: HttpService,
+         private readonly s3FileService: S3FileService
     ) {}
 
     async hotelHandler(order_id, custom_order_id, order_request, user, order_request_second) {
@@ -63,6 +65,15 @@ export class HotelService {
 
                     //  Sending the confirmtion Email
                    const bookingSuccessTemplate = await hotelBookingTemplate(result?.BookResult,userDetails?.full_name,extraInfo);
+                   const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(bookingSuccessTemplate);
+                    if (pdfBuffer) {
+                                      const ticketPath = `hotel-invoice/${Date.now()}-invoice-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Invoice Url: ",pdfUrl);
+                                }
+
+
                    await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', bookingSuccessTemplate);
                   return { success: true, bookingData: result.BookResult };
             } else {

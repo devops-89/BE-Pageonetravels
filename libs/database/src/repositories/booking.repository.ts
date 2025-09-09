@@ -78,47 +78,47 @@ export class BookingRepositoryService {
         }
     }
 
-    async createBookingService(booking_payload) {
-        try {
-            const {
-                bookingpayment_amount,
-                bookingpaymentcurrency,
-                bookingpayment_date,
-                flight_details,
-                passenger_details,
-                booking_type,
-                userId
-            } = booking_payload;
+    // async createBookingService(booking_payload) {
+    //     try {
+    //         const {
+    //             bookingpayment_amount,
+    //             bookingpaymentcurrency,
+    //             bookingpayment_date,
+    //             flight_details,
+    //             passenger_details,
+    //             booking_type,
+    //             userId
+    //         } = booking_payload;
     
-            let fields = this.mapObject({
-                bookingpayment_amount,
-                bookingpayment_date,
-                flight_details: typeof flight_details === 'string' ? flight_details : JSON.stringify(flight_details),
-                passenger_details: typeof passenger_details === 'string' ? passenger_details : JSON.stringify(passenger_details),
-                booking_status: BOOKING_STATUS.INIT,
-                booking_date: new Date(),
-                booking_type,
-                bookingpayment_status: PAYMENT_STATUS.PENDING,
-                bookingpaymentcurrency
-            });
+    //         let fields = this.mapObject({
+    //             bookingpayment_amount,
+    //             bookingpayment_date,
+    //             flight_details: typeof flight_details === 'string' ? flight_details : JSON.stringify(flight_details),
+    //             passenger_details: typeof passenger_details === 'string' ? passenger_details : JSON.stringify(passenger_details),
+    //             booking_status: BOOKING_STATUS.INIT,
+    //             booking_date: new Date(),
+    //             booking_type,
+    //             bookingpayment_status: PAYMENT_STATUS.PENDING,
+    //             bookingpaymentcurrency
+    //         });
     
-            if (!bookingpayment_amount || bookingpayment_amount <= 0) {
-                throw Error("Invalid payment amount");
-            }
-            if (!flight_details || !passenger_details) {
-                throw Error("Missing flight or passenger details");
-            }
+    //         if (!bookingpayment_amount || bookingpayment_amount <= 0) {
+    //             throw Error("Invalid payment amount");
+    //         }
+    //         if (!flight_details || !passenger_details) {
+    //             throw Error("Missing flight or passenger details");
+    //         }
     
-            return this.transactionManager.runInTransaction(async (manager) => {
-                const saveBookingData = manager.create("booking", fields);
-                await manager.save("booking", saveBookingData);
-                return saveBookingData;
-            });
-        } catch (error) {
-            console.log("Error in createBookingService Repo:", error);
-            throw error;
-        }
-    }
+    //         return this.transactionManager.runInTransaction(async (manager) => {
+    //             const saveBookingData = manager.create("booking", fields);
+    //             await manager.save("booking", saveBookingData);
+    //             return saveBookingData;
+    //         });
+    //     } catch (error) {
+    //         console.log("Error in createBookingService Repo:", error);
+    //         throw error;
+    //     }
+    // }
 
 
     //unwanted code

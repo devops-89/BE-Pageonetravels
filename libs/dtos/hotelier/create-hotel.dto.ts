@@ -9,7 +9,8 @@ import {
   Matches,
   ValidateNested,
 } from 'class-validator';
-import { Type, Transform } from 'class-transformer';
+
+import { Type, Transform, plainToInstance } from 'class-transformer';
 import { CustomFile } from '../../../apps/hotel_management/src/utils/customtypes';
 class AmenitiesDto {
   @IsBoolean()
@@ -120,9 +121,23 @@ export class CreateHotelDto {
   @Transform(({ value }) => value?.trim())
   currency: string;
   // Nested amenities object
-  @ValidateNested()
-  @Type(() => AmenitiesDto)
-  amenities: AmenitiesDto;
+@ValidateNested()
+@Type(() => AmenitiesDto)
+@Transform(({ value }) => {
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      return plainToInstance(AmenitiesDto, parsed);
+    } catch {
+      return value;
+    }
+  }
+  if (typeof value === 'object' && value !== null) {
+    return plainToInstance(AmenitiesDto, value);
+  }
+  return value;
+})
+amenities: AmenitiesDto;
    // File upload fields
   @IsOptional()
   @IsString()

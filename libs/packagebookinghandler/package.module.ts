@@ -11,18 +11,17 @@ import { OrderRepositoryService } from '../../libs/database/src/repositories/ord
 import { EmailService } from '../../libs/email-service/email.service';
 import {PDFGenerateService} from '../../libs/pdf-generate/pdf-generate.service';
 import { DBModule } from '../../libs/database/src/database.module';
-import { HotelService } from './hotel.service';
-import {S3Module} from "../../libs/S3-Service/s3.module";
+import { PackageService } from './package.service';
+import { PackageRepositoryService } from '../database/src';
 @Module({
   imports:[
     ConfigModule ,
     TBOConfigModule.register(),
     DBModule.forRoot(),
-    S3Module.forRoot()
   ],
   controllers: [],
   providers: [
-    HotelService,
+    PackageService,
     ConfigService,
     TBO_CredentialsService,
     ResponseHandlerModule,

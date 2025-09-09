@@ -26,18 +26,42 @@ async function bootstrap() {
     const globalPrefix = 'api';
     app.setGlobalPrefix(globalPrefix);
 
-    app.useGlobalPipes(
-      new ValidationPipe({
-        exceptionFactory: (validationErrors: ValidationError[] = []) => {
-          let msg = '';
-          for (const error of validationErrors) {
-              msg += `Invalid ${error.property} - ${Object.values(error.constraints).join(', ')}, `;
-          }
-          return new BadRequestException(msg);
-        },
-      }),
-    );
+    // app.useGlobalPipes(
+    //   new ValidationPipe({
+    //     exceptionFactory: (validationErrors: ValidationError[] = []) => {
+    //       let msg = '';
+    //       for (const error of validationErrors) {
+    //           msg += `Invalid ${error.property} - ${Object.values(error.constraints).join(', ')}, `;
+    //       }
+    //       return new BadRequestException(msg);
+    //     },
+    //   }),
+    // );
     
+   app.useGlobalPipes(
+  new ValidationPipe({
+    whitelist: true,
+    transform: true,
+    exceptionFactory: (validationErrors: ValidationError[] = []) => {
+      if (!validationErrors || validationErrors.length === 0) {
+        return new BadRequestException('Validation failed');
+      }
+
+      const messages = validationErrors
+        .map((error) => {
+          const constraints = error.constraints
+            ? Object.values(error.constraints).join(', ')
+            : 'Invalid input';
+          return `Invalid ${error.property} - ${constraints}`;
+        })
+        .join('; ');
+
+      return new BadRequestException(messages);
+    },
+  }),
+);
+
+
     const config = new ConfigService()
     // const config_service = new TBO_CredentialsService(a,b)
     // await TBO_CredentialsService.getSettingValues();

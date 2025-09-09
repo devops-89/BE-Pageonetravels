@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { UserRepositoryService } from '../../../../libs/database/src/repositories/user.repository';
 import { OrderRepositoryService } from '../../../../libs/database/src/repositories/order.repository';
-import { LccTicketDto, VerifyDto } from '../../../../libs/dtos/flight/flight-ticket.dto';
+import { LccTicketDto } from '../../../../libs/dtos/flight/flight-ticket.dto';
 import { TokenValidationGuard } from '../../../../libs/middlewares/authMiddleware.guard';
 import { RazorpayService } from './razorpay.service';
 import { Repository } from 'typeorm';
@@ -11,6 +11,7 @@ import { Order, Payment, User } from '../../../../libs/database/src/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PAYMENT_STATUS } from '../../../../libs/constants/bookingContant';
 import { RazorpayService as RazorpayPaymentService } from '../../../../libs/paymentgateway/razorpay.service';
+import {CreatePackageBookingDto} from "../../../../libs/dtos/package/package-booking.dto";
 
 @Controller('razorpay')
 export class RazorpayController {
@@ -36,7 +37,7 @@ export class RazorpayController {
                 throw `An error occurred while fetching the user. Please try again later.`;
             }
             const email = refData.email;
-            const result = await this.razorpayService.createOrder(reference_id, body, email);
+            const result = await this.razorpayService.createFlightOrder(reference_id, body, email);
             return this.responsehandlderservice.sendSuccessResponse(res, result);
         } catch (error) {
             console.log(error);
@@ -125,6 +126,33 @@ export class RazorpayController {
             console.log('Hotel Booking Error: ', error);
             return this.responsehandlderservice.sendErrorResponse(res, error);
         }
+    }
+
+    @Post("package-payment-init")
+    @UseGuards(TokenValidationGuard)
+    async packagePaymentInit(@Body() body:CreatePackageBookingDto,@Req() req:Request,@Res() res:Response){
+          try {
+            const payload = req['userPayload'];
+            const { reference_id } = payload;
+            const refData = await this.userRepositoryService.getUserByUserId(reference_id);
+            
+
+            if (!refData) {
+                throw `An error occurred while fetching the user. Please try again later.`;
+            }
+            console.log("Payload coming for the razorpay: ",body);
+            // const email = refData.email;
+            // const result = await this.razorpayService.createPackageOrder(reference_id,body ,email);  
+           return this.responsehandlderservice.sendSuccessResponse(res, {
+                message: 'Package Booking Initialized. Proceed to payment.',
+                data:"123456"
+                
+            });
+        } catch (error) {
+            console.log(error);
+            return this.responsehandlderservice.sendErrorResponse(res, error);
+        }
+
     }
 
     @Get('/payment/verify')

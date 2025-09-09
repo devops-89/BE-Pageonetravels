@@ -5,6 +5,8 @@ import { OrderId } from "aws-sdk/clients/outposts";
 import { User } from "./user.entity";
 import { IsOptional, IsString } from "class-validator";
 import { PAYMENT_STATUS } from "../../../../libs/constants/bookingContant";
+import { PackageBooking } from "./package-booking.entity";
+
 
 
 @Entity('payment')
@@ -13,9 +15,13 @@ export class Payment {
     payment_id: string;  
 
 
-    @OneToOne(() => Order, (order) => order.payment)
+    @OneToOne(() => Order,{ nullable: true })
     @JoinColumn({ name: 'order_id' })
-    order: Order;
+    order?: Order;
+
+    @OneToOne(() => PackageBooking, { nullable: true })
+    @JoinColumn({ name: 'package_booking_id' })
+    packageBooking?: PackageBooking;
 
     @ManyToOne(() => User, (user) => user.payments)
     @JoinColumn({ name: "user_id" })

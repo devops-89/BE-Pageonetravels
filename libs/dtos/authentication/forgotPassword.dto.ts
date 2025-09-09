@@ -1,4 +1,5 @@
 import { IsString, IsEmail, IsNotEmpty, IsNumber, IsOptional, MinLength, IsEnum } from 'class-validator';
+import {Transform} from "class-transformer";
 import { USER_TYPE } from 'libs/constants/autenticationConstants/userContants';
 
 export class ForgotPasswordDto {
@@ -27,5 +28,7 @@ export class ResetPasswordDto {
 
   @IsString()
   @IsNotEmpty({ message: 'Password is required' })
+  @MinLength(6, { message: 'Password must be at least 6 characters long.' })
+  @Transform(({ value }) => value?.trim())
   password: string;
 }

@@ -7,7 +7,7 @@ import { ResponseHandlerModule } from '../../../../libs/response-handler/respons
 import { TransactionManager } from '../../../../libs/database/src/repositories/utils';
 import { JwtService } from '../../../../libs/jwt-service/jwt.service';
 import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMiddleware';
-import { Booking, DBModule, User, UserRepositoryService } from '../../../../libs/database/src';
+import { Booking, DBModule, PackageBooking, PackageBookingRepositoryService, User, UserRepositoryService } from '../../../../libs/database/src';
 import { PackageCategoryRepositoryService } from '../../../../libs/database/src/repositories/packagecategory.repository';
 import { PackageDayRepositoryService } from '../../../../libs/database/src/repositories/packageday.repository';
 import { PackageRepositoryService } from '../../../../libs/database/src/repositories/package.repository';
@@ -23,11 +23,12 @@ import {S3Module} from "../../../../libs/S3-Service/s3.module";
     DBModule.forRoot(),
     TypeOrmModule.forFeature([
       User,
-      PackageCategory, // Register your entity here
+      PackageCategory, 
       PackageAmenite,
       PackageDay,
       Package,
       Booking,
+      PackageBooking
     ]),
     ConfigModule,
     ResponseHandlerModule,
@@ -45,7 +46,13 @@ import {S3Module} from "../../../../libs/S3-Service/s3.module";
     PackageDayRepositoryService,
     PackageRepositoryService,
     BookingRepositoryService,
+    PackageBooking,
+    PackageBookingRepositoryService
   ],
-  exports: [PackageService], // Export if needed by other modules
+  exports: [PackageService, PackageRepositoryService,
+    PackageAmeniteRepositoryService,
+    PackageCategoryRepositoryService,
+    PackageDayRepositoryService,
+    TypeOrmModule], // Export if needed by other modules
 })
 export class PackageModule {}

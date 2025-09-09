@@ -166,3 +166,8 @@ export class CreateBookingDto {
   TokenId: string;
 }
 
+export class CancelHotelBookingDto {
+  @IsNotEmpty()
+  @IsString()
+  reason: string;
+}

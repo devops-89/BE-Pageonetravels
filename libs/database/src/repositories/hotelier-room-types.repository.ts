@@ -27,9 +27,11 @@ export class HotelierRoomTypesRepositoryService {
                 });
             }
             // handle images
-            const upload = body.gallery_images || [];
-            const originalNames = upload.map((file) => file.path).join(', ');
-            const mainImage = body.main_image?.path || null;
+            // const upload = body.gallery_images || [];
+            //  oconstriginalNames = upload.map((file) => file.path).join(', ');
+            // const mainImage = body.main_image?.path || null;
+            console.log("body amenities:",body?.amenities);
+            console.log("body wifi: ",body?.amenities?.wifi)
             const newRoom = this.hotelRoomRepo.create({
                 hotel,
                 room_type: body.room_type,
@@ -40,12 +42,22 @@ export class HotelierRoomTypesRepositoryService {
                 base_price: body.base_price,
                 tax_percentage: body.tax_percentage,
                 currency: body.currency,
-                main_image: mainImage,
-                gallery_images: originalNames,
-                amenities: body.amenities,
+                main_image: body.main_image,
+                gallery_images: body.gallery_images,
+                //const amenities = body.amenities || {};
+                amenities:{
+                  wifi:body.amenities.wifi ?? false,
+                  ac:body.amenities.ac ?? false,
+                  tv:body.amenities.tv,
+                  balcony:body.amenities.balcony,
+                  attached_bathroom:body.amenities.attached_bathroom,
+                  room_service:body.amenities.room_service,
+                  breakfast_included:body.amenities.breakfast_included
+                },
                 number_of_rooms: body.number_of_rooms,
                 available_rooms: body.available_rooms,
-                max_guests: body.max_guests || body.max_adults + body.max_children,
+                // max_guests: body.max_guests || body.max_adults + body.max_children,
+
             });
             return await this.hotelRoomRepo.save(newRoom);
         } catch (error) {
@@ -65,15 +77,13 @@ export class HotelierRoomTypesRepositoryService {
     /**
      * Find all room types for a given hotel
      */
-    async findByHotel(hotelId: string) {
-        return this.hotelRoomRepo.find({
-            // where: { hotel: { : hotelId } },
-            where: { id: hotelId },
-            relations: ['hotel', 'inventory'],
-            // relations: ['inventory'],
-            order: { created_at: 'DESC' },
-        });
-    }
+ async findByHotel(hotelId: string) {
+  return this.hotelRoomRepo.find({
+    where: { hotel: { hotel_id: hotelId } },   // ✅ correct relation filter
+    relations: ['hotel', 'inventory'],
+    order: { created_at: 'DESC' },
+  });
+}
     /**
      * Update room info (basic details, pricing, amenities)
      */

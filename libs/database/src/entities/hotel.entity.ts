@@ -76,9 +76,11 @@ export class Hotel {
     base_price: number;
     @Column({ type: 'decimal', precision: 5, scale: 2 })
     tax_percentage: number;
-    @Column({ type: 'jsonb' }) // Use jsonb for PostgreSQL, or 'simple-json' for other databases
+
+    @Column({ type: 'jsonb' }) 
     @IsObject()
     amenities: AmenitiesDto;
+    
     @Column({ type: 'uuid' })
     user_id: string;
     @ManyToOne(() => User, (user) => user.hotels, { onDelete: 'CASCADE' })
@@ -90,5 +92,5 @@ export class Hotel {
     created_at: Date;
     @UpdateDateColumn()
     updated_at: Date;
-  id: any;
+
 }

@@ -1,7 +1,7 @@
 export const flightTicketPdfTemplate = (data:any) => {
     // Extract data from the static response
     const flightData = data?.Response?.Response?.FlightItinerary;
-    const segment = flightData.Segments[0];
+    const segment = flightData?.Segments?.[0];
     const airline = segment.Airline;
     const fare = flightData.Fare;
     const passengers = flightData.Passenger;

@@ -12,6 +12,7 @@ import { bookingConTemplate } from '../../libs/templates/outbondTemplate';
 import { bookConfirmationTemplate } from '../../libs/templates/flightOutbond';
 import { flightTicketPdfTemplate } from '../../libs/templates/ticket';
 import { paymentSuccessTicketFailureTemplate } from '../../libs/templates/ticketfail.template';
+import { S3FileService } from '../../libs/S3-Service/s3File.service';
 import axios from "axios";
 import * as fs from "fs";
 import { HttpService } from '@nestjs/axios';
@@ -31,7 +32,8 @@ export class FlightService {
         private readonly orderRepositoryService:OrderRepositoryService,
         private readonly EmailService: EmailService,
         private readonly configService: ConfigService,
-        private readonly httpService: HttpService
+        private readonly httpService: HttpService,
+        private readonly s3FileService: S3FileService
     ) {}
 
     async flightHandler(order_id,custom_order_id,journey_type, journey, isLCC, is_LCC_round , trace_id, order_request, order_request_second,user){
@@ -83,6 +85,14 @@ if (data?.Response?.Response) {
                             const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                             if (pdfBuffer) {
                                 attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
+
+
+
+
                             }
                             const welcomeTemplate = await bookingConfirmationTemplate(result.data,"Guest");
                             await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -128,11 +138,15 @@ if (data?.Response?.Response) {
                             if(resultTicket.data.Response.ResponseStatus === 1){
                                 // try to ticket check status then save db success/fail
                                 await this.orderRepositoryService.updatePaymentSuccess(order_id,resultTicket.data);
-                                const ticket = flightTicketPdfTemplate(resultTicket);
+                                const ticket = flightTicketPdfTemplate(resultTicket?.data);
                                 const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                                 const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                                 if (pdfBuffer) {
                                     attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                      const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                                 }
                                 const welcomeTemplate = await bookingConfirmationTemplate(resultTicket.data,"Guest");
                                 await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -161,19 +175,24 @@ if (data?.Response?.Response) {
                         let result = await this.httpAPICall(url, payload);
                         console.log(">>>>>>>>>>>>lcc one way international payload print:", payload);
                        console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-                        console.log("+++++++++++++lcc one way international response+++++++++ ",result);
+                        console.log("+++++++++++++lcc one way international response updated +++++++++ ",result);
                         console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
-                            await this.orderRepositoryService.updatePaymentSuccess(order_id,result.data);
-                            const ticket = flightTicketPdfTemplate(result);
-                               console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                            await this.orderRepositoryService.updatePaymentSuccess(order_id,result?.data);
+                                console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
                               console.log("+++++++++++++ticket for lcc one way international email response+++++++++ ",result);
                               console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                            const ticket = flightTicketPdfTemplate(result?.data);
+                           
                             const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                             const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                             if (pdfBuffer) {
                                 attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                  const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                             }
                             const welcomeTemplate = await bookingConfirmationTemplate(result.data,"Guest");
                             await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -219,11 +238,15 @@ if (data?.Response?.Response) {
                             if(resultTicket.data.Response.ResponseStatus === 1){
                                 // try to ticket check status then save db success/fail
                                 await this.orderRepositoryService.updatePaymentSuccess(order_id,resultTicket.data);
-                                const ticket = flightTicketPdfTemplate(resultTicket);
+                                const ticket = flightTicketPdfTemplate(resultTicket?.data);
                                 const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                                 const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                                 if (pdfBuffer) {
                                     attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                      const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                                 }
                                 const welcomeTemplate = await bookingConfirmationTemplate(resultTicket.data,"Guest");
                                 await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -256,11 +279,15 @@ if (data?.Response?.Response) {
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
                             await this.orderRepositoryService.updatePaymentSuccess(order_id,result.data);
-                            const ticket = flightTicketPdfTemplate(result);
+                            const ticket = flightTicketPdfTemplate(result?.data);
                             const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                             const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                             if (pdfBuffer) {
                                 attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                  const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                             }
                             const welcomeTemplate = await bookingConTemplate(result,"Guest");
                             await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -270,11 +297,15 @@ if (data?.Response?.Response) {
                                 // try to ticket check status then save db success/fail 
                                 console.log("booking successfull");
                                 await this.orderRepositoryService.updatePaymentSuccess(order_id,resultSecond.data);
-                                const ticket = flightTicketPdfTemplate(resultSecond);
+                                const ticket = flightTicketPdfTemplate(resultSecond?.data);
                                 const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                                 const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                                 if (pdfBuffer) {
                                     attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                      const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                                 } 
                                 const welcomeTemplate = await bookConfirmationTemplate(resultSecond.data,"Guest");
                                 await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -302,11 +333,15 @@ if (data?.Response?.Response) {
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
                             await this.orderRepositoryService.updatePaymentSuccess(order_id,result.data);
-                            const ticket = flightTicketPdfTemplate(result);
+                            const ticket = flightTicketPdfTemplate(result?.data);
                             const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                             const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                             if (pdfBuffer) {
                                 attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                  const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                             }
                             const welcomeTemplate = await bookingConTemplate(result,"Guest");
                             await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -336,11 +371,15 @@ if (data?.Response?.Response) {
                                 if(resultTicket.data.Response.ResponseStatus === 1){
                                     // try to ticket check status then save db success/fail
                                     await this.orderRepositoryService.updatePaymentSuccess(order_id,resultTicket.data);
-                                    const ticket = flightTicketPdfTemplate(resultTicket);
+                                    const ticket = flightTicketPdfTemplate(resultTicket?.data);
                                     const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                                     const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                                     if (pdfBuffer) {
                                         attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                          const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                                     }
                                     const welcomeTemplate = await bookConfirmationTemplate(resultTicket,"Guest");
                                     await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -394,11 +433,15 @@ if (data?.Response?.Response) {
                             if(resultTicket.data.Response.ResponseStatus === 1){
                                 // try to ticket check status then save db success/fail
                                 await this.orderRepositoryService.updatePaymentSuccess(order_id,resultTicket.data);
-                                const ticket = flightTicketPdfTemplate(resultTicket);
+                                const ticket = flightTicketPdfTemplate(resultTicket?.data);
                                 const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                                 const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                                 if (pdfBuffer) {
                                     attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                      const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                                 }
                                 const welcomeTemplate = await bookingConTemplate(resultTicket,"Guest");
                                 await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -427,11 +470,15 @@ if (data?.Response?.Response) {
                                     if(resultTicket.data.Response.ResponseStatus === 1){
                                         // try to ticket check status then save db success/fail
                                         await this.orderRepositoryService.updatePaymentSuccess(order_id,resultTicket.data);
-                                        const ticket = flightTicketPdfTemplate(resultTicket);
+                                        const ticket = flightTicketPdfTemplate(resultTicket?.data);
                                         const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                                         const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                                         if (pdfBuffer) {
                                             attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                              const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                                         }
                                         const welcomeTemplate = await bookConfirmationTemplate(resultTicket,"Guest");
                                         await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -494,11 +541,15 @@ if (data?.Response?.Response) {
                             if(resultTicket.data.Response.ResponseStatus === 1){
                                 // try to ticket check status then save db success/fail
                                 await this.orderRepositoryService.updatePaymentSuccess(order_id,resultTicket.data);
-                                const ticket = flightTicketPdfTemplate(resultTicket);
+                                const ticket = flightTicketPdfTemplate(resultTicket?.data);
                                 const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                                 const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                                 if (pdfBuffer) {
                                     attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                      const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                                 }
                                 const welcomeTemplate = await bookingConTemplate(resultTicket,"Guest");
                                 await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -508,11 +559,15 @@ if (data?.Response?.Response) {
                                 if(resultSecond.data.Response.ResponseStatus === 1){
                                     // try to ticket check status then save db success/fail
                                     await this.orderRepositoryService.updatePaymentSuccess(order_id,resultSecond.data);
-                                    const ticket = flightTicketPdfTemplate(resultSecond);
+                                    const ticket = flightTicketPdfTemplate(resultSecond?.data);
                                     const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                                     const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                                     if (pdfBuffer) {
                                         attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                          const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                                     }
                                     const welcomeTemplate = await bookConfirmationTemplate(resultSecond,"Guest");
                                     await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -547,14 +602,19 @@ if (data?.Response?.Response) {
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
                             await this.orderRepositoryService.updatePaymentSuccess(order_id,result.data);
-                            const ticket = flightTicketPdfTemplate(result);
+                            const ticket = flightTicketPdfTemplate(result?.data);
                             const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                             const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                             if (pdfBuffer) {
                                 attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                  const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                             }
                             const welcomeTemplate = await bookingConfirmationTemplate(result.data,"Guest");
                             await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
+
                         }else if(result.data.Response.ResponseStatus != 1){
                             // status fail
                             await this.orderRepositoryService.updatePaymentFail(order_id,result.data);
@@ -588,11 +648,15 @@ if (data?.Response?.Response) {
                                 console.log("booking successfull.")
                                 // try to ticket check status then save db success/fail
                                 await this.orderRepositoryService.updatePaymentSuccess(order_id,resultTicket.data);
-                                const ticket = flightTicketPdfTemplate(resultTicket);
+                                const ticket = flightTicketPdfTemplate(resultTicket?.data);
                                 const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                                 const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                                 if (pdfBuffer) {
                                     attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                      const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                                 }
                                 const welcomeTemplate = await bookingConfirmationTemplate(resultTicket.data,"Guest");
                                 await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -621,11 +685,15 @@ if (data?.Response?.Response) {
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
                             await this.orderRepositoryService.updatePaymentSuccess(order_id,result.data);
-                            const ticket = flightTicketPdfTemplate(result);
+                            const ticket = flightTicketPdfTemplate(result?.data);
                             const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                             const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                             if (pdfBuffer) {
                                 attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                  const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                             }
                             const welcomeTemplate = await bookingConfirmationTemplate(result.data,"Guest");
                             await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -663,11 +731,15 @@ if (data?.Response?.Response) {
                             if(resultTicket.data.Response.ResponseStatus === 1){
                                 // try to ticket check status then save db success/fail
                                 await this.orderRepositoryService.updatePaymentSuccess(order_id,resultTicket.data);
-                                const ticket = flightTicketPdfTemplate(resultTicket);
+                                const ticket = flightTicketPdfTemplate(resultTicket?.data);
                                 const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                                 const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                                 if (pdfBuffer) {
                                     attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                      const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                                 }
                                 const welcomeTemplate = await bookingConfirmationTemplate(resultTicket.data,"Guest");
                                 await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -694,11 +766,15 @@ if (data?.Response?.Response) {
                         if(result.data.Response.ResponseStatus === 1){
                             // try to ticket check status then save db success/fail
                             await this.orderRepositoryService.updatePaymentSuccess(order_id,result.data);
-                            const ticket = flightTicketPdfTemplate(result);
+                            const ticket = flightTicketPdfTemplate(result?.data);
                             const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                             const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                             if (pdfBuffer) {
                                 attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                  const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                             }
                             const welcomeTemplate = await bookingConfirmationTemplate(result.data,"Guest");
                             await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);
@@ -736,11 +812,15 @@ if (data?.Response?.Response) {
                             if(resultTicket.data.Response.ResponseStatus === 1){
                                 // try to ticket check status then save db success/fail
                                 await this.orderRepositoryService.updatePaymentSuccess(order_id,resultTicket.data);
-                                const ticket = flightTicketPdfTemplate(resultTicket);
+                                const ticket = flightTicketPdfTemplate(resultTicket?.data);
                                 const attactments: { filename: string; contentType: string; content: Buffer }[] = [];
                                 const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(ticket.html);
                                 if (pdfBuffer) {
                                     attactments.push({ filename: `flight-ticket.pdf`, contentType: 'application/pdf', content: pdfBuffer });
+                                      const ticketPath = `tickets/${Date.now()}-ticket-${order_id}.pdf`;
+                                const s3Url = await this.s3FileService.s3FileUpload(pdfBuffer, ticketPath);
+                               let pdfUrl=await this.orderRepositoryService.updatePdfUrl(order_id, s3Url);
+                               console.log("PDF Ticket Url: ",pdfUrl);
                                 }
                                 const welcomeTemplate = await bookingConfirmationTemplate(resultTicket.data,"Guest");
                                 await this.EmailService.sendEmail(userDetails.email, 'Welcome to Our Service', welcomeTemplate,attactments);

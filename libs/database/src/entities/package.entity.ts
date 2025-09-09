@@ -45,12 +45,7 @@ gallery_image: string[];
   @Column()
   package_day: string;
 
- 
-  // @Column({ type: 'decimal', precision: 10, scale: 2 })
-  // customize_day_price: number;
 
-  // @Column({ type: 'decimal', precision: 10, scale: 2 })
-  // customize_person_price: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   package_price: number;

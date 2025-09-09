@@ -8,7 +8,7 @@ import { FlightTicketRepositoryService } from '../../../../libs/database/src/rep
 import {HotelPaymentRepositoryService} from "../../../../libs/database/src/repositories/hotelPayment.repository";
 import { FlightService } from '../../../../libs/tickethandler/flight.service';
 import {HotelService} from "../../../../libs/hotelbookinghandler/hotel.service";
-import { ORDER_STATUS,PAYMENT_STATUS } from '../../../../libs/constants/bookingContant';
+import { PAYMENT_STATUS } from '../../../../libs/constants/bookingContant';
 
 import * as crypto from 'crypto';
 

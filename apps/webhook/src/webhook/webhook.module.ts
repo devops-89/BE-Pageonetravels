@@ -14,6 +14,7 @@ import { ResponseHandlerModule } from '../../../../libs/response-handler/respons
 import { EmailService } from '../../../../libs/email-service/email.service';
 import {PDFGenerateService} from '../../../../libs/pdf-generate/pdf-generate.service';
 import { HttpModule } from '@nestjs/axios';
+import {S3Module} from "../../../../libs/S3-Service/s3.module";
 
 
 @Module({
@@ -24,8 +25,9 @@ import { HttpModule } from '@nestjs/axios';
     TypeOrmModule.forFeature([
       FlightService,
       ConfigService,
-      HotelService
+      HotelService,
     ]),
+    S3Module.forRoot(),
     ResponseHandlerModule,
     HttpModule
   ],

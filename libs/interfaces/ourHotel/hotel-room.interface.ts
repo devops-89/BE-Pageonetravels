@@ -11,8 +11,8 @@ export interface ICreateHotelRoom {
     base_price: number;
     tax_percentage?: number;
     currency?: string;
-    main_image: CustomFile;
-    gallery_images?: CustomFile[];
+    main_image: string;
+    gallery_images?: string[];
     amenities : {
       wifi: boolean;
       ac: boolean;

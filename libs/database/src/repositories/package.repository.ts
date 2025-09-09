@@ -7,6 +7,7 @@ import { PackageCategoryRepositoryService } from '../../../../libs/database/src/
 import { PackageDayRepositoryService } from '../../../../libs/database/src/repositories/packageday.repository';
 import { ERROR_CODES } from "../../../../libs/constants/commonConstants";
 import { PaginationDto } from "../../../../libs/dtos/authentication/user.dto";
+import {PackageFilterDto} from "../../../../libs/dtos/package/package.dto";
 
 @Injectable()
 export class PackageRepositoryService {
@@ -62,41 +63,56 @@ export class PackageRepositoryService {
         }
     }
 
-    async getPackageList(pagination: PaginationDto, search?: string) {
-        try {
-          const { page = 1, limit = 10 } = pagination;
-      
-          const queryBuilder = this.pkgRepository.createQueryBuilder('package')
-            .orderBy('package.created_at', 'DESC')
-            .skip((page - 1) * limit)
-            .take(limit);
-      
-          if (search) {
-            queryBuilder.where('package.name ILIKE :search OR package.description ILIKE :search', {
-              search: `%${search}%`,
-            });
-          }
-      
-          const [items, count] = await queryBuilder.getManyAndCount();
-      
-          const meta = {
-            totalDocs: count,
-            limit,
-            totalPages: Math.ceil(count / limit),
-            hasPrevPage: page > 1,
-            hasNextPage: page * limit < count,
-          };
-      
-          return {
-            items,
-            meta,
-          };
-        }catch(error){
-            console.log("Package List Repository Error.",error);
-            throw error;
-        }
-      }
-      
+   async getPackageList(pagination: PaginationDto, filters: PackageFilterDto) {
+  try {
+    const { page = 1, limit = 10 } = pagination;
+    const { search, city, state, country, packageDay, packageType } = filters;
+    const queryBuilder = this.pkgRepository.createQueryBuilder('package')
+      .orderBy('package.created_at', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+    if (search) {
+      queryBuilder.andWhere(
+        'package.name ILIKE :search OR package.description ILIKE :search',
+        { search: `%${search}%` },
+      );
+    }
+    if (city) {
+      queryBuilder.andWhere('package.city ILIKE :city', { city: `%${city}%` });
+    }
+    if (state) {
+      queryBuilder.andWhere('package.state ILIKE :state', { state: `%${state}%` });
+    }
+    if (country) {
+      queryBuilder.andWhere('package.country ILIKE :country', { country: `%${country}%` });
+    }
+    if (packageDay) {
+      queryBuilder.andWhere('package.package_day = :packageDay', { packageDay });
+    }
+    if (packageType) {
+      queryBuilder.andWhere('package.package_type = :packageType', { packageType });
+    }
+    const [items, count] = await queryBuilder.getManyAndCount();
+    const meta = {
+      totalDocs: count,
+      limit,
+      totalPages: Math.ceil(count / limit),
+      hasPrevPage: page > 1,
+      hasNextPage: page * limit < count,
+    };
+    return { items, meta };
+  } catch (error) {
+    console.log("Package List Repository Error.", error);
+    throw error;
+  }
+}
+
+
+
+
+
+
+
 
     async getPackageUpdate(id,body:any){
         try{
@@ -123,6 +139,9 @@ export class PackageRepositoryService {
             throw error;
         }
     }
+
+
+    
 
 }
 

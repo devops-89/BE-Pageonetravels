@@ -96,6 +96,7 @@ export class FlightdetailController {
   }, @Res() res: Response) {
       try {
           const result = await this.flightdetailservice.getCancellationCharges(body);
+          console.log("Cancellation Result: ",result);
           return this.responseHandler.sendSuccessResponse(res, result);
       } catch (error) {
           return this.responseHandler.sendErrorResponse(res, error);

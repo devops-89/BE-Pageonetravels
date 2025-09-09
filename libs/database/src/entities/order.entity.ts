@@ -120,6 +120,12 @@ export class Order {
     @UpdateDateColumn()
     updated_at: Date;
 
+    @Column({ type: 'text', nullable: true })
+    @IsOptional()
+    @IsString()
+    pdf_url: string;
+
+
     // Add OneToOne relation to Payment entity
     @OneToOne(() => Payment, (payment) => payment.order)
     payment: Payment;

@@ -11,12 +11,14 @@ import { OrderRepositoryService } from '../../libs/database/src/repositories/ord
 import { EmailService } from '../../libs/email-service/email.service';
 import {PDFGenerateService} from '../../libs/pdf-generate/pdf-generate.service';
 import { DBModule } from '../../libs/database/src/database.module';
+import {S3Module} from "../../libs/S3-Service/s3.module";
 
 @Module({
   imports:[
     ConfigModule ,
     TBOConfigModule.register(),
     DBModule.forRoot(),
+    S3Module.forRoot()
   ],
   controllers: [],
   providers: [

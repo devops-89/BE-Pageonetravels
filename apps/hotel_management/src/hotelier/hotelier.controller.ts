@@ -128,19 +128,14 @@ export class HotelierController {
         }
     }
     @Get('fetch-all-hotel')
-    @UseGuards(TokenValidationGuard)
+ 
     async getAllHotel(@Req() req: Request, @Res() res: Response) {
         try {
-            const payload: JWTPayload = req['userPayload'];
-            if (!payload) {
-                throw { message: 'Please provide a valid Token.', statusCode: ERROR_CODES.BAD_REQUEST };
-            }
-            if (payload.user_type === 'HOTEL') {
+         
+           
                 const result = await this.hotelierService.fetchHotelList();
                 return this.responseHandlerService.sendSuccessResponse(res, result);
-            } else {
-                throw { message: 'Please provide a valid Token.', statusCode: ERROR_CODES.BAD_REQUEST };
-            }
+          
         } catch (error) {
             console.log('Error in update hotel', error);
             return this.responseHandlerService.sendErrorResponse(res, error);
