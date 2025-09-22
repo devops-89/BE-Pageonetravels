@@ -1,11 +1,11 @@
 // entities/hotelier-room-inventory.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Unique, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn , Column, ManyToOne, Unique, JoinColumn } from 'typeorm';
 import { HotelRoomTypes } from './hotelier-room-types.entity';
 
 @Entity('room_inventory')
 @Unique(['roomType', 'date'])
 export class RoomInventory {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: number;
 
   @ManyToOne(() => HotelRoomTypes, (rt) => rt.inventory, { onDelete: 'CASCADE' })

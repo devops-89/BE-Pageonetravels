@@ -69,7 +69,6 @@ export class HotelierRoomTypesController {
 
     // get Rooms By Hotel Id
     @Get('rooms')
-@UseGuards(TokenValidationGuard)
 async getRooms(
   @Req() req: Request,
   @Res() res: Response,

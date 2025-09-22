@@ -11,6 +11,7 @@ import { Order } from "./order.entity";
 import { TransactionDetail } from "./transaction.entity";
 import { Payment } from "./payment.entity";
 import { Hotel } from "./hotel.entity";
+import { PackageBooking } from "./package-booking.entity";
 
 @Entity('user')
 export class User {
@@ -119,6 +120,10 @@ export class User {
 
   @OneToMany(() => Order, (order)=>order.user, {cascade: true})
   orders:Order[]
+
+  @OneToMany(() => PackageBooking, (packageBooking) => packageBooking.user, { cascade: true })
+  packageBookings: PackageBooking[];
+
 
 
   @OneToMany(() => Payment, (payment) => payment.user, { cascade: true })

@@ -16,6 +16,5 @@
   ],
   "include": [
     "libs/**/*.ts"
-// , "libs/database/src/typeorm.config.ts"  
 ]
 }

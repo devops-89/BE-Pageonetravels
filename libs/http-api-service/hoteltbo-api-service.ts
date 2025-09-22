@@ -7,6 +7,7 @@ import { HotelDetailsRepositoryService } from "../../libs/database/src/repositor
 import { ERROR_CODES } from '../../libs/constants/commonConstants';
 import { CommissionRepositoryService } from "../../libs/database/src/repositories/commission.repository";
 import { COMMISSION_TYPE } from 'libs/constants/autenticationConstants/userContants';
+import { HotelDetailDto } from 'libs/dtos/hotel/search-hotel.dto';
 
 
 @Injectable()
@@ -112,6 +113,35 @@ export class HotelTBOAPIService {
     } catch (error) {
       console.error('Error in fetchCityList:', error.message);
       throw (error.message || 'Failed to fetch the city list.');
+    }
+  }
+
+  async fetchClientHotelDetails(body:HotelDetailDto){
+    try{
+        const username = "TBOStaticAPITest";
+        const password = "Tbo@11530818";
+  
+      const credentials = Buffer.from(`${username}:${password}`).toString('base64');
+     
+      const headers = {
+        'Authorization': `Basic ${credentials}`,
+        'Content-Type': 'application/json',
+      };
+
+      const payload = {
+        "Hotelcodes": body.Hotelcodes, 
+        "Language": body.Language 
+      }
+      
+        const hotel_details_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/Hoteldetails';
+      const response = await this.httpPostAPICall(hotel_details_base_url, payload ,headers);
+     
+      return response;
+
+    }
+    catch(error){
+        console.log(">>>>>>",error);
+      console.error('Error in fetchCityList:', error.message);
     }
   }
 

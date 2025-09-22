@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HotelierInventoryRepositoryService } from '../../../../libs/database/src/repositories/hotelier-inventory.repository';
 import { SearchAvailabilityDto } from '../../../../libs/dtos/hotelier/hotelier-inventory.dto';
-import {HotelierRoomTypesRepositoryService } from '../../../../libs/database/src/repositories/hotelier-room-types.repository';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { HotelRoomTypes } from '../../../../libs/database/src';
 import { Repository } from 'typeorm';
@@ -13,7 +13,7 @@ export class HotelierInventoryService {
     private readonly rtRepo: Repository<HotelRoomTypes>,
   ) {}
 async isRoomTypeAvailable(
-  roomTypeId: string,   // ✅ change number → string
+  roomTypeId: string,   
   checkIn: string,
   checkOut: string,
   rooms: number,
@@ -24,6 +24,9 @@ async isRoomTypeAvailable(
   if (rows.length !== dateSpan(checkIn, checkOut).length) return false;
   return rows.every(r => r.available_rooms >= rooms);
 }
+
+
+
   // Simple availability search by city
 async searchByCity(dto: SearchAvailabilityDto) {
   // 1) find candidate room types by city (optionally by hotel)
@@ -32,7 +35,7 @@ const qb = this.rtRepo.createQueryBuilder('rt')
   .where('h.city = :city', { city: dto.city });
 
 if (dto.hotelId) {
-  qb.andWhere('h.hotel_id = :hid', { hid: dto.hotelId });  // ✅ use hotel_id
+  qb.andWhere('h.hotel_id = :hid', { hid: dto.hotelId });  
 }
 
   const roomTypes = await qb.getMany();

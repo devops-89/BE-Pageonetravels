@@ -8,10 +8,7 @@ import { PaginationDto } from '../../../../../libs/dtos/authentication/user.dto'
 
 @Controller('stats')
 export class UserStatsController {
-    constructor(
-        private readonly userStatsService: UserStatsService,
-        private readonly responseHandler: ResponseHandlerService
-    ) {}
+    constructor(private readonly userStatsService: UserStatsService, private readonly responseHandler: ResponseHandlerService) {}
 
     // @Get("/count-user-stats")
     // @UseGuards(TokenValidationGuard)
@@ -24,7 +21,7 @@ export class UserStatsController {
     //     }
     // }
 
-    @Get("/dashboard-stats")
+    @Get('/dashboard-stats')
     //@UseGuards(TokenValidationGuard)
     async getDashboardStats(@Res() res: Response): Promise<void> {
         try {
@@ -35,20 +32,24 @@ export class UserStatsController {
         }
     }
 
-     
-   @Get("user-bookings")
-//@UseGuards(TokenValidationGuard)
-    async getAllBookingsForUser(
-      @Query('userId') userId: string,
-      @Query() pagination: PaginationDto,
-      @Query() filter: BookingFilterDto,
-      @Res() res: Response
-    ) {
-      try {
-        const result = await this.userStatsService.getUserBookings(userId, pagination, filter);
-        return this.responseHandler.sendSuccessResponse(res, result);
-      } catch (error) {
-        return this.responseHandler.sendErrorResponse(res, error);
-      }
+    @Get('user-bookings')
+    //@UseGuards(TokenValidationGuard)
+    async getAllBookingsForUser(@Query('userId') userId: string, @Query() pagination: PaginationDto, @Query() filter: BookingFilterDto, @Res() res: Response) {
+        try {
+            const result = await this.userStatsService.getUserBookings(userId, pagination, filter);
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch (error) {
+            return this.responseHandler.sendErrorResponse(res, error);
+        }
     }
-} 
+
+    @Get('bookings')
+    async getAllBookings(@Query() pagination: PaginationDto, @Query() filter: BookingFilterDto, @Res() res: Response) {
+        try {
+            const result = await this.userStatsService.getAllBookings(pagination, filter);
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch (error) {
+            return this.responseHandler.sendErrorResponse(res, error);
+        }
+    }
+}

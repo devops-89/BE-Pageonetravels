@@ -74,36 +74,7 @@ export class UserStatsService {
         }
     }
 
-    async getAllBookings(userId?: string) {
-          try {
-            const orders = await this.orderRepository.find(userId);
-            const parsedOrders = orders.map(order => ({
-              ...order,
-              order_request: order.order_request,
-              order_response: order.order_response,
-              order_request_second:order.order_request_second,
-              order_response_second: order.order_response_second,
-              ticket_details: order.ticket_details,
-              contact_details: order.contact_details,
-              success_response: order.success_response,
-              fail_response: order.fail_response,
-            }));
-            return {
-              message: 'Bookings retrieved successfully',
-              data: parsedOrders,
-            };
-          } catch (error) {
-            console.log('Error in getAllBookings:', error);
-            throw error;
-          }
-        }
-        private tryParse(data: string | null) {
-          try {
-            return data ? JSON.parse(data) : null;
-          } catch {
-            return data;
-          }
-        }
+    
 
 // get user Booking (filter applied on the basis of various factors)
         async getUserBookings(userId: string, pagination: PaginationDto, filter: BookingFilterDto): Promise<ApiResponse.ApiOK> {
@@ -118,4 +89,22 @@ export class UserStatsService {
           throw error;
         }
       }
+
+// get all booking based on order type
+async getAllBookings(
+  pagination: PaginationDto, 
+  filter: BookingFilterDto
+): Promise<ApiResponse.ApiOK> {
+  try {
+    const bookingsList = await this.orderRepository.getBookingsWithFilters(pagination, filter);
+
+    return {
+      message: 'All bookings fetched successfully',
+      data: bookingsList,
+    };
+  } catch (error) {
+    console.error('Error in getAllBookings service:', error);
+    throw error; 
+  }
+}
 } 

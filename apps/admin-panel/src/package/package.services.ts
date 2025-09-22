@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepositoryService } from '../../../../libs/database/src';
 import { CreatePackageCategoryDto, UpdatePackageCategoryDto } from '../../../../libs/dtos/package/package-category.dto';
 import { PackageCategoryRepositoryService } from '../../../../libs/database/src/repositories/packagecategory.repository';
@@ -7,6 +7,8 @@ import { PackageDayRepositoryService } from '../../../../libs/database/src/repos
 import { PackageRepositoryService } from '../../../../libs/database/src/repositories/package.repository';
 import { CreatePackageAmeniteDto, UpdatePackageAmeniteDto } from '../../../../libs/dtos/package/package-amenites.dto';
 import { CreatePackageDayDto, UpdatePackageDayDto } from '../../../../libs/dtos/package/package-days.dto';
+import {CancelPackageBookingDto} from "../../../../libs/dtos/package/package-booking.dto";
+import { PackageBookingRepositoryService } from '../../../../libs/database/src';
 import { PaginationDto } from '../../../../libs/dtos/authentication/user.dto';
 
 import { S3FileService } from '../../../../libs/S3-Service/s3File.service';
@@ -21,7 +23,7 @@ export class PackageService {
         private readonly packageRepositoryService: PackageRepositoryService,
         private readonly packageCategoryRepositoryService: PackageCategoryRepositoryService,
         private readonly packageAmeniteRepositoryService: PackageAmeniteRepositoryService,
-        
+        private readonly packageBookingRepositoryService: PackageBookingRepositoryService,
         private readonly s3FileService: S3FileService
     ) {}
 
@@ -269,24 +271,24 @@ export class PackageService {
   /**
    * Cancel a booking by ID
    */
-  // async cancelBooking(id: string, reason: string) {
-  //   try {
-  //     const booking =
-  //       await this.packageBookingRepositoryService.cancelBooking(id, reason);
+  async cancelPackageBooking(body:CancelPackageBookingDto) {
+    try {
+      const booking =
+        await this.packageBookingRepositoryService.cancelPackageBooking(body);
 
-  //     if (!booking) {
-  //       throw new NotFoundException('Booking not found');
-  //     }
+      if (!booking) {
+        throw new NotFoundException('Booking not found');
+      }
 
-  //     return {
-  //       message: 'Booking cancelled successfully.',
-  //       data: booking,
-  //     };
-  //   } catch (error) {
-  //     console.log('Cancel Booking Service Error', error);
-  //     throw error;
-  //   }
-  // }
+      return {
+        message: 'Booking cancelled successfully.',
+        data: booking,
+      };
+    } catch (error) {
+      console.log('Cancel Booking Service Error', error);
+      throw error;
+    }
+  }
 
   /**
    * Find bookings by user ID

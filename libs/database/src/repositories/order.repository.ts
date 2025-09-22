@@ -384,4 +384,49 @@ export class OrderRepositoryService {
             throw error;
         }
     }
+
+    // get all booking with booking type
+    async getBookingsWithFilters(pagination: PaginationDto, filter: BookingFilterDto): Promise<IPaginationObject> {
+  const { search, journey, orderType } = filter;
+  const { page = 1, limit = 10 } = pagination;
+
+  const queryBuilder = this.orderRepository.createQueryBuilder('o')
+    .leftJoinAndSelect('o.user', 'u')
+    .orderBy('o.created_at', 'DESC')
+    .skip((page - 1) * limit)
+    .take(limit);
+
+  if (search) {
+    queryBuilder.andWhere(
+      `(
+        u.full_name ILIKE :search OR
+        u.email ILIKE :search OR
+        CAST(o.order_type AS TEXT) ILIKE :search OR
+        CAST(o.journey AS TEXT) ILIKE :search OR
+        o.custom_order_id ILIKE :search
+      )`,
+      { search: `%${search}%` }
+    );
+  }
+
+  if (journey) {
+    queryBuilder.andWhere(`CAST(o.journey AS TEXT) = :journey`, { journey });
+  }
+
+  if (orderType) {
+    queryBuilder.andWhere(`CAST(o.order_type AS TEXT) = :orderType`, { orderType });
+  }
+
+  const [orders, count] = await queryBuilder.getManyAndCount();
+
+  return {
+    docs: orders,
+    limit,
+    totalDocs: count,
+    totalPages: Math.ceil(count / limit),
+    hasPrevPage: page > 1,
+    hasNextPage: page * limit < count,
+  };
+}
+
 }

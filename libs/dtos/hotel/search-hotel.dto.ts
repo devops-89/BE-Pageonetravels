@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsDateString, IsIP, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsDateString, IsInt, IsIP, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class PaxRoomDto {
@@ -85,4 +85,14 @@ export class BookingDto {
   @IsNotEmpty()
   @IsString()
   BookingCode: string;
+}
+
+export class HotelDetailDto{
+  @IsString()
+  @IsNotEmpty()
+  Hotelcodes: string;
+
+  @IsString()
+  @IsNotEmpty()
+  Language: string;
 }

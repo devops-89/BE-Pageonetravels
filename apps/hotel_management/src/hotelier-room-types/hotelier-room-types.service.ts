@@ -45,20 +45,23 @@ async getRoomsByHotel(hotelId: string) {
   try {
     const rooms = await this.roomTypesRepositoryService.findByHotel(hotelId);
 
-    if (!rooms.length) {
-      throw new NotFoundException(`No rooms found for hotel ID: ${hotelId}`);
-    }
-
+    // Instead of throwing, normalize response
     return {
       success: true,
-      message: `Rooms fetched successfully for hotel ID: ${hotelId}`,
-      data: rooms,
+      message: rooms.length
+        ? `Rooms fetched successfully for hotel ID: ${hotelId}`
+        : `No rooms found for hotel ID: ${hotelId}`,
+      data: rooms.map((room) => ({
+        ...room,
+        inventory: room.inventory ?? [], // ensure [] if null
+      })),
     };
   } catch (error) {
     console.error('Error fetching rooms by hotelId:', error);
-    throw error; 
+    throw error;
   }
 }
+
 
 // generate Inventory for the Perticular Room Category
       async generateInventory(roomTypeId: string, inventory: InventoryItemDto[]) {

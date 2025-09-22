@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {  Order, Payment, User } from '../entities';
+import {  Order, Payment, User, PackageBooking } from '../entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderRepositoryService } from './order.repository';
@@ -101,6 +101,41 @@ export class HotelPaymentRepositoryService {
                 await this.paymentRepository.save(updatedOrder);
 
                 return updatedOrder;
+            }catch(error){
+                console.log(">>>>>>>>>>>>>",error.message);
+                throw error;
+            }
+        }
+
+         async findAndUpdatePackageBooking(packageBookingId:string,body:any){
+            try{
+                const packageBookingRef = new PackageBooking();
+                packageBookingRef.id = packageBookingId;
+
+                const updatedPackageBooking = await this.paymentRepository.findOne({
+                    where: {  packageBooking: packageBookingRef },
+                    loadRelationIds: true,
+                });
+
+                if (!updatedPackageBooking) { 
+                    throw { 
+                        message: `Payment with order_id ${packageBookingId} not found.`, 
+                        statusCode: ERROR_CODES.BAD_REQUEST 
+                    };
+                }
+        
+                updatedPackageBooking.razorpay_webhook_response = body;
+                updatedPackageBooking.status = PAYMENT_STATUS.SUCCESS;
+                updatedPackageBooking.payment_mode = "razorpay";
+                updatedPackageBooking.currency = "INR";
+                updatedPackageBooking.transaction_id = body.payload.payment.entity.id;
+                updatedPackageBooking.razorpay_order_id = body.payload.payment.entity.order_id;
+                updatedPackageBooking.amount = body.payload.payment.entity.amount;
+                
+                // Save the updated order to the database 
+                await this.paymentRepository.save(updatedPackageBooking);
+
+                return updatedPackageBooking;
             }catch(error){
                 console.log(">>>>>>>>>>>>>",error.message);
                 throw error;

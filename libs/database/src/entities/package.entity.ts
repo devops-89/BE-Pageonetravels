@@ -9,10 +9,11 @@ import {
   ManyToMany,
   JoinTable,
   Index,
+  OneToMany,
 } from 'typeorm';
 import { PackageCategory } from './packageCategory.entity';
 import { PackageAmenite } from './packageAmenite.entity';
-
+import { PackageBooking } from './package-booking.entity';
 
 
 @Entity('packages')
@@ -73,6 +74,9 @@ gallery_image: string[];
 
 @Column({ type: 'jsonb', nullable: true })
 amenities: PackageAmenite[];
+
+ @OneToMany(() => PackageBooking, (booking) => booking.package)
+  bookings: PackageBooking[];
 
 
    @Column({ type: 'int', default: 1 })

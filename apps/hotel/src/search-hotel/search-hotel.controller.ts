@@ -8,6 +8,7 @@ import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 import { HotelSearchRequestDto , BookingDto } from '../../../../libs/dtos/hotel/search-hotel.dto';
 import { CreateHotelBookingDto,CreateBookingDto } from '../../../../libs/dtos/hotel/hotel-booking.dto';
 import {TokenValidationGuard} from '../../../../libs/middlewares/authMiddleware.guard';
+import { HotelDetailDto } from '../../../../libs/dtos/hotel/search-hotel.dto';
 
 @Controller('/hotel') 
 export class SearchHotelController { 
@@ -42,7 +43,7 @@ export class SearchHotelController {
         });
       }
   
-      const result = await this.searchHotelService.searchCity(country_code);
+      const result = await this.searchHotelService.searchCity();
       return this.responseHandler.sendSuccessResponse(res, result);
     } catch (error) {
      
@@ -67,7 +68,22 @@ export class SearchHotelController {
     }
   }
 
-  @Post('/hoteldetails')
+  @Post('/clientHotelDetails')
+  async ClientHotelDetails(@Body() body:HotelDetailDto,@Res() res:Response){
+    try{
+        const result=await this.searchHotelService.ClientHotelDetails(body);
+        return this.responseHandler.sendSuccessResponse(res,result.data);
+    }
+    catch(error){
+        return this.responseHandler.sendErrorResponse(res, {
+        message: 'Error fetching cities',
+        statusCode: ERROR_CODES.UNEXPECTED_ERROR,
+      });
+    }
+    }
+  
+
+ @Post('/hoteldetails')
   async HotelDetails(@Body() body: string,@Res() res: Response) {
     try {
       const result = await this.searchHotelService.HotelDetails(body);
@@ -81,6 +97,7 @@ export class SearchHotelController {
       });
     }
   }
+
 
   @Post('/cityhoteldetails')
   async CityHotelDetails(@Body() body: string,@Res() res: Response) {

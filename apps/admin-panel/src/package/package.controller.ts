@@ -4,12 +4,12 @@ import { CreatePackageCategoryDto, UpdatePackageCategoryDto } from '../../../../
 import { CreatePackageAmeniteDto, UpdatePackageAmeniteDto, AmeniteIdParams } from '../../../../libs/dtos/package/package-amenites.dto';
 import { CreatePackageDayDto, PkgIdParams, UpdatePackageDayDto } from '../../../../libs/dtos/package/package-days.dto';
 import { CreatePackageDto, PkgId } from '../../../../libs/dtos/package/package-create.dto';
+import { CancelPackageBookingDto } from '../../../../libs/dtos/package/package-booking.dto';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { imageFileFilter } from '../../../../libs/utils/fileUpload';
 import { PaginationDto } from '../../../../libs/dtos/authentication/user.dto';
-import {PackageFilterDto} from "../../../../libs/dtos/package/package.dto";
-//import {CreatePackageBookingDto} from "../../../../libs/dtos/package/package-booking.dto";
+import { PackageFilterDto } from '../../../../libs/dtos/package/package.dto';
 
 @Controller('package')
 export class PackageController {
@@ -54,17 +54,16 @@ export class PackageController {
         }
     }
 
-  @Get('list')
-    async getPackageList(@Query() pagination: PaginationDto,@Query() filters: PackageFilterDto,@Res() res: Response,) {
-    try {
-        const result = await this.packageService.getPackage(pagination, filters);
-        return this.responseHandlerService.sendSuccessResponse(res, result);
+    @Get('list')
+    async getPackageList(@Query() pagination: PaginationDto, @Query() filters: PackageFilterDto, @Res() res: Response) {
+        try {
+            const result = await this.packageService.getPackage(pagination, filters);
+            return this.responseHandlerService.sendSuccessResponse(res, result);
         } catch (error) {
-            console.log("Get Package List Error", error);
-        return this.responseHandlerService.sendErrorResponse(res, error);
+            console.log('Get Package List Error', error);
+            return this.responseHandlerService.sendErrorResponse(res, error);
         }
     }
-
 
     @Post('update')
     async updatePackage(@Res() res: Response, @Query() id: PkgId, @Req() req: Request, @Body() body: any) {
@@ -216,28 +215,18 @@ export class PackageController {
         }
     }
 
-    // @Post('book')
-    // async bookPackage(@Res() res: Response, @Body() body: unknown) {
-    //     try {
-    //         const result = await this.packageService.bookPackage(body);
-    //         return this.responseHandlerService.sendSuccessResponse(res, result);
-    //     } catch (error) {
-    //         console.log('Book Package Error', error);
-    //         return this.responseHandlerService.sendErrorResponse(res, error);
-    //     }
-    // }
+    @Post('cancel_package_booking')
+    async cancelPackageBooking(@Res() res: Response, @Body() body: CancelPackageBookingDto) {
+        try {
+            const result = await this.packageService.cancelPackageBooking(body);
 
-    // package booking
-//     @Post('package-booking')
-// async packageBooking(@Res() res: Response, @Body() body: CreatePackageBookingDto) {
-//     try {
-//         const result = await this.packageService.PackageBooking(body);
-//         return this.responseHandlerService.sendSuccessResponse(res, result);
-//     } catch (error) {
-//         console.log("Package Booking Error", error);
-//         return this.responseHandlerService.sendErrorResponse(res, error);
-//     }
-// }
-
+            return this.responseHandlerService.sendSuccessResponse(res, {
+                message: 'Package booking cancelled successfully',
+                data: result,
+            });
+        } catch (error) {
+            console.log('Cancel Package Booking Error', error);
+            return this.responseHandlerService.sendErrorResponse(res, error);
+        }
+    }
 }
-

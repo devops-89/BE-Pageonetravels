@@ -4,12 +4,16 @@ import { FlightTicketRepositoryService, OrderRepositoryService, UserRepositorySe
 import { LccTicketDto } from '../../../../libs/dtos/flight/flight-ticket.dto';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 import * as crypto from 'crypto';
+import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { ConfigService } from '../../../../libs/config/config.service';
-// import { CreatePackageBookingDto } from '../../../../libs/dtos/package/package-booking.dto';
 import { PackageRepositoryService } from '../../../../libs/database/src/repositories';
 import { PackageBookingRepositoryService } from '../../../../libs/database/src/repositories/package-booking.repository';
-// import { BookingStatus } from '../../../../libs/database/src';
-// import { PAYMENT_STATUS } from '../../../../libs/constants/bookingContant';
+import { CreatePackageBookingDto } from '../../../../libs/dtos/package/package-booking.dto';
+import { BookingStatus, PackageBooking, Payment, User } from '../../../../libs/database/src';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { PAYMENT_STATUS } from '../../../../libs/constants/bookingContant';
+
 
 @Injectable()
 export class RazorpayService {
@@ -20,7 +24,12 @@ export class RazorpayService {
         private readonly packageBookingRepositoryService:PackageBookingRepositoryService,
         private readonly packageRepositoryService:PackageRepositoryService,
         private readonly razorpayPaymentService: RazorpayPaymentService,
-        private readonly flightTicketService: FlightTicketRepositoryService
+        private readonly flightTicketService: FlightTicketRepositoryService,
+        private readonly responsehandlderservice: ResponseHandlerService,
+        @InjectRepository(Payment)
+        private readonly paymentRepository: Repository<Payment>,
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
     ) {}
 
     async createFlightOrder(reference_id: string, body: LccTicketDto, email: string) {
@@ -57,7 +66,7 @@ export class RazorpayService {
 
             const data = await this.razorpayPaymentService.createPaymentLink(paymentInput);
 
-            const orderSave = await this.flightTicketService.insertOrder(data, { order_id: orderdetails.order_id, user: reference_id });
+            await this.flightTicketService.insertOrder(data, { order_id: orderdetails.order_id, user: reference_id });
             return { message: 'Order Created successfully', data: data };
         } catch (error) {
             console.error('Error ', error);
@@ -71,98 +80,81 @@ export class RazorpayService {
         return expireBy;
     }
 
-//     async createPackageOrder(reference_id: string,body:CreatePackageBookingDto, email: string){
-//         try{
-//                 // getting package details
-//             const packageDetail=await this.packageRepositoryService.getPackageById(body?.packageId);
-//             const amount=packageDetail.selling_price;
-//             console.log("package details:",amount, email);
+async createPackageOrder(reference_id: string, body: CreatePackageBookingDto, email: string) {
+  const { packageId, startDate, endDate, passengerDetails } = body;
 
-//             // package repository code
+  // ✅ check for overlapping booking
+  const alreadyBooked = await this.packageBookingRepositoryService.hasActiveBooking(
+    packageId,
+    reference_id,
+    new Date(startDate),
+    new Date(endDate),
+  );
+  if (alreadyBooked) {
+    throw {
+      message: 'You already have an active booking for this package in this time span.',
+      statusCode: ERROR_CODES.BAD_REQUEST,
+    };
+  }
 
-//              // booking payload
-// const bookingData = {
-//   packageId: body.packageId, 
-//   userId: reference_id,
-//   title: body.title,         
-//   first_name: body.first_name,
-//   last_name: body.last_name,
-//   DOB: body.DOB,
-//   passport_number: body.passport_number,
-//   passport_expiry: body.passport_expiry,
-//   email: body.email,
-//   mealType: body.mealType,
-//   status: BookingStatus.PENDING,   
-// };
+  // ✅ passenger details from DTO
+  const passengers = passengerDetails.map((p) => ({
+    title: p.title,
+    firstName: p.first_name,
+    middleName: '', // optional
+    lastName: p.last_name,
+    DOB: p.DOB,
+    passportNumber: p.passport_number ?? '',
+    passportExpiry: p.passport_expiry ?? '',
+    meal: p.mealType,
+  }));
 
-//             // save order
-//             // const orderResponse = await this.orderRepositoryService.insertBooking(reference_id, 'HOTEL', hotelPayload, amount, body.BookingCode, undefined, undefined, undefined, undefined, extraInfo);
-//             const response=await this.packageBookingRepositoryService.createPackageBooking(bookingData);
+const user = await this.userRepository.findOne({ where: { id: reference_id } });
 
-//             console.log('+++++++++++++++Order Response:++++++++++++++++', response);
-
-//             // extract the custom order id from the orderReaponse
-//             const custom_order_id = response.id;
-
-//             // create Razorpay Payment Link
-//             const paymentLink = await this.razorpayPaymentService.createPaymentLink({
-//                 amount: Math.round(amount * 100),
-//                 currency: 'INR',
-//                 description: 'Payment For Package Booking',
-//                 reference_id: custom_order_id.trim(),
-//                 customer: {
-//                     email: email,
-//                 },
-//                 notes: {
-//                     module: 'package',
-//                     order_id: custom_order_id,
-//                 },
-//                 callback_url: 'https://page1-fe.vercel.app/payment/success',
-//             });
-
-//             // save payment record to payment table
-//             const packageBookingDetails = await this.packageBookingRepositoryService.findPackageBookingById(custom_order_id);
-//             console.log('package booking Details by custom order id: ', packageBookingDetails);
-//             const user = reference_id;
-
-//             // const orderRef = new PackageBooking();
-//             // orderRef.order_id = custom_order_id;
-
-//             // const userRef = new User();
-//             // userRef.id = user;
+const bookingData: Partial<PackageBooking> = {
+  packageId,
+  user, // full User object
+  status: BookingStatus.PENDING,
+  passengerDetails: passengers,
+  specialRequest: body.specialRequest ?? '',
+  email: body.email,
+  phone: body.phone ?? '',
+  startDate: new Date(startDate),
+  endDate: new Date(endDate),
+};
 
 
+  const booking = await this.packageBookingRepositoryService.createPackageBooking(bookingData);
+  console.log("booking id: ",booking);
 
-//             // Create the payment entity
-//             // const paymentEntity = this.paymentRepository.create({
-//             //     razorpay_link_response: JSON.stringify(paymentLink),
-//             //     user: { id: user }, 
-//             //     packageBooking: { id: response.id },
-//             //     amount: amount.toString(),
-//             //     payment_gateway: 'Razorpay',
-//             //     payment_status: paymentLink.status,
-//             //     status: PAYMENT_STATUS.IN_PROGRESS,
-//             // });
+  // ✅ create payment link
+  const paymentInput = {
+    amount: Math.round(Number(body.amount) * 100),
+    currency: 'INR',
+    description: 'Payment for Package Booking',
+    reference_id: booking.id.trim(),
+    customer: { email },
+    notes: { module: 'package', order_id: booking.id },
+    callback_url: 'https://page1-fe.vercel.app/payment/success',
+  };
 
-//             // Save the entity (ensures relations are handled)
-//             // await this.paymentRepository.save(paymentEntity);
+  const paymentLink = await this.razorpayPaymentService.createPaymentLink(paymentInput);
 
-//             // return this.responsehandlderservice.sendSuccessResponse(res, {
-//             //     message: 'Package Booking Initialized. Proceed to payment.',
-//             //     data: paymentLink,
-//             // });
+  // ✅ save payment entity
+  const paymentEntity = this.paymentRepository.create({
+    razorpay_link_response: JSON.stringify(paymentLink),
+    user: { id: reference_id },
+    packageBooking: { id: booking.id },
+    amount: body.amount.toString(),
+    payment_gateway: 'Razorpay',
+    payment_status: paymentLink.status,
+    status: PAYMENT_STATUS.IN_PROGRESS,
+  });
 
+  await this.paymentRepository.save(paymentEntity);
 
-//             // package repository code
-//         }
-//         catch(error){
-//              console.error('Error ', error);
-//             throw error;
-           
-//         }
-//     }
-
-   
+  return { booking, paymentLink };
+}
 
     async paymentVerify(razorpayPaymentId: string, razorpayPaymentLinkId: string, razorpaySignature: string) {
         try {

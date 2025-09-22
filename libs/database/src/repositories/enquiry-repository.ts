@@ -14,6 +14,7 @@ export class EnquiryRepositoryService {
         ){}
 
     async createEnquiry(body){
+        
         await this.enquiryRepository.save(body);
     }
 

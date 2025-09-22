@@ -107,7 +107,7 @@ export class RazorpayController {
             // Create the payment entity
             const paymentEntity = this.paymentRepository.create({
                 razorpay_link_response: JSON.stringify(paymentLink),
-                user: { id: user }, // or use userRef if already created
+                user: { id: user },
                 order: { order_id: orderdetails.order_id },
                 amount: orderdetails.amount,
                 payment_gateway: 'Razorpay',
@@ -141,11 +141,11 @@ export class RazorpayController {
                 throw `An error occurred while fetching the user. Please try again later.`;
             }
             console.log("Payload coming for the razorpay: ",body);
-            // const email = refData.email;
-            // const result = await this.razorpayService.createPackageOrder(reference_id,body ,email);  
+            const email = refData.email;
+            const result = await this.razorpayService.createPackageOrder(reference_id,body ,email);  
            return this.responsehandlderservice.sendSuccessResponse(res, {
                 message: 'Package Booking Initialized. Proceed to payment.',
-                data:"123456"
+                data:result
                 
             });
         } catch (error) {

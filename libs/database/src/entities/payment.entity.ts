@@ -19,7 +19,7 @@ export class Payment {
     @JoinColumn({ name: 'order_id' })
     order?: Order;
 
-    @OneToOne(() => PackageBooking, { nullable: true })
+    @OneToOne(() => PackageBooking, { nullable: true,onDelete: 'CASCADE' })
     @JoinColumn({ name: 'package_booking_id' })
     packageBooking?: PackageBooking;
 

@@ -8,6 +8,7 @@ import { ResponseHandlerService } from '../../../../../libs/response-handler/res
 import { ChangePasswordDto, LoginDto, LoginOrRegisterDto, RegisterDto, VerifyDto } from '../../../../../libs/dtos/authentication/user.dto';
 import {  TokenValidationGuard } from '../../../../../libs/middlewares/authMiddleware.guard';
 import { ResetPasswordDto, ForgotPasswordDto, SignupLoginDTO } from '../../../../../libs/dtos/authentication/forgotPassword.dto'
+import { UserI } from '../../../../../libs/interfaces/authentication/user.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -76,15 +77,15 @@ export class AuthController {
 
 
 
-    // @Post('/renewAccessToken')
-    // async renewAccessToken(@Res() res: Response, @Body(new ValidationPipe()) body: RenewTokenDto) {
-    //     try {
-    //         const result = await this.authService.renewAccessToken(body as UserI.RenewAccessToken);
-    //         return this.ResponseHandler.sendSuccessResponse(res, result);
-    //     } catch (error) {
-    //         return this.ResponseHandler.sendErrorResponse(res, error);
-    //     }
-    // }
+    @Post('/renewAccessToken')
+    async renewAccessToken(@Res() res: Response, @Body(new ValidationPipe()) body: UserI.RenewAccessToken) {
+        try {
+            const result = await this.authService.renewAccessToken(body as UserI.RenewAccessToken);
+            return this.ResponseHandler.sendSuccessResponse(res, result);
+        } catch (error) {
+            return this.ResponseHandler.sendErrorResponse(res, error);
+        }
+    }
 
 
     @Post('/register')

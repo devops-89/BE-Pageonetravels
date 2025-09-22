@@ -24,38 +24,9 @@ export class HotelierController {
             return this.responseHandlerService.sendErrorResponse(res, error);
         }
     }
-    // // Add Hotel
-    // @Post('/add-hotel')
-    // @UseGuards(TokenValidationGuard)
-    // @UseInterceptors(
-    //     FileFieldsInterceptor(
-    //         [
-    //             { name: 'main_image', maxCount: 1 },
-    //             { name: 'gallery_images', maxCount: 5 },
-    //         ],
-    //         { fileFilter: imageFileFilter }
-    //     )
-    // )
-    // async createHotel(@Req() req: Request, @UploadedFiles() files, @Res() res: Response, @Body() body: CreateHotelDto) {
-    //     try {
-    //         const payload: JWTPayload = req['userPayload'];
-    //         if (!payload) {
-    //             throw { message: 'Please provide a valid Token.', statusCode: ERROR_CODES.BAD_REQUEST };
-    //         }
-    //         if (payload.user_type === 'HOTEL') {
-    //             const result = await this.hotelierService.addHotel(payload.reference_id, body);
-    //             return this.responseHandlerService.sendSuccessResponse(res, result);
-    //         } else {
-    //             throw { message: 'Please provide a valid Token.', statusCode: ERROR_CODES.BAD_REQUEST };
-    //         }
-    //     } catch (error) {
-    //         console.error('Error in the Search Flight', error);
-    //         return this.responseHandlerService.sendErrorResponse(res, error);
-    //     }
-    // }
+    
 
-
-     // Add Hotel
+    // Add Hotel
     @Post('/add-hotel')
     @UseGuards(TokenValidationGuard)
     @UseInterceptors(
@@ -77,9 +48,7 @@ export class HotelierController {
                 const mainImageFile = files?.main_image?.[0];
                 const galleryImageFile = files?.gallery_images || [];
 
-                console.log("amenities:", body.amenities);
-
-               
+                console.log('amenities:', body.amenities);
 
                 const result = await this.hotelierService.addHotel(payload.reference_id, body, mainImageFile, galleryImageFile);
                 return this.responseHandlerService.sendSuccessResponse(res, result);
@@ -91,12 +60,6 @@ export class HotelierController {
             return this.responseHandlerService.sendErrorResponse(res, error);
         }
     }
-
-
-
-
-
-
 
     // Update Hotel
     @Post('hotel-update')
@@ -128,14 +91,10 @@ export class HotelierController {
         }
     }
     @Get('fetch-all-hotel')
- 
     async getAllHotel(@Req() req: Request, @Res() res: Response) {
         try {
-         
-           
-                const result = await this.hotelierService.fetchHotelList();
-                return this.responseHandlerService.sendSuccessResponse(res, result);
-          
+            const result = await this.hotelierService.fetchHotelList();
+            return this.responseHandlerService.sendSuccessResponse(res, result);
         } catch (error) {
             console.log('Error in update hotel', error);
             return this.responseHandlerService.sendErrorResponse(res, error);
