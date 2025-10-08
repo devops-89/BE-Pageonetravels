@@ -99,6 +99,9 @@ export class Order {
     @Column('decimal', { precision: 10, scale: 2 })
     amount: string;
 
+    @Column({type:'int', nullable:true})
+    ChangeRequestId: number;
+
     @Column({
         type: 'enum',
         enum: ORDER_STATUS,

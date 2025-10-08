@@ -3,12 +3,14 @@ import { SearchHotelService } from './search-hotel.service';
 // import { HotelSearchDto } from '../../../../libs/dtos/hotel/search-hotel.dto';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { GenerateTokenService } from './generateToken.service';
-import { UserRepositoryService } from '../../../../libs/database/src';
+import {  UserRepositoryService } from '../../../../libs/database/src';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 import { HotelSearchRequestDto , BookingDto } from '../../../../libs/dtos/hotel/search-hotel.dto';
-import { CreateHotelBookingDto,CreateBookingDto } from '../../../../libs/dtos/hotel/hotel-booking.dto';
+import { CreateHotelBookingDto } from '../../../../libs/dtos/hotel/hotel-booking.dto';
 import {TokenValidationGuard} from '../../../../libs/middlewares/authMiddleware.guard';
 import { HotelDetailDto } from '../../../../libs/dtos/hotel/search-hotel.dto';
+import { SyncCronService } from '../app/bull/sync-cron.service';
+
 
 @Controller('/hotel') 
 export class SearchHotelController { 
@@ -16,7 +18,9 @@ export class SearchHotelController {
     private readonly searchHotelService: SearchHotelService,
     private readonly responseHandler: ResponseHandlerService,
     private readonly generateTokenService: GenerateTokenService,
-    private readonly userRepositoryService: UserRepositoryService
+   
+    private readonly userRepositoryService: UserRepositoryService,
+    private readonly syncService: SyncCronService
   ) { } 
    
   @Get('/country-list') 
@@ -86,7 +90,7 @@ export class SearchHotelController {
  @Post('/hoteldetails')
   async HotelDetails(@Body() body: string,@Res() res: Response) {
     try {
-      const result = await this.searchHotelService.HotelDetails(body);
+      const result = await this.searchHotelService.HotelDetails();
       console.log(result);
       // return this.responseHandler.sendSuccessResponse(res, result);
     } catch (error) {
@@ -182,51 +186,88 @@ async hotelBooking(
   }
 }
 
+@Post('/getBookingDetails')
+async hotelBookingDetails(
+  @Req() req: Request,
+  @Res() res: Response,
+  @Body() body: { order_id: string; ip: string }
+) {
+  try {
+    const { order_id, ip } = body;
 
-  @Post('/getBookingDetails')
-  async hotelBookingDetails(@Req() req:Request,@Res() res:Response,@Body() body:CreateBookingDto){
-    try{
-      console.log(body);
-      const result = await this.searchHotelService.bookingDetails(body);
-      return this.responseHandler.sendSuccessResponse(res,result);
-    }catch(error){
-      return this.responseHandler.sendErrorResponse(res,error);
+    // 🔍 Validate input
+    if (!order_id || !ip) {
+      return this.responseHandler.sendErrorResponse(res, {
+        statusCode: 400,
+        message: 'Both order_id and ip are required.',
+        success: false,
+      });
     }
-  }
 
-  @Post('/cancelBooking')
+    //  Fetch booking details
+    const result = await this.searchHotelService.bookingDetails(order_id, ip);
+
+    //  Send success response
+    return this.responseHandler.sendSuccessResponse(res, {
+      message: 'Hotel booking status fetched successfully.',
+      data: result,
+    });
+  } catch (error) {
+    //  Log error for diagnostics
+    console.error(' Error in /getBookingDetails:', error);
+
+    return this.responseHandler.sendErrorResponse(res, {
+      statusCode: error?.statusCode || 500,
+      message:
+        error?.message ||
+        (typeof error === 'string' ? error : 'Unexpected error occurred.'),
+      success: false,
+    });
+  }
+}
+
+ @Post('/cancelBooking')
   async cancelBooking(
-    @Body() body: { BookingId: number; Remarks: string; ip_address: string },
-    @Res() res: Response
+    @Body() body: { orderId: string; Remarks: string; ip: string },
+    @Res() res: Response,
   ) {
     try {
-      const result = await this.searchHotelService.sendChangeRequest(
-        body.BookingId,
-        body.Remarks,
-        body.ip_address
-      );
-      return this.responseHandler.sendSuccessResponse(res, result);
+        const result=await this.searchHotelService.cancelBooking(body);
+      // 4. Return the API response along with updated order status
+      return this.responseHandler.sendSuccessResponse(res, {message:"Cancellation request initiated successfully",data:result});
     } catch (error) {
       return this.responseHandler.sendErrorResponse(res, error);
     }
   }
 
-  // Check Cancellation Status
+
+//   // Check Cancellation Status
   @Post('/cancelStatus')
   async cancelStatus(
-    @Body() body: { ChangeRequestId: number; ip_address: string },
+    @Body() body: { orderId: string; ip: string },
     @Res() res: Response
   ) {
     try {
-      const result = await this.searchHotelService.getChangeRequestStatus(
-        body.ChangeRequestId,
-        body.ip_address
-      );
+
+      const result=await this.searchHotelService.checkCancelStatus(body);
+      // const result = await this.searchHotelService.getChangeRequestStatus(
+      //   body.ChangeRequestId,
+      //   body.ip_address
+      // );
       return this.responseHandler.sendSuccessResponse(res, result);
     } catch (error) {
       return this.responseHandler.sendErrorResponse(res, error);
 }
 }
+
+ @Get('hotel-static-api-persist')
+   async startSync() {
+    await this.syncService.scheduleSyncJobs();
+    return { message: 'TBO Hotel sync started!' };
+  }
+
+ 
+
 }
 
 

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '../../../../libs/config/config.module';
 import { DBModule } from '../../../../libs/database/src/database.module'
-import { SearchRepositoryService, Setting, SettingRepositoryService } from '../../../../libs/database/src';
+import {  HotelCity, HotelTboCode, HotelTboCodeRepositoryService, SearchRepositoryService, Setting, SettingRepositoryService } from '../../../../libs/database/src';
 import { ResponseHandlerModule } from '../../../../libs/response-handler/response-handler.module';
 import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.module';
 import { GenerateTokenService } from './generateToken.service';
@@ -18,7 +18,8 @@ import { RazorpayModule } from '../../../../libs/paymentgateway/razorpay.module'
 import { RazorpayService } from "../../../../libs/paymentgateway/razorpay.service";
 import { JwtService } from '../../../../libs/jwt-service/jwt.service';
 import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMiddleware';
-
+import { SyncCronService } from '../app/bull/sync-cron.service';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
     imports:[
@@ -30,11 +31,19 @@ import { TokenValidationMiddleware } from '../../../../libs/middlewares/authMidd
         TypeOrmModule.forFeature([
             Setting,
             SettingRepositoryService,
-            SearchRepositoryService
+            SearchRepositoryService,
+            HotelCity,
+            HotelTboCode,
         ]),
+         BullModule.registerQueue(
+      { name: 'sync-country' },
+      { name: 'sync-city' },
+      { name: 'sync-hotel-codes' },
+    ),
         RazorpayModule,
     ],
     controllers: [SearchHotelController],
-    providers: [SearchHotelService, GenerateTokenService, TBO_CredentialsService, HotelTBOAPIService,HTTPSTboAPIService, RazorpayService,JwtService,TokenValidationMiddleware ],
+    exports: [SearchHotelService,SyncCronService],
+    providers: [SearchHotelService, GenerateTokenService, TBO_CredentialsService, HotelTBOAPIService,HTTPSTboAPIService, RazorpayService,JwtService,TokenValidationMiddleware, HotelTboCodeRepositoryService, HotelCity, HotelTboCode,SyncCronService ],
 })
 export class SearchHotelModule {}

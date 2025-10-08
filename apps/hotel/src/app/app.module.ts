@@ -5,7 +5,12 @@ import { SearchHotelModule } from '../search-hotel/search-hotel.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 import {MongoDBModule} from '../../../../libs/database/src/mongodb/mongodbconnect';
-
+import {BullModule} from "@nestjs/bull";
+import { ScheduleModule } from '@nestjs/schedule';
+import { SyncCronService } from './bull/sync-cron.service';
+import { CountrySyncProcessor } from './bull/country-sync.queue';
+import { CitySyncProcessor } from './bull/city-sync.queue';
+import { HotelTBOCodeSyncProcessor } from './bull/hotelTBOCodeSync.queue';
 
 @Module({
     imports: [
@@ -21,8 +26,27 @@ import {MongoDBModule} from '../../../../libs/database/src/mongodb/mongodbconnec
                 max: 100000, // This is now at the correct level
             }),
         }),
+        // bull global configuration
+        BullModule.forRoot({
+            redis:{
+                host:"localhost",
+                port:6379
+            }
+        }),
+       // Register Queues
+       BullModule.registerQueue({
+        name:"sync-country"
+       }),
+       BullModule.registerQueue({
+        name:"sync-city"
+       }),
+       BullModule.registerQueue({
+        name:"sync-hotel-codes"
+       }),
+       ScheduleModule.forRoot(),
+       
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [AppService,SyncCronService,CountrySyncProcessor,CitySyncProcessor,HotelTBOCodeSyncProcessor],
 })
 export class AppModule {}

@@ -61,9 +61,9 @@ export class RazorpayService {
                     module: 'flight',
                     order_id: orderdetails.order_id,
                 },
-                callback_url: 'https://page1-fe.vercel.app/payment/success',
+                callback_url: 'https://page1-fe.vercel.app/payment/flight/status',
             };
-
+// https://page1-fe.vercel.app/payment/flight/status
             const data = await this.razorpayPaymentService.createPaymentLink(paymentInput);
 
             await this.flightTicketService.insertOrder(data, { order_id: orderdetails.order_id, user: reference_id });

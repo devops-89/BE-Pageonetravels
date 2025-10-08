@@ -31,4 +31,5 @@ export * from './faq.repository';
 export * from './social.repository';
 export * from './footer.repository';
 export * from './hotelier-inventory.repository';
-export * from './package-booking.repository'
+export * from './package-booking.repository';
+export * from "./hoteltbocode.repository";

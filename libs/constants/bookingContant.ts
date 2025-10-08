@@ -16,6 +16,7 @@ export enum ORDER_STATUS {
     INIT = "INIT",                // Booking initialized but not confirmed
     PENDING = "PENDING",          // Awaiting confirmation or payment
     CONFIRMED = "CONFIRMED",      // Booking successfully confirmed
+    CANCELLING="CANCELLING",
     CANCELLED = "CANCELLED",      // Booking cancelled by user or admin
     FAILED = "FAILED",            // Booking attempt failed (e.g., payment failure)
     IN_PROGRESS = "IN_PROGRESS",  // Booking currently being processed
@@ -23,6 +24,7 @@ export enum ORDER_STATUS {
     EXPIRED = "EXPIRED",          // Booking expired due to inactivity or timeout
     REFUNDED = "REFUNDED",        // Payment refunded after cancellation or failure
     REJECTED = "REJECTED",        // Booking rejected (e.g., by admin or due to unavailability)
+    UNKNOWN="UNKNOWN"
 }
 
 export enum PAYMENT_STATUS {
@@ -37,3 +39,5 @@ export enum PAYMENT_STATUS {
     DECLINED = "DECLINED",        // Payment declined by the provider or bank
     EXPIRED = "EXPIRED",          // Payment session or authorization expired
 }
+
+

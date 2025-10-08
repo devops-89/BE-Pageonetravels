@@ -16,18 +16,31 @@ async function bootstrap() {
 
     app.useGlobalPipes(
         new ValidationPipe({
+            whitelist: true,
+            transform: true,
             exceptionFactory: (validationErrors: ValidationError[] = []) => {
+                if (!validationErrors || validationErrors.length === 0) {
+                    // No validation errors -> do not throw
+                    return undefined;
+                }
+
                 let msg = '';
                 for (const error of validationErrors) {
-                    msg += `Invalid ${error.property} - ${Object.values(error.constraints).join(', ')}, `;
+                    if (error.constraints) {
+                        msg += `Invalid ${error.property} - ${Object.values(error.constraints).join(', ')}, `;
+                    }
                 }
-                return new BadRequestException(msg);
+
+                // Trim trailing comma and space
+                msg = msg.replace(/, $/, '');
+
+                return new BadRequestException(msg || 'Validation failed');
             },
         }),
     );
 
-    const config = new ConfigService()
-    config.loadFromEnv()
+    const config = new ConfigService();
+    config.loadFromEnv();
     const port = config.get().servicePorts.adminpanel || 3005;
     await app.listen(port);
     Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`);

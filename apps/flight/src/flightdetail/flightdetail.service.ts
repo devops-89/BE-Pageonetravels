@@ -181,20 +181,21 @@ export class FlightDetailService {
                     "ResultIndex": result_index
                 };
                 
-                console.log("+++++++++++++++++Fare  api calling++++++++++++++++++");
+                console.log("+++++++++++++++++Fare Quote  api calling++++++++++++++++++");
                 response = await this.httptboapiservice.fareRule(base_url, payload_request);
                 console.log("fare Quote api calling url:", base_url);
                 console.log("Payload for Fare Quote API: ", payload_request);
-                console.log("flight Fare Quote url+++++: ",response);
-                
+                console.log("flight Fare Quote Response: ",response);
+                console.log("+++++++++++++++++Fare Quote  api calling++++++++++++++++++");
+
                 response = await this.httptboapiservice.flightFormat(response);
                 console.log("flight format url+++++: ",response);
                 await this.addImage(response);
                 
                 ssrResponse = await this.httptboapiservice.ssr(base_url_ssr, payload_request);
-                console.log("++++++++ssr url:++++++++",base_url_ssr);
-                console.log("++++++++++ssr payload: ++++++++++",payload_request);
-                console.log("+++++ssr response:++++++",ssrResponse);
+                // console.log("++++++++ssr url:++++++++",base_url_ssr);
+                // console.log("++++++++++ssr payload: ++++++++++",payload_request);
+                // console.log("+++++ssr response:++++++",ssrResponse);
                 ssrResponse.Response.isLCC = response.Results.IsLCC     
                           
                 if(journey_type === "ONEWAY"){

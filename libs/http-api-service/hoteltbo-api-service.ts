@@ -74,47 +74,49 @@ export class HotelTBOAPIService {
   
   
   async fetchCityList(cityListURL: string, countryCodes: any): Promise<any> {
-    try {
-      const username = "TBOStaticAPITest";
-      const password = "Tbo@11530818";
-  
-      const credentials = Buffer.from(`${username}:${password}`).toString('base64');
-      const responses = [];
-      const headers = {
-        'Authorization': `Basic ${credentials}`,
-        'Content-Type': 'application/json',
-      };
+  try {
+    const username = "TBOStaticAPITest";
+    const password = "Tbo@11530818";
 
-     // Process each country code one by one
-      for (const country of countryCodes) {
-        const payload = {
-          "CountryCode": country.code
-        };
-      
+    const credentials = Buffer.from(`${username}:${password}`).toString('base64');
+    const headers = {
+      'Authorization': `Basic ${credentials}`,
+      'Content-Type': 'application/json',
+    };
+
+    const responses = [];
+
+    for (const country of countryCodes) {
+      const payload = { CountryCode: country.code };
+
       try {
         const response = await this.httpPostAPICall(cityListURL, payload, headers);
-        // if(response.Status === 200){
-        //   console.log("sdf");
-        //   await this.hotelCityRepositoryService.createCity(country.code,country.name,response.CityList);
-        // }
-        // console.log("start");
-        // const savedata = await this.hotelCityRepositoryService.createCity(country.code,country.name,response.CityList);
-        // console.log("kingsdfaaaaaaaaaaaaa",savedata);
+
+        if (response.Status?.Code === 200 && response.CityList?.length) {
+          // Save cities for this country
+          await this.hotelCityRepositoryService.createCity(
+            country.code,
+            country.name,
+            response.CityList
+          );
+        }
+
         responses.push(response);
+
       } catch (error) {
         console.error(`Error fetching cities for country ${country.code}:`, error.message);
-        // Continue with next country even if one fails
-        continue;
+        continue; // continue with next country
       }
     }
-     
-      return responses;
 
-    } catch (error) {
-      console.error('Error in fetchCityList:', error.message);
-      throw (error.message || 'Failed to fetch the city list.');
-    }
+    return responses;
+
+  } catch (error) {
+    console.error('Error in fetchCityList:', error.message);
+    throw new Error(error.message || 'Failed to fetch the city list.');
   }
+}
+
 
   async fetchClientHotelDetails(body:HotelDetailDto){
     try{
@@ -201,33 +203,37 @@ export class HotelTBOAPIService {
     }
   }
 
-  async fetchCityHotelDetails(baseurl: string, city_code:string): Promise<any> {
-    try {
-     
-      const username = "TBOStaticAPITest";
-      const password = "Tbo@11530818";
-      const credentials = Buffer.from(`${username}:${password}`).toString('base64');
-     
-      const headers = {
-        'Authorization': `Basic ${credentials}`,
-        'Content-Type': 'application/json',
+ async fetchCityHotelDetails(baseurl: string, city_code: string): Promise<any> {
+  try {
+    const username = "TBOStaticAPITest";
+    const password = "Tbo@11530818";
+    const credentials = Buffer.from(`${username}:${password}`).toString("base64");
+
+    const headers = {
+      Authorization: `Basic ${credentials}`,
+      "Content-Type": "application/json",
+    };
+
+    const payload = {
+      CityCode: city_code, 
+    };
+
+    const response = await this.httpPostAPICall(baseurl, payload, headers);
+    console.log("Hotel Code  TBO API Response: ",response);
+
+    if (!response?.Status || response.Status.Code !== 200) {
+      throw {
+        message: response?.Status?.Description || "Hotel API failed",
+        statusCode: response?.Status?.Code || 500,
       };
-
-      const payload = {
-        "CityCode": city_code,
-        "IsDetailedResponse": "true"
-      }
-
-      const response = await this.httpPostAPICall(baseurl, payload, headers);
-      if(response.Status.Code === 500){
-        throw { message: response.Status.Description, statusCode: response.Status.Code };
-      }
-      return response;
-
-    } catch (error) {
-      throw error
     }
+
+    return response;
+  } catch (error) {
+    console.error("Error in fetchCityHotelDetails:", error.message || error);
+    throw error;
   }
+}
 
   // old function
   // async searchHotelFromTBO(body,base_url: string, token: string,hotelCodesinCity:any ) {
@@ -419,7 +425,47 @@ export class HotelTBOAPIService {
       throw error;
     }
   }
+
+async sendChangeRequest(
+  BookingId: number,
+  Remarks: string,
+  ip_address: string,
+  token: string,
+) {
+  try {
   
+    const payload = {
+      EndUserIp: ip_address,
+      TokenId: token,
+      BookingId,
+      RequestType: 4, 
+      BookingMode: 5,
+      Remarks,
+    };
+
+    console.log("New cancellation payload:",payload);
+
+    const url =
+      'https://HotelBE.tektravels.com/hotelservice.svc/rest/SendChangeRequest';
+
+    // const response = await this.httpPostAPICall(url, payload, { headers });
+    const response=await axios.post(url,payload);
+
+    const result = response.data?.HotelChangeRequestResult;
+
+  
+
+    if (!result) {
+      throw new Error('No response from TBO SendChangeRequest API');
+    }
+
+    return result;
+  } catch (error: any) {
+    console.error('Error in sendChangeRequest:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
 
 
 

@@ -198,6 +198,7 @@ export class OrderRepositoryService {
             }
 
             updatedOrder.fail_response = flightresposne;
+            updatedOrder.status=ORDER_STATUS.FAILED;
 
             // Save the updated order to the database
             await this.orderRepository.save(updatedOrder);
@@ -223,6 +224,7 @@ export class OrderRepositoryService {
             }
 
             updatedOrder.success_response = flightresposne;
+            updatedOrder.status=ORDER_STATUS.COMPLETED;
 
             // Save the updated order to the database
             await this.orderRepository.save(updatedOrder);
@@ -331,6 +333,8 @@ export class OrderRepositoryService {
         }
     }
 
+
+
     async findAll(userId?: string): Promise<Order[]> {
         try {
             const query = this.orderRepository.createQueryBuilder('order').leftJoinAndSelect('order.user', 'user');
@@ -346,20 +350,22 @@ export class OrderRepositoryService {
         }
     }
 
-    async find(orderId?: string): Promise<Order[]> {
-        try {
-            const query = this.orderRepository.createQueryBuilder('order').leftJoinAndSelect('order.user', 'user');
+async find(orderId?: string): Promise<Order> {
+  try {
+       const updatedOrder = await this.orderRepository.findOne({
+                where: { order_id: orderId },
+                loadRelationIds: true,
+            });
 
-            if (orderId) {
-                query.where('user.id = :userId', { orderId });
-            }
 
-            return await query.getMany();
-        } catch (error) {
-            console.error('Error fetching all orders:', error);
-            throw error;
-        }
-    }
+
+    return updatedOrder;
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    throw error;
+  }
+}
+
 
     async updatePdfUrl(orderId: string, pdfUrl: string): Promise<string> {
         try {
@@ -381,6 +387,34 @@ export class OrderRepositoryService {
             return updatedOrder.pdf_url;
         } catch (error) {
             console.error(`Failed to update PDF URL for order ${orderId}:`, error);
+            throw error;
+        }
+    }
+
+    // change Order Status
+    async updateOrderStatus(orderId:string,status:ORDER_STATUS,ChangeRequestId:number){
+        try{
+           const updatedOrder=await this.orderRepository.findOne({
+            where:{order_id:orderId},
+            loadRelationIds:true
+           });
+
+              if (!updatedOrder) {
+                throw {
+                    message: `Order with order_id: ${orderId} not found.`,
+                    statusCode: ERROR_CODES.BAD_REQUEST,
+                };
+            }
+
+            updatedOrder.status=status;
+            updatedOrder.ChangeRequestId=ChangeRequestId;
+            await this.orderRepository.save(updatedOrder);
+            return updatedOrder;
+
+
+        }
+        catch(error){
+            console.error(`Failed to update Order Status fror Order ${orderId}: `,error);
             throw error;
         }
     }

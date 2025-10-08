@@ -44,6 +44,8 @@ import {
     HotelierRepositoryService,
     PackageBookingRepositoryService,
     PackageBooking,
+    HotelTboCodeRepositoryService,
+    HotelTboCode,
 
 
 } from './';
@@ -97,6 +99,7 @@ export class DBModule {
                 RoomInventory,
                 PackageBooking,
                 Booking,
+                HotelTboCode
             ],
             synchronize: true,
             logging: false,
@@ -166,6 +169,7 @@ export class DBModule {
                     HotelierBooking,
                     PackageBooking,
                     Booking,
+                    HotelTboCode
                     //HotelierRepositoryService, // Uncomment if needed
                 ]),
             ],
@@ -191,6 +195,7 @@ export class DBModule {
                 // InventoryService,
                 HotelierRoomTypesRepositoryService,
                 HotelierInventoryRepositoryService,
+                HotelTboCodeRepositoryService,
                 EnquiryRepositoryService,
                 {
                     provide: TransactionManager, // Register TransactionManager
@@ -219,7 +224,8 @@ export class DBModule {
                 EnquiryRepositoryService,
                 HotelierInventoryRepositoryService,
                 PackageBookingRepositoryService,
-                BookingRepositoryService
+                BookingRepositoryService,
+                HotelTboCodeRepositoryService
             ],
         };
     }

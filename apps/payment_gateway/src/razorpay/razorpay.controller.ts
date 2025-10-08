@@ -12,6 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PAYMENT_STATUS } from '../../../../libs/constants/bookingContant';
 import { RazorpayService as RazorpayPaymentService } from '../../../../libs/paymentgateway/razorpay.service';
 import {CreatePackageBookingDto} from "../../../../libs/dtos/package/package-booking.dto";
+import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 
 @Controller('razorpay')
 export class RazorpayController {
@@ -22,7 +23,8 @@ export class RazorpayController {
         private readonly razorpayService: RazorpayService,
         private readonly razorpayPaymentService: RazorpayPaymentService,
         @InjectRepository(Payment)
-        private readonly paymentRepository: Repository<Payment>
+        private readonly paymentRepository: Repository<Payment>,
+         private readonly rediscacheservice: RedisCacheService
     ) {}
 
     @Post('/payment-init')
@@ -30,7 +32,27 @@ export class RazorpayController {
     async ticketLCC(@Body() body: LccTicketDto, @Req() req: Request, @Res() res: Response) {
         try {
             const payload = req['userPayload'];
-            const { reference_id } = payload;
+            const { reference_id} = payload;
+
+            const {traceId}=body;
+
+            // check session is valid or not using TraceId start
+
+                if (!traceId) {
+    return this.responsehandlderservice.sendErrorResponse(res, { message: 'TraceId is required', statusCode: 400 });
+}
+
+        // Check in Redis
+        const traceData = await this.rediscacheservice.getCache(`trace:${traceId}`);
+
+    if (!traceData) {
+    return this.responsehandlderservice.sendErrorResponse(res, { message: 'Session expired', statusCode: 440 }); 
+}
+
+       
+        // check session is valid or not using TraceId end
+
+
             const refData = await this.userRepositoryService.getUserByUserId(reference_id);
 
             if (!refData) {
@@ -75,6 +97,10 @@ export class RazorpayController {
             // extract the custom order id from the orderReaponse
             const custom_order_id = orderResponse.custom_order_id;
 
+             const orderdetails = await this.orderRepositoryService.findOne(custom_order_id)
+
+            console.log("==============orderId not getting: ===================",orderdetails.order_id);
+
             // create Razorpay Payment Link
             const paymentLink = await this.razorpayPaymentService.createPaymentLink({
                 amount: Math.round(amount * 100),
@@ -86,13 +112,15 @@ export class RazorpayController {
                 },
                 notes: {
                     module: 'hotel',
-                    order_id: orderResponse.order_id,
+                    order_id: orderdetails.order_id,
                 },
-                callback_url: 'https://page1-fe.vercel.app/payment/success',
+                callback_url: 'https://page1-fe.vercel.app/payment/hotel/status',
             });
 
+            // https://page1-fe.vercel.app/payment/hotel/status
+
             // save payment record to payment table
-            const orderdetails = await this.orderRepositoryService.findOne(custom_order_id);
+           ;
             console.log('Order Details by custom order id: ', orderdetails);
             const user = reference_id;
 

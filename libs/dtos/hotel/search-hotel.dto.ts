@@ -1,5 +1,6 @@
 import { IsArray, IsBoolean, IsDateString, IsInt, IsIP, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Message } from 'twilio/lib/twiml/MessagingResponse';
 
 class PaxRoomDto {
   @IsNumber()
@@ -95,4 +96,21 @@ export class HotelDetailDto{
   @IsString()
   @IsNotEmpty()
   Language: string;
+}
+
+export class GetBookingDetailDto{
+  @IsString()
+  @IsNotEmpty({message:"All Payload is Required For Getting Booking Details!"})
+  "EndUserIp": string;
+
+
+  @IsString()
+   @IsNotEmpty({message:"All Payload is Required For Getting Booking Details!"})
+  "TokenId": string;
+
+
+  @IsNumber()
+   @IsNotEmpty({message:"All Payload is Required For Getting Booking Details!"})
+  "BookingId":number;
+
 }

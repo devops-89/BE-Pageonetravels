@@ -24,7 +24,7 @@ export class HotelCountryRepositoryService {
 
     async getCountryCode(){
         const countries = await this.hotelCountryRepository.find({
-            select: ['code','name']  // Only select the 'code' field
+            select: ['code','name']  
         });
         console.log("sd",countries);
         return countries;

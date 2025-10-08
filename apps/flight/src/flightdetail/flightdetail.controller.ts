@@ -1,38 +1,44 @@
-import { Controller, Post,Get, Req, Res, ValidationPipe, Body, Param} from '@nestjs/common';
+import { Controller, Post, Get, Req, Res, ValidationPipe, Body, Param, NotFoundException } from '@nestjs/common';
 import { FlightDetailService } from './flightdetail.service';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
-import { FlightDetailRequestDto,FlightRuleDto } from '../../../../libs/dtos/flight/flight-detail.dto';
+import { FlightDetailRequestDto, FlightRuleDto } from '../../../../libs/dtos/flight/flight-detail.dto';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
+import { OrderRepositoryService } from '../../../../libs/database/src';
+import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
 
+import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
+import { GenerateTokenService } from '../search-flight/generateToken.service';
 
 @Controller('flightdetail')
 export class FlightdetailController {
-    constructor(private readonly flightdetailservice: FlightDetailService,
-        private readonly responseHandler: ResponseHandlerService,
-      
+    constructor(
+        private readonly flightdetailservice: FlightDetailService,
 
-    ) { }
+        private readonly responseHandler: ResponseHandlerService,
+        private readonly tboConfigService: TBO_CredentialsService,
+        private readonly orderRepositoryService: OrderRepositoryService,
+        private readonly httptboapiservice: HTTPSTboAPIService,
+        private readonly generateTokenService: GenerateTokenService,
+    ) {}
 
     @Post('/farerule')
-    async FareRule(@Req() req: Request, @Res() res: Response,
-    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })) body: FlightRuleDto) {
+    async FareRule(@Req() req: Request, @Res() res: Response, @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })) body: FlightRuleDto) {
         try {
             const result = await this.flightdetailservice.FareRule(body);
             return this.responseHandler.sendSuccessResponse(res, result);
         } catch (error) {
-            console.log("Internal Server Error", error);
+            console.log('Internal Server Error', error);
             return this.responseHandler.sendErrorResponse(res, error);
         }
     }
 
     @Post('/flightdetail')
-    async FlightDetail(@Req() req: Request, @Res() res: Response,
-    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })) body: FlightDetailRequestDto,) {
+    async FlightDetail(@Req() req: Request, @Res() res: Response, @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })) body: FlightDetailRequestDto) {
         try {
             const result = await this.flightdetailservice.FlightDetail(body);
             return this.responseHandler.sendSuccessResponse(res, result);
         } catch (error) {
-            console.log("Internal Server Error", error);
+            console.log('Internal Server Error', error);
             return this.responseHandler.sendErrorResponse(res, ERROR_CODES.INVALID_BASE_URL);
         }
     }
@@ -57,144 +63,173 @@ export class FlightdetailController {
     //     }
     // }
 
-
-
     // this is not userful
     @Post('/fetch_seat_meal_baggage_details')
-    async FetchSeatMealBaggaeDetails(@Req() req: Request, @Res() res: Response,
-    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })) body: FlightDetailRequestDto,) {
+    async FetchSeatMealBaggaeDetails(@Req() req: Request, @Res() res: Response, @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })) body: FlightDetailRequestDto) {
         try {
             const result = await this.flightdetailservice.FetchSeatMealBaggaeDetails(body);
             return this.responseHandler.sendSuccessResponse(res, result);
         } catch (error) {
-            console.log("Internal Server Error", error);
+            console.log('Internal Server Error', error);
             return this.responseHandler.sendErrorResponse(res, error);
         }
     }
 
     // ===================================== flight canncellation routes ============================================
-     // to fetch airline types before cancellation
-  // Flight Cancellation Endpoints
+    // to fetch airline types before cancellation
+    // Flight Cancellation Endpoints
 
-  @Post('release-pnr')
-  async releasePNR(@Body() body: { bookingId: string; endUserIp: string; tokenId: string }, @Res() res: Response) {
-      try {
-          const result = await this.flightdetailservice.releasePNR(body.bookingId, body.endUserIp, body.tokenId);
-          return this.responseHandler.sendSuccessResponse(res, result);
-      } catch (error) {
-          return this.responseHandler.sendErrorResponse(res, error);
-      }
-  }
+    @Post('release-pnr')
+    async releasePNR(@Body() body: { bookingId: string; endUserIp: string; tokenId: string }, @Res() res: Response) {
+        try {
+            const result = await this.flightdetailservice.releasePNR(body.bookingId, body.endUserIp, body.tokenId);
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch (error) {
+            return this.responseHandler.sendErrorResponse(res, error);
+        }
+    }
 
-  @Post('get-cancellation-charges')
-  async getCancellationCharges(@Body() body: {
-      BookingId: string;
-      RequestType: string;
-      BookingMode: string;
-      EndUserIp: string;
+    @Post('get-cancellation-charges')
+    async getCancellationCharges(
+        @Body()
+        body: {
+            BookingId: string;
+            RequestType: string;
+            BookingMode: string;
+            EndUserIp: string;
+        },
+        @Res() res: Response
+    ) {
+        try {
+            const result = await this.flightdetailservice.getCancellationCharges(body);
+            console.log('Cancellation Result: ', result);
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch (error) {
+            return this.responseHandler.sendErrorResponse(res, error);
+        }
+    }
 
-  }, @Res() res: Response) {
-      try {
-          const result = await this.flightdetailservice.getCancellationCharges(body);
-          console.log("Cancellation Result: ",result);
-          return this.responseHandler.sendSuccessResponse(res, result);
-      } catch (error) {
-          return this.responseHandler.sendErrorResponse(res, error);
-      }
-  }
+    @Post('verify-booking')
+    async verifyPayment(@Body() body: {order_id:string,ip:string}) {
+        const { order_id, ip } = body;
 
-//   @Post('get-cancellation-charges')
-// async getCancellationCharges(
-//   @Body() body: { orderId: string; requestType: string; bookingMode: string; endUserIp: string },
-//   @Res() res: Response
-// ) {
-//   try {
-//     //const tokenId = await this.orderRepository.findTokenIdByOrderId(body.orderId);
+        // 1. Fetch booking record by order_id from DB
+        const orderDetails = await this.orderRepositoryService.findOne({ where: { order_id: order_id } });
+        if (!orderDetails) throw new NotFoundException('Order is Not Found!');
 
-//     if (!tokenId) {
-//       return this.responseHandler.sendErrorResponse(res, 'Token ID not found in order_request');
-//     }
+         const { token } = await this.generateTokenService.getToken(ip);
 
-//     const result = await this.flightdetailservice.getCancellationCharges({
-//       ...body
-//     });
+        // 2. Prepare GetBookingDetails payload
+        const payload = {
+            EndUserIp: ip,
+            TokenId: token,
+            TraceId: orderDetails.trace_id, 
+        };
 
-//     return this.responseHandler.sendSuccessResponse(res, result);
-//   } catch (error) {
-//     return this.responseHandler.sendErrorResponse(res, error);
-//   }
-// }
+        const tbo_credentials = await this.tboConfigService.getTBOCredentials();
+        console.log("payload:",tbo_credentials.FLIGHT_BOOKING_DETAILS,payload);
 
+        // 3. Call TBO API
+        const response = await this.httptboapiservice.httpAPICall(tbo_credentials.FLIGHT_BOOKING_DETAILS, payload);
 
-  @Post('send-change-request')
-  async sendChangeRequest(@Body() body: {
-      bookingId: string;
-      requestType: number;
-      tokenId: string;
-      cancellationType: number;
-      sectors?: Array<{ origin: string; destination: string }>;
-      ticketIds?: number[];
-      remarks?: string;
-      userEmail?: string;
-  }, @Res() res: Response) {
-      try {
-          const result = await this.flightdetailservice.sendChangeRequest(body);
-          return this.responseHandler.sendSuccessResponse(res, result);
-      } catch (error) {
-          return this.responseHandler.sendErrorResponse(res, error);
-      }
-  }
+        return { success: true, booking: response.data };
+    }
 
-  @Get('change-request-status/:changeRequestId')
-  async getChangeRequestStatus(@Param('changeRequestId') changeRequestId: string, @Res() res: Response) {
-      try {
-          const result = await this.flightdetailservice.getChangeRequestStatus(changeRequestId);
-          return this.responseHandler.sendSuccessResponse(res, result);
-      } catch (error) {
-          return this.responseHandler.sendErrorResponse(res, error);
-      }
-  }
+    //   @Post('get-cancellation-charges')
+    // async getCancellationCharges(
+    //   @Body() body: { orderId: string; requestType: string; bookingMode: string; endUserIp: string },
+    //   @Res() res: Response
+    // ) {
+    //   try {
+    //     //const tokenId = await this.orderRepository.findTokenIdByOrderId(body.orderId);
 
-//   @Post('cancel-flight-ticket-new')
-//   async cancelFlightTicketNew(@Body() body: {
-//       bookingId: string;
-//       requestType?: number;
-//       userEmail?: string;
-//       remarks?: string;
-//       sectors?: Array<{ origin: string; destination: string }>;
-//       ticketIds?: number[];
-//   }, @Res() res: Response) {
-//       try {
-//           const result = await this.flightdetailservice.cancelFlightTicketNew(body);
-//           return this.responseHandler.sendSuccessResponse(res, result);
-//       } catch (error) {
-//           return this.responseHandler.sendErrorResponse(res, error);
-//       }
-//   }
+    //     if (!tokenId) {
+    //       return this.responseHandler.sendErrorResponse(res, 'Token ID not found in order_request');
+    //     }
 
-//   @Post('partial-cancellation')
-//   async partialCancellation(@Body() body: {
-//       bookingId: string;
-//       sectors: Array<{ origin: string; destination: string }>;
-//       ticketIds: number[];
-//       remarks?: string;
-//       userEmail?: string;
-//   }, @Res() res: Response) {
-//       try {
-//           const result = await this.flightdetailservice.partialCancellation(body);
-//           return this.responseHandler.sendSuccessResponse(res, result);
-//       } catch (error) {
-//           return this.responseHandler.sendErrorResponse(res, error);
-//       }
-//   }
+    //     const result = await this.flightdetailservice.getCancellationCharges({
+    //       ...body
+    //     });
 
-  @Get('airline-types')
-  async getAirlineTypes(@Res() res: Response) {
-      try {
-          const result = await this.flightdetailservice.getAirlineTypes();
-          return this.responseHandler.sendSuccessResponse(res, result);
-      } catch (error) {
-          return this.responseHandler.sendErrorResponse(res, error);
-      }
+    //     return this.responseHandler.sendSuccessResponse(res, result);
+    //   } catch (error) {
+    //     return this.responseHandler.sendErrorResponse(res, error);
+    //   }
+    // }
+
+    @Post('send-change-request')
+    async sendChangeRequest(
+        @Body()
+        body: {
+            bookingId: string;
+            requestType: number;
+            tokenId: string;
+            cancellationType: number;
+            sectors?: Array<{ origin: string; destination: string }>;
+            ticketIds?: number[];
+            remarks?: string;
+            userEmail?: string;
+        },
+        @Res() res: Response
+    ) {
+        try {
+            const result = await this.flightdetailservice.sendChangeRequest(body);
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch (error) {
+            return this.responseHandler.sendErrorResponse(res, error);
+        }
+    }
+
+    @Get('change-request-status/:changeRequestId')
+    async getChangeRequestStatus(@Param('changeRequestId') changeRequestId: string, @Res() res: Response) {
+        try {
+            const result = await this.flightdetailservice.getChangeRequestStatus(changeRequestId);
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch (error) {
+            return this.responseHandler.sendErrorResponse(res, error);
+        }
+    }
+
+    //   @Post('cancel-flight-ticket-new')
+    //   async cancelFlightTicketNew(@Body() body: {
+    //       bookingId: string;
+    //       requestType?: number;
+    //       userEmail?: string;
+    //       remarks?: string;
+    //       sectors?: Array<{ origin: string; destination: string }>;
+    //       ticketIds?: number[];
+    //   }, @Res() res: Response) {
+    //       try {
+    //           const result = await this.flightdetailservice.cancelFlightTicketNew(body);
+    //           return this.responseHandler.sendSuccessResponse(res, result);
+    //       } catch (error) {
+    //           return this.responseHandler.sendErrorResponse(res, error);
+    //       }
+    //   }
+
+    //   @Post('partial-cancellation')
+    //   async partialCancellation(@Body() body: {
+    //       bookingId: string;
+    //       sectors: Array<{ origin: string; destination: string }>;
+    //       ticketIds: number[];
+    //       remarks?: string;
+    //       userEmail?: string;
+    //   }, @Res() res: Response) {
+    //       try {
+    //           const result = await this.flightdetailservice.partialCancellation(body);
+    //           return this.responseHandler.sendSuccessResponse(res, result);
+    //       } catch (error) {
+    //           return this.responseHandler.sendErrorResponse(res, error);
+    //       }
+    //   }
+
+    @Get('airline-types')
+    async getAirlineTypes(@Res() res: Response) {
+        try {
+            const result = await this.flightdetailservice.getAirlineTypes();
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch (error) {
+            return this.responseHandler.sendErrorResponse(res, error);
+        }
     }
 }

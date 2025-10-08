@@ -57,7 +57,7 @@ export class HotelService {
             let result = await this.httpAPICall(url, payload, headers);
             console.log('Hotel Booking Response: ', result);
             console.log("+++++++++++++++++++++++++++++++++++++++++");
-            console.log("User Details:",userDetails);
+            console.log("New User Details:",userDetails);
             if (result?.BookResult?.ResponseStatus === 1) {
                 console.log('Booking Success(result.BookResult):', result.BookResult);
               
