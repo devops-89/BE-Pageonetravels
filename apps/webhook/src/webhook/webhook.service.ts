@@ -44,6 +44,7 @@ export class WebhookService {
 
 async processWebhookEvent(signature: string, body: any) {
   const webhookSecret = this.configService.get().RAZORPAY_CREDENTIAL.RAZORPAY_WEBHOOK_SECRET;
+  console.log("webhook secret: ", webhookSecret);
 
   const expectedSignature = crypto
     .createHmac('sha256', webhookSecret)
