@@ -11,6 +11,17 @@ import { AppModule } from './app/app.module';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+
+ // --- TEMPORARY ENV LOGS ---
+  console.log('DB_HOST:', process.env.DB_HOST);
+  console.log('DB_DATABASE:', process.env.DB_DATABASE);
+  console.log('DB_USERNAME:', process.env.DB_USERNAME);
+  console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
+  console.log('RAZORPAY_KEY_ID:', process.env.RAZORPAY_KEY_ID);
+  console.log('RAZORPAY_KEY_SECRET:', process.env.RAZORPAY_KEY_SECRET);
+  // -----------------
+
+
     app.enableCors({
         origin: "*",
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",

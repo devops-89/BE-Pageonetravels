@@ -75,7 +75,7 @@ export class ConfigService {
       hotel_management: parseInt(env.HOTEL_MANAGEMENT_PORT) || defaultConfig.hotel_management,
       payment_service: parseInt(env.PAYMENT_SERVICE) || defaultConfig.payment_service,
       webhook_service: parseInt(env.WEBHOOK_SERVICE) || defaultConfig.webhook_service,
-      utilityServices: parseInt(env.UTILITY_SERVICE) || defaultConfig.utilityServices
+      utilityService: parseInt(env.UTILITY_SERVICE) || defaultConfig.utilityService
     };
   }
 
