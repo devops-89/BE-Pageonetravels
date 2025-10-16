@@ -53,8 +53,8 @@ export class HotelTBOAPIService {
   async fetchCountryList(countryListURL: string): Promise<any> {
     try {
      
-      const username = "TBOStaticAPITest";
-      const password = "Tbo@11530818";
+      const username = "travelcategory";
+      const password = "Tra@59334536";
   
       const credentials = Buffer.from(`${username}:${password}`).toString('base64');
       const headers = {
@@ -75,8 +75,8 @@ export class HotelTBOAPIService {
   
   async fetchCityList(cityListURL: string, countryCodes: any): Promise<any> {
   try {
-    const username = "TBOStaticAPITest";
-    const password = "Tbo@11530818";
+    const username = "travelcategory";
+    const password = "Tra@59334536";
 
     const credentials = Buffer.from(`${username}:${password}`).toString('base64');
     const headers = {
@@ -135,7 +135,7 @@ export class HotelTBOAPIService {
         "Language": body.Language 
       }
       
-        const hotel_details_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/Hoteldetails';
+        const hotel_details_base_url = 'https://apiwr.tboholidays.com/HotelAPI/Hoteldetails';
       const response = await this.httpPostAPICall(hotel_details_base_url, payload ,headers);
      
       return response;
@@ -150,8 +150,8 @@ export class HotelTBOAPIService {
   async fetchHotelDetails(cityListURL: string, hotel_city_code:number): Promise<any> {
     try {
      
-      const username = "TBOStaticAPITest";
-      const password = "Tbo@11530818";
+      const username = "travelcategory";
+      const password = "Tra@59334536";
   
       const credentials = Buffer.from(`${username}:${password}`).toString('base64');
      
@@ -205,8 +205,8 @@ export class HotelTBOAPIService {
 
  async fetchCityHotelDetails(baseurl: string, city_code: string): Promise<any> {
   try {
-    const username = "TBOStaticAPITest";
-    const password = "Tbo@11530818";
+    const username = "travelcategory";
+    const password = "Tra@59334536";
     const credentials = Buffer.from(`${username}:${password}`).toString("base64");
 
     const headers = {
@@ -338,8 +338,8 @@ export class HotelTBOAPIService {
 
   async handlePreBook(url: string, data: string) {
     try {
-      const username = "Pageone";
-      const password = "Pageone@1234";
+      const username = "DELP574";
+      const password = "Api@deL5-4@";
       const credentials = Buffer.from(`${username}:${password}`).toString('base64');
   
       const headers = {
@@ -356,7 +356,7 @@ export class HotelTBOAPIService {
       if (!response?.HotelResult?.[0]?.HotelCode) {
         throw { message: "Invalid hotel response structure - missing HotelCode.", statusCode: ERROR_CODES.BAD_REQUEST };
       }
-      const hotel_details_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/Hoteldetails';
+      const hotel_details_base_url = 'https://apiwr.tboholidays.com/HotelAPI/Hoteldetails';
       const hotel_details = await this.fetchHotelDetails(
         hotel_details_base_url, 
         response.HotelResult[0].HotelCode
@@ -386,8 +386,8 @@ export class HotelTBOAPIService {
 
   async hotelBook(url:string,data:any){
     try{
-      const username = "Pageone";
-      const password = "Pageone@1234";
+      const username = "DELP574";
+      const password = "Api@deL5-4@";
       const credentials = Buffer.from(`${username}:${password}`).toString('base64');
   
       const headers = {
@@ -407,8 +407,8 @@ export class HotelTBOAPIService {
 
   async hotelBookingDetails(url:string,data:any){
     try{
-      const username = "Pageone";
-      const password = "Pageone@1234";
+      const username = "DELP574";
+      const password = "Api@deL5-4@";
       const credentials = Buffer.from(`${username}:${password}`).toString('base64');
   
       const headers = {
@@ -446,7 +446,7 @@ async sendChangeRequest(
     console.log("New cancellation payload:",payload);
 
     const url =
-      'https://HotelBE.tektravels.com/hotelservice.svc/rest/SendChangeRequest';
+      'https://hotelbooking.travelboutiqueonline.com/HotelAPI_V10/HotelService.svc/rest/SendChangeRequest';
 
     // const response = await this.httpPostAPICall(url, payload, { headers });
     const response=await axios.post(url,payload);

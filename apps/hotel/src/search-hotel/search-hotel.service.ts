@@ -57,7 +57,7 @@ export class SearchHotelService {
 
             const countryCodes = await this.hotelCountryRepositoryService.getCountryCode();
 
-            const city_search_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/CityList';
+            const city_search_base_url = 'https://apiwr.tboholidays.com/HotelAPI/CityList';
 
             const city_list = await this.hotelTBOAPIService.fetchCityList(city_search_base_url, countryCodes);
 
@@ -92,7 +92,7 @@ export class SearchHotelService {
 
             const hotelDetailsList = [];
             for (const city of code_list.HotelCodes) {
-                const hotel_details_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/Hoteldetails';
+                const hotel_details_base_url = 'https://apiwr.tboholidays.com/HotelAPI/Hoteldetails';
                 const hotel_details = await this.hotelTBOAPIService.fetchHotelDetails(hotel_details_base_url, city);
                 console.log('>>>>>>>>>>> >>>> >', hotel_details);
                 hotelDetailsList.push(hotel_details);
@@ -109,7 +109,7 @@ export class SearchHotelService {
         try {
             const { city_code } = body;
 
-            const city_hotel_details = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/TBOHotelCodeList';
+            const city_hotel_details = 'https://apiwr.tboholidays.com/HotelAPI/TBOHotelCodeList';
 
             const hotel_details = await this.hotelTBOAPIService.fetchCityHotelDetails(city_hotel_details, city_code);
 
@@ -149,7 +149,7 @@ export class SearchHotelService {
         try {
             const allResponses = [];
 
-            const city_hotel_details_api = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/TBOHotelCodeList';
+            const city_hotel_details_api = 'https://apiwr.tboholidays.com/HotelAPI/TBOHotelCodeList';
             console.log('++++++++++++++++++++++++++++body payload:', body);
 
             // Get hotel list for the city
@@ -221,7 +221,7 @@ export class SearchHotelService {
 
     async preBook(body) {
         try {
-            const hotel_prebook_url = 'https://affiliate.tektravels.com/HotelAPI/PreBook';
+            const hotel_prebook_url = 'https://affiliate.travelboutiqueonline.com/HotelAPI/PreBook';
             const data = body.BookingCode;
             const response = await this.hotelTBOAPIService.handlePreBook(hotel_prebook_url, data);
             return { message: 'Hotel Pre Book fetched successfully', data: response };
@@ -292,7 +292,7 @@ export class SearchHotelService {
             console.log('💾 Order Saved:', savedOrder);
 
             // 2. Call TBO Booking API
-            const url = 'https://HotelBE.tektravels.com/hotelservice.svc/rest/book/';
+            const url = 'https://hotelbooking.travelboutiqueonline.com/HotelAPI_V10/HotelService.svc/rest/Book';
             const tboBookingResponse = await this.hotelTBOAPIService.hotelBook(url, body); //  actual booking API call
 
             // 3. Return the response from TBO
@@ -305,7 +305,7 @@ export class SearchHotelService {
 
     async bookingDetails(orderId: string, ip: string) {
         try {
-            const url = 'https://hotelbe.tektravels.com/hotelservice.svc/rest/Getbookingdetail';
+            const url = 'https://hotelbooking.travelboutiqueonline.com/HotelAPI_V10/HotelService.svc/rest/Getbookingdetail';
 
             // Fetch order details
             const orderDetails = await this.orderRepository.find(orderId);
@@ -366,8 +366,8 @@ export class SearchHotelService {
 
     async fetchHotelData(payload) {
         try {
-            const username = 'Pageone';
-            const password = 'Pageone@1234';
+            const username = 'DELP574';
+            const password = 'Api@deL5-4@';
             const credentials = Buffer.from(`${username}:${password}`).toString('base64');
 
             const headers = {
@@ -376,7 +376,7 @@ export class SearchHotelService {
             };
 
             // const baseURL = "https://affiliate.tektravels.com/HotelAPI/Search";
-            const baseURL = 'https://affiliate.tektravels.com/HotelAPI/Search';
+            const baseURL = 'https://affiliate.travelboutiqueonline.com/HotelAPI/Search';
 
             const config = { headers };
             const result = await axios.post(baseURL, payload, config);
@@ -450,7 +450,7 @@ export class SearchHotelService {
             ChangeRequestId,
         };
 
-        const url = 'https://HotelBE.tektravels.com/hotelservice.svc/rest/GetChangeRequestStatus';
+        const url = 'https://hotelbooking.travelboutiqueonline.com/HotelAPI_V10/HotelService.svc/rest/GetChangeRequest';
         const response = await axios.post(url, payload);
         const result = response.data?.HotelChangeRequestStatusResult;
 
@@ -487,7 +487,7 @@ export class SearchHotelService {
     // syncing services
 
     async syncCountryData() {
-        const country_search_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/CountryList';
+        const country_search_base_url = 'https://apiwr.tboholidays.com/HotelAPI/CountryList';
         const country_list = await this.hotelTBOAPIService.fetchCountryList(country_search_base_url);
         if (country_list.Status.Code === 200) {
             await this.hotelCountryRepositoryService.createCountry(country_list.CountryList);
@@ -497,7 +497,7 @@ export class SearchHotelService {
 
     async syncCityData() {
         const countryCodes = await this.hotelCountryRepositoryService.getCountryCode();
-        const city_search_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/CityList';
+        const city_search_base_url = 'https://apiwr.tboholidays.com/HotelAPI/CityList';
 
         // Helper to remove duplicate city codes
         const removeDuplicateCities = (cities: any[]) => {
@@ -563,7 +563,7 @@ export class SearchHotelService {
                     return;
                 }
 
-                const hotelCodeListUrl = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/TBOHotelCodeList';
+                const hotelCodeListUrl = 'https://apiwr.tboholidays.com/HotelAPI/TBOHotelCodeList';
                 const maxRetries = 3;
 
                 for (let attempt = 1; attempt <= maxRetries; attempt++) {

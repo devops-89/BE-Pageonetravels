@@ -42,11 +42,11 @@ export class HotelService {
             const extraInfo=JSON.parse(order_request_second);
             console.log('payload: ', payload);
             const userDetails = await this.userRepositoryService.getUserByUserId(user);
-            let url = 'https://HotelBE.tektravels.com/hotelservice.svc/rest/book/';
+            let url = 'https://hotelbooking.travelboutiqueonline.com/HotelAPI_V10/HotelService.svc/rest/Book';
 
             // making the header
-            const username = 'Pageone';
-            const password = 'Pageone@1234';
+            const username = 'DELP574';
+            const password = 'Api@deL5-4@';
             const credentials = Buffer.from(`${username}:${password}`).toString('base64');
 
             const headers = {

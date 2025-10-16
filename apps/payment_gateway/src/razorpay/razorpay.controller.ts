@@ -114,11 +114,10 @@ export class RazorpayController {
                     module: 'hotel',
                     order_id: orderdetails.order_id,
                 },
-                callback_url: 'https://page1-fe.vercel.app/payment/hotel/status',
+                callback_url: 'https://page1travels.com/payment/hotel/status',
             });
 
-            // https://page1-fe.vercel.app/payment/hotel/status
-
+         
             // save payment record to payment table
            ;
             console.log('Order Details by custom order id: ', orderdetails);
