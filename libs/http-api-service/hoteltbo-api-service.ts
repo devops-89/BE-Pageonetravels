@@ -120,8 +120,8 @@ export class HotelTBOAPIService {
 
   async fetchClientHotelDetails(body:HotelDetailDto){
     try{
-        const username = "TBOStaticAPITest";
-        const password = "Tbo@11530818";
+        const username = "travelcategory";
+        const password = "Tra@59334536";
   
       const credentials = Buffer.from(`${username}:${password}`).toString('base64');
      
