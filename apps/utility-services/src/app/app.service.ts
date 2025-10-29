@@ -12,13 +12,13 @@ export class AppService {
     async createAEnquiry(body) {
         try { 
            await this.enquiryRepositoryService.createEnquiry(body);
-           console.log("body header:",body.enquiry_description.email);
+          
            if(body.enquiry_description.email){
              const subject = 'Enquiry Received';
         
          const enquiryEmailHTML = buildEnquiryTemplate(body.enquiry_type, body.enquiry_description);
         await this.emailService.sendEmail(body.enquiry_description.email, subject, enquiryEmailHTML);
-        console.log("Enquiry Send Successfully.");
+       
            }
            
            
