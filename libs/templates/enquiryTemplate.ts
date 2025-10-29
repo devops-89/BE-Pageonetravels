@@ -1,4 +1,4 @@
-import { EnquiryType } from "//database";
+import { EnquiryType } from "../database/src/entities/enquiry.entity";
 import { LOGO } from "../constants/commonConstants"; 
 
 function wrapWithLayout(content: string, title: string): string {
