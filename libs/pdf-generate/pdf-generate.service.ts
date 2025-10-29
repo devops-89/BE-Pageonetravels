@@ -1,69 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
-// import * as html_to_pdf from 'html-pdf-node';
-import * as html_pdf from 'html-pdf';
+// Use require for wkhtmltopdf, not import
+const wkhtmltopdf = require('wkhtmltopdf');
 
 @Injectable()
-export class PDFGenerateService 
-{
- 
-    generateHTMLToPDF(htmlContent: string):Promise<Buffer> {
-        return new Promise(async(resolve, reject)=>{
-            try {
-                
-                const options = {
-                    format: 'A4',
-                    orientation: 'portrait',
-                    // border: {
-                    //     top: '1cm',
-                    //     right: '2cm',
-                    //     bottom: '1cm',
-                    //     left: '2cm',
-                    // },
-                    type: 'pdf',
-                    childProcessOptions: {
-                        detached: true,
-                    },
-                };
-                html_pdf.create(htmlContent, options).toBuffer((err: Error, buffer: Buffer) => {
-                    if (err) {
-                        console.log('Error html to pdf', err);
-                        reject(err);
-                    }
-                    resolve(buffer);
-                    return;
-                });
-                
-                // html_to_pdf.generatePdf({ content: htmlContent }, { format: 'A4' }, (err: Error, buffer: Buffer) => 
-                // {
-                //     if (err) {
-                //         console.log("Error html to pdf", err)
-                //         reject(err)};
-
-                //     console.log('PDF generated successfully', buffer);
-
-                //     resolve(buffer);
-                //     return;
-                // }); 
-             }
-             catch (error) {
-                 console.log("Error while generating html to pdf", error)
-                 resolve(null);
-             }
-        })
-     
-    }
-
-    async readPDFFile(orderId: any) {
-        const filePath = `./Invoice/${orderId}.pdf`;
-        return new Promise((resolve, reject) => {
-            fs.readFile(filePath, (err, data) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(data);
-                }
-            });
+export class PDFGenerateService {
+  generateHTMLToPDF(htmlContent: string): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+      try {
+        const chunks: any[] = [];
+        const stream = wkhtmltopdf(htmlContent, {
+          pageSize: 'A4',
+          orientation: 'portrait',
+          marginTop: '10mm',
+          marginBottom: '10mm',
+          marginLeft: '10mm',
+          marginRight: '10mm',
+          printMediaType: true,
         });
-    };
+
+        stream.on('data', (chunk) => chunks.push(chunk));
+        stream.on('end', () => resolve(Buffer.concat(chunks)));
+        stream.on('error', (err) => {
+          console.error('wkhtmltopdf error:', err);
+          reject(err);
+        });
+      } catch (error) {
+        console.error('Error while generating PDF:', error);
+        reject(error);
+      }
+    });
+  }
+
+  async readPDFFile(orderId: string) {
+    const filePath = `./Invoice/${orderId}.pdf`;
+    return new Promise((resolve, reject) => {
+      fs.readFile(filePath, (err, data) => {
+        if (err) reject(err);
+        else resolve(data);
+      });
+    });
+  }
 }
