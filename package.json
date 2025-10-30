@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build:all": "npx nx run-many --target build --all",
+    "build:all": "npx nx run-many --target build --all --parallel=1",
     "build": "npx nx build",
     "start": "npx nx serve",
     "clear-cache": "npx nx reset clear-cache"

@@ -44,24 +44,24 @@ export class FlightdetailController {
     }
 
     // get Agency Balance
-    //  @Post('get-agency-balance')
-    // async getAgencyBalance(
-    //     @Body() body: {
-    //         ClientId: string;
-    //         TokenAgencyId: string;
-    //         TokenMemberId: string;
-    //         EndUserIp: string;
-    //         TokenId: string;
-    //     },
-    //     @Res() res: Response
-    // ) {
-    //     try {
-    //         const result = await this.flightdetailservice.getAgencyBalance(body);
-    //         return this.responseHandler.sendSuccessResponse(res, result);
-    //     } catch (error) {
-    //         return this.responseHandler.sendErrorResponse(res, error);
-    //     }
-    // }
+     @Post('get-agency-balance')
+    async getAgencyBalance(
+        @Body() body: {
+            ClientId: string;
+            TokenAgencyId: string;
+            TokenMemberId: string;
+            EndUserIp: string;
+            TokenId: string;
+        },
+        @Res() res: Response
+    ) {
+        try {
+            const result = await this.flightdetailservice.getAgencyBalance(body);
+            return this.responseHandler.sendSuccessResponse(res, result);
+        } catch (error) {
+            return this.responseHandler.sendErrorResponse(res, error);
+        }
+    }
 
     // this is not userful
     @Post('/fetch_seat_meal_baggage_details')
@@ -123,7 +123,7 @@ export class FlightdetailController {
         const payload = {
             EndUserIp: ip,
             TokenId: token,
-            TraceId: orderDetails.trace_id, 
+            TraceId: orderDetails.trace_id,
         };
 
         const tbo_credentials = await this.tboConfigService.getTBOCredentials();

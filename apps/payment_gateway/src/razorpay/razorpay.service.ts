@@ -61,7 +61,7 @@ export class RazorpayService {
                     module: 'flight',
                     order_id: orderdetails.order_id,
                 },
-                callback_url: 'https://uat.page1travels.com/payment/flight/status',
+                callback_url: 'https://dev.page1travels.com/payment/flight/status',
             };
 // https://page1-fe.vercel.app/payment/flight/status
             const data = await this.razorpayPaymentService.createPaymentLink(paymentInput);
@@ -135,7 +135,7 @@ const bookingData: Partial<PackageBooking> = {
     reference_id: booking.id.trim(),
     customer: { email },
     notes: { module: 'package', order_id: booking.id },
-    callback_url: 'https://uat.page1travels.com/payment/success',
+    callback_url: 'https://dev.page1travels.com/payment/success',
   };
 
   const paymentLink = await this.razorpayPaymentService.createPaymentLink(paymentInput);

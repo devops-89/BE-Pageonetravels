@@ -11,7 +11,7 @@ import { Order, Payment, User } from '../../../../libs/database/src/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PAYMENT_STATUS } from '../../../../libs/constants/bookingContant';
 import { RazorpayService as RazorpayPaymentService } from '../../../../libs/paymentgateway/razorpay.service';
-import {CreatePackageBookingDto} from "../../../../libs/dtos/package/package-booking.dto";
+import { CreatePackageBookingDto } from '../../../../libs/dtos/package/package-booking.dto';
 import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 
 @Controller('razorpay')
@@ -24,7 +24,7 @@ export class RazorpayController {
         private readonly razorpayPaymentService: RazorpayPaymentService,
         @InjectRepository(Payment)
         private readonly paymentRepository: Repository<Payment>,
-         private readonly rediscacheservice: RedisCacheService
+        private readonly rediscacheservice: RedisCacheService
     ) {}
 
     @Post('/payment-init')
@@ -32,29 +32,26 @@ export class RazorpayController {
     async ticketLCC(@Body() body: LccTicketDto, @Req() req: Request, @Res() res: Response) {
         try {
             const payload = req['userPayload'];
-            const { reference_id} = payload;
+            const { reference_id } = payload;
 
-            const {traceId}=body;
+            const { traceId } = body;
 
             // check session is valid or not using TraceId start
 
-                if (!traceId) {
-    return this.responsehandlderservice.sendErrorResponse(res, { message: 'TraceId is required', statusCode: 400 });
-}
+            if (!traceId) {
+                return this.responsehandlderservice.sendErrorResponse(res, { message: 'TraceId is required', statusCode: 400 });
+            }
 
-        // Check in Redis
-        const traceData = await this.rediscacheservice.getCache(`trace:${traceId}`);
+            // Check in Redis
+            const traceData = await this.rediscacheservice.getCache(`trace:${traceId}`);
 
-    if (!traceData) {
-    return this.responsehandlderservice.sendErrorResponse(res, { message: 'Session expired', statusCode: 440 }); 
-}
+            if (!traceData) {
+                return this.responsehandlderservice.sendErrorResponse(res, { message: 'Session expired', statusCode: 440 });
+            }
 
-       
-        // check session is valid or not using TraceId end
-
+            // check session is valid or not using TraceId end
 
             const refData = await this.userRepositoryService.getUserByUserId(reference_id);
-
             if (!refData) {
                 throw `An error occurred while fetching the user. Please try again later.`;
             }
@@ -75,8 +72,8 @@ export class RazorpayController {
             const { extraInfo, ...restOfBookingData } = body;
 
             const cleanedBody = { ...restOfBookingData };
-            console.log("extraInfo", extraInfo);
-            console.log("cleanedBody:",cleanedBody);
+            console.log('extraInfo', extraInfo);
+            console.log('cleanedBody:', cleanedBody);
 
             const payload = req['userPayload'];
             const { reference_id } = payload;
@@ -97,9 +94,9 @@ export class RazorpayController {
             // extract the custom order id from the orderReaponse
             const custom_order_id = orderResponse.custom_order_id;
 
-             const orderdetails = await this.orderRepositoryService.findOne(custom_order_id)
+            const orderdetails = await this.orderRepositoryService.findOne(custom_order_id);
 
-            console.log("==============orderId not getting: ===================",orderdetails.order_id);
+            console.log('==============orderId not getting: ===================', orderdetails.order_id);
 
             // create Razorpay Payment Link
             const paymentLink = await this.razorpayPaymentService.createPaymentLink({
@@ -114,13 +111,12 @@ export class RazorpayController {
                     module: 'hotel',
                     order_id: orderdetails.order_id,
                 },
-                callback_url: 'https://uat.page1travels.com/payment/hotel/status',
+                callback_url: 'https://dev.page1travels.com/payment/hotel/status',
             });
 
             // https://page1-fe.vercel.app/payment/hotel/status
 
             // save payment record to payment table
-           ;
             console.log('Order Details by custom order id: ', orderdetails);
             const user = reference_id;
 
@@ -156,31 +152,28 @@ export class RazorpayController {
         }
     }
 
-    @Post("package-payment-init")
+    @Post('package-payment-init')
     @UseGuards(TokenValidationGuard)
-    async packagePaymentInit(@Body() body:CreatePackageBookingDto,@Req() req:Request,@Res() res:Response){
-          try {
+    async packagePaymentInit(@Body() body: CreatePackageBookingDto, @Req() req: Request, @Res() res: Response) {
+        try {
             const payload = req['userPayload'];
             const { reference_id } = payload;
             const refData = await this.userRepositoryService.getUserByUserId(reference_id);
-            
 
             if (!refData) {
                 throw `An error occurred while fetching the user. Please try again later.`;
             }
-            console.log("Payload coming for the razorpay: ",body);
+            console.log('Payload coming for the razorpay: ', body);
             const email = refData.email;
-            const result = await this.razorpayService.createPackageOrder(reference_id,body ,email);  
-           return this.responsehandlderservice.sendSuccessResponse(res, {
+            const result = await this.razorpayService.createPackageOrder(reference_id, body, email);
+            return this.responsehandlderservice.sendSuccessResponse(res, {
                 message: 'Package Booking Initialized. Proceed to payment.',
-                data:result
-                
+                data: result,
             });
         } catch (error) {
             console.log(error);
             return this.responsehandlderservice.sendErrorResponse(res, error);
         }
-
     }
 
     @Get('/payment/verify')
