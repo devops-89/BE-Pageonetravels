@@ -10,18 +10,18 @@ export class AppService {
     ){}
 
     async createAEnquiry(body) {
-        try { 
+        try {
            await this.enquiryRepositoryService.createEnquiry(body);
-          
+
            if(body.enquiry_description.email){
              const subject = 'Enquiry Received';
-        
+        console.log("Email Sending");
          const enquiryEmailHTML = buildEnquiryTemplate(body.enquiry_type, body.enquiry_description);
         await this.emailService.sendEmail(body.enquiry_description.email, subject, enquiryEmailHTML);
-       
+
            }
-           
-           
+
+
         } catch (error) {
             console.log("Error in creating enquiry", error)
             throw new BadGatewayException("Error in creating enquiry");
@@ -29,9 +29,9 @@ export class AppService {
     }
 
     async getEnquiry(enquiryType){
-        try{   
+        try{
             const response = await this.enquiryRepositoryService.getEnquiry(enquiryType);
-            return { message :"Successfully Fetch Data", data : response }; 
+            return { message :"Successfully Fetch Data", data : response };
         }catch(error){
             console.log(error);
             throw error;
