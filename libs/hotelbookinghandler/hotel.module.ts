@@ -31,5 +31,5 @@ import {S3Module} from "../../libs/S3-Service/s3.module";
     EmailService
     ]
 })
-export class FlightModule { }
+export class HotelModule { }
 

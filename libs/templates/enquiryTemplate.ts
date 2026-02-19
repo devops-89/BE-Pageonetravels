@@ -11,7 +11,7 @@ function wrapWithLayout(content: string, title: string): string {
 <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; overflow:hidden; box-shadow:0px 2px 10px rgba(0,0,0,0.1);">
 <tr>
 <td align="center" style="background:#f8f8f8; padding:18px;">
-  <img src="${LOGO}" alt="Company Logo" style="max-height: 50px; margin-bottom: 5px;" />
+  <img src="../images/img.png" alt="Company Logo" style="max-height: 50px; margin-bottom: 5px;" />
 </td>
 </tr>
 </table>

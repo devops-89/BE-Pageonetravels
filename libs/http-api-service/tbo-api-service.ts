@@ -28,7 +28,7 @@ export class HTTPSTboAPIService {
         }
     }
 
-    
+
 
     async searchFlightAPI(
         token: any,
@@ -36,10 +36,10 @@ export class HTTPSTboAPIService {
         base_ip: string,
         body: ISearchFlight
     ) {
-        try {  
+        try {
             const {
-                min_price,
-                max_price,
+                // min_price,
+                // max_price,
                 multicity = [],
                 return_date,
                 preferred_time,
@@ -57,7 +57,7 @@ export class HTTPSTboAPIService {
 
 
             const segments = await this.generateSegments({ journey_type, origin, destination, departure_date, return_date, multicity, cabin_class, preferred_time });
-            
+
             const payload: IFlightSearch = {
                 EndUserIp: base_ip,
                 TokenId: token,
@@ -69,12 +69,12 @@ export class HTTPSTboAPIService {
                 OneStopFlight: one_stop_flight,
                 PreferredAirlines: null,
                 Segments: segments,
-                Sources: null,
-                MinPrice: min_price,
-                MaxPrice: max_price,
+                "Sources": null
+                // MinPrice: min_price,
+                // MaxPrice: max_price,
             };
             console.log("Payload in searchFlightAPI", payload);
-            
+
 
             const response = await this.httpAPICall(base_url, payload)
             return response;
@@ -82,13 +82,13 @@ export class HTTPSTboAPIService {
         } catch (error) {
             // Enhanced error handling
             console.error("Error in searchFlightAPI function:", error);
-            
+
             if (typeof error === "string") {
                 throw { message: error, statusCode: 400 };
             } else if (error.message) {
                 throw { message: error.message, statusCode: 500 };
             }
-    
+
             throw { message: "An unknown error occurred.", statusCode: 500 };
         }
     }
@@ -156,7 +156,7 @@ export class HTTPSTboAPIService {
 
     async ssr(base_url_ssr: string, payload:IFareRule){
         try {
-            
+
             let result = await this.httpAPICall(base_url_ssr, payload);
             return result;
         } catch (error) {
@@ -173,11 +173,11 @@ export class HTTPSTboAPIService {
             throw error
         }
     }
-    
+
     async flightBooking(baseURL: string, payload: object) {
         try {
             let result = await this.httpAPICall(baseURL, payload);
-            if (result && result.Response && result.Response.Error && result.Response.Error.ErrorMessage) { 
+            if (result && result.Response && result.Response.Error && result.Response.Error.ErrorMessage) {
                 throw { message: result.Response.Error.ErrorMessage, statusCode: ERROR_CODES.BAD_REQUEST };
             }
 
@@ -198,14 +198,14 @@ export class HTTPSTboAPIService {
     async flightFormat(response: any) {
         try {
             // Check if the response contains an error message
-            
+
             if (response && response.Response && response.Response.Error && response.Response.Error.ErrorMessage) {
                 throw { message: response.Response.Error.ErrorMessage, statusCode: ERROR_CODES.BAD_REQUEST };
             }
-            
+
             // Remove the 'Error' object from the response
             if (response && response.Response && response.Response.Error) {
-                
+
                 let data  = response.Response;
                 delete data.Error;
 
@@ -215,7 +215,7 @@ export class HTTPSTboAPIService {
                 }
                 response = data;
             }
-    
+
             return response;
         } catch (error) {
             console.log("error >", error);
@@ -225,9 +225,9 @@ export class HTTPSTboAPIService {
 
     async flightBookingTicket(base_url: string, payload: any) {
         try {
-            
+
             let result = await this.httpAPICall(base_url, payload);
-            if (result && result.Response && result.Response.Error && result.Response.Error.ErrorMessage) { 
+            if (result && result.Response && result.Response.Error && result.Response.Error.ErrorMessage) {
                 throw { message: result.Response.Error.ErrorMessage, statusCode: ERROR_CODES.BAD_REQUEST };
             }
 
@@ -237,14 +237,14 @@ export class HTTPSTboAPIService {
                 delete data.Error;
                 result = data;
             }
-            
+
             return result;
         } catch (error) {
             console.error("After Booking getting error of ticket:", error.message);
             throw error;
         }
     }
-    
+
 
     async BookingFlightForNonLCC(baseurl: string, body: any) {
         try {
@@ -312,7 +312,7 @@ export class HTTPSTboAPIService {
     async BookingFlightForLCC(baseurl: string, body: any) {
         try {
             const { result_index, ip_address, token, trace_id, Passengerss, agent_number } = body;
-            
+
 
             const payload =
             {
@@ -325,7 +325,7 @@ export class HTTPSTboAPIService {
                 "ResultIndex": result_index,
 
             }
-           
+
 
             const result = await this.httpAPICall(baseurl, payload);
 
@@ -360,7 +360,17 @@ export class HTTPSTboAPIService {
         }
     }
 
-    async sendChangeRequest(baseURL: string, payload: SendChangeRequestDto): Promise<SendChangeRequestResponse> {
+    async sendChangeRequest(baseURL: string, payload:{
+        EndUserIp: string;          // Mandatory
+        TokenId: string;            // Mandatory
+        BookingId: number;          // Mandatory
+        RequestType: number; // Mandatory
+        /**  NotSet = 0, FullCancellation = 1, PartialCancellation = 2, Reissuance = 3 */
+        CancellationType: number;
+        /** NotSet = 0, NoShow = 1 , FlightCancelled = 2, Others = 3 */
+        TicketId?: string;           // Mandatory in case of partial cancellation (comma-separated TicketIds)
+        Remarks: string;            // Mandatory
+    }): Promise<SendChangeRequestResponse> {
         try {
             const result = await this.httpAPICall(baseURL, payload);
             return result;

@@ -69,7 +69,7 @@ export class AuthService {
             }
 
 
-            if (otpReq.otp_type === OTP_TYPE.REGISTER_OTP) {   
+            if (otpReq.otp_type === OTP_TYPE.REGISTER_OTP) {
                 const userStatus: UserI.UpdateUserStatus = {
                     id: otpReq.user,
                     status: USER_ACCOUNT_STATUS.ACTIVE,
@@ -92,7 +92,7 @@ export class AuthService {
                 } else {
                     userStatus.is_phone_verified = true;
                 }
-        
+
                 await this.UserModel.addOrUpdateUser(userStatus);
             }
 
@@ -137,7 +137,7 @@ export class AuthService {
                 identity = identity.toLowerCase()
                 const emailResult = await this.loginWithEmail({ email: identity, user_type });
                 return emailResult;
-            } 
+            }
             // else {
             //     if (country_code && validPhoneNo(`${country_code}${identity}`)) {
             //         const phoneResult = await this.loginWithPhone({ country_code, phone_number: identity, user_type });
@@ -231,9 +231,9 @@ export class AuthService {
             const { email, user_type } = input;
             let user_id: string;
             let otp_type = OTP_TYPE.LOGIN_OTP;
-            
+
             const user = await this.UserModel.getUnverifiedUserByEmail(email);
-            
+
             if ((user && user.verify_status== USER_VERIFY_STATUS.UNVERIFIED) || !user) {
                 //const permission = await this.PermissionModel.getPermissionByRoleName({ group });
                 // const permissionObj: UserI.PermissionObj = {}
@@ -283,9 +283,9 @@ export class AuthService {
             const otpId = await this.OtpVerificationModel.addOtpVerificationRequest(otpObj);
 
             // send email
-            
+
             const otpEmail = otpVerificationTemplate(OTP);
-            
+
             await this.EmailService.sendEmail(email, 'Your OTP Code', otpEmail.html);
 
             return { message: `${OTP_VERIFY_MSG.OTP_SEND} ${email}`, data: { reference_id: otpId, OTP } };
@@ -298,8 +298,8 @@ export class AuthService {
 
     async guestLogin(): Promise<ApiResponse.ApiOK> {
         try {
-           
-        
+
+
             const access_token = await this.jwtService.generateJWTNeverExpToken({
                 token_type: TOKEN_TYPE.GUEST_LOGIN
             });
@@ -311,7 +311,7 @@ export class AuthService {
         }
     }
 
-    
+
     async  registerWithEmailPassword(input: RegisterDto): Promise<ApiResponse.ApiOK> {
         try {
             input.email = input.email.toLowerCase();
@@ -343,9 +343,10 @@ export class AuthService {
                     phone_number:phone_number,
                     country_code:country_code,
                     id: (user && user.verify_status == USER_VERIFY_STATUS.UNVERIFIED) ? user.id:undefined,
-                   
+
                 } as UserI.AddOrUpdateUser
                 let insertedId = await this.UserModel.addOrUpdateUser(userObj);
+                console.log("inderted Id: ",insertedId);
                 if (!insertedId) {
                     throw { message: COMMON_MSG.INVALID_REQUEST, statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
                 }
@@ -373,7 +374,7 @@ export class AuthService {
                 };
 
                 const otpId = await this.OtpVerificationModel.addOtpVerificationRequest(otpObj);
-                
+
                 const emailTemplate = otpVerificationTemplate(OTP);
                 await this.EmailService.sendEmail(email, 'Email Verification', emailTemplate.html);
 
@@ -389,16 +390,16 @@ export class AuthService {
         try {
             input.identity = input.identity.toLowerCase()
             const { identity, password, country_code } = input;
-            
+
             if (validateEmail(identity)) {
-                
+
                 const user = await this.UserModel.getUserByEmail(identity);
                 if (!user) {
                 throw {  message: LOGIN_MSG.INVALID_EMAIL_PASSWORD,  statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER  };
                 }
-                
+
                 return await this.loginWithPasswordHandler(user, identity, password, LOGIN_BY.EMAIL);
-    
+
             } else {
                 if ((identity && !country_code) || (country_code && !identity)) {
                     throw {
@@ -406,16 +407,16 @@ export class AuthService {
                         message: COMMON_MSG.PHONE_WTH_COUNTRY_CODE
                     };
                 }
-    
+
                 const user = await this.UserModel.getUserByPhoneNo(identity);
-    
+
                 if (!user) {
                     throw {
                         message: LOGIN_MSG.INVALID_PHONE_PASSWORD,
                         statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER
                     };
                 }
-    
+
                 return await this.loginWithPasswordHandler(user, identity, password, LOGIN_BY.PHONE);
             }
         } catch (error) {
@@ -424,44 +425,44 @@ export class AuthService {
         }
     }
 
-    async loginWithPasswordHandler(   
+    async loginWithPasswordHandler(
         user: User,
         identity: string,
         password: string,
         loginBy: LOGIN_BY
     ): Promise<ApiResponse.ApiOK> {
         try {
-           
+
             if(![USER_TYPE.USER, USER_TYPE.HOTEL, USER_TYPE.ADMIN].includes(user.user_type)) {
-                throw {  
-                    message: "You are not authorized to access the website.", 
-                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
+                throw {
+                    message: "You are not authorized to access the website.",
+                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER
                 };
             }
 
-            
+
             if (user.status === USER_ACCOUNT_STATUS.BLOCKED) {
-                throw { 
+                throw {
                     message: COMMON_MSG.BLOCKED_USER,
-                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
+                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER
                 };
             }
 
             if (user.status != USER_ACCOUNT_STATUS.ACTIVE) {
-                throw { 
-                    message: LOGIN_MSG.INACTIVE_ACCOUNT, 
-                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
+                throw {
+                    message: LOGIN_MSG.INACTIVE_ACCOUNT,
+                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER
                 };
             }
 
-            
+
             const isPasswordCorrect = await checkPasswordHash(password, user.password);
-            
-            if (!isPasswordCorrect) { 
-                
-                throw { 
-                    message: LOGIN_MSG.INVALID_CREDENTIALS, 
-                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER 
+
+            if (!isPasswordCorrect) {
+
+                throw {
+                    message: LOGIN_MSG.INVALID_CREDENTIALS,
+                    statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER
                 };
             }
 
@@ -473,7 +474,7 @@ export class AuthService {
                 user_type: user.user_type
             };
             const { jwt_token, refresh_token } = await this.LoginService.getLoginToken(token_data);
-            
+
             const data = {
                 access_token: jwt_token,
                 refresh_token,
@@ -483,19 +484,19 @@ export class AuthService {
                 reference_id: user.id,
                 // phone_number:user.phone_number
             };
-    
-            return { 
-                message: LOGIN_MSG.LOGIN_SUCCESS, 
-                data 
+
+            return {
+                message: LOGIN_MSG.LOGIN_SUCCESS,
+                data
             };
-            
+
         } catch (error) {
             console.error("Error in loginWithPasswordHandler:", error);
             throw error;
         }
     }
 
-    
+
     async renewAccessToken(input: UserI.RenewAccessToken): Promise<ApiResponse.ApiOK> {
         try {
             const { access_token, refresh_token } = input;
@@ -525,10 +526,10 @@ export class AuthService {
                     };
                 }
 
-                
+
                 const session = await this.LoginSessionModel.getLoginSessionByRefreshToken(refresh_token, expPayload.session_id);
                 if (session && session.loginStatus === SESSION_STATUS.LOGGED_IN) {
-                    
+
                     if (refresh_token !== session.refresh_token || session.refreshTokenExpiry < Date.now()) {
                         throw {
                             message: "Login session expired, Please login again",
@@ -579,13 +580,13 @@ export class AuthService {
                 throw { statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: "No such user found" };
             }
 
-        
+
             const isPasswordCorrect = await checkPasswordHash(old_password, user.password);
             if (!isPasswordCorrect) {
                 throw { message: "Old password is incorrect", statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER };
             }
 
-           
+
             const password_hash = await generatePasswordHash(new_password);
             await this.UserModel.updateProfile({ user_id: user.id, password: password_hash });
 
@@ -597,7 +598,7 @@ export class AuthService {
             };
             const { jwt_token, refresh_token } = await this.LoginService.getLoginToken(token_data);
 
-           
+
             return {
                 message: `Password updated successfully...`,
                 data: {
@@ -613,7 +614,7 @@ export class AuthService {
         }
     }
 
-    
+
 
     async forgotPasswordRequest(input: ForgotPasswardI.ForgotPasswardReq): Promise<ApiResponse.ApiOK> {
         const { email } = input;
@@ -649,7 +650,7 @@ export class AuthService {
         };
 
         const otpId = await this.OtpVerificationModel.addOtpVerificationRequest(otpObj);
-        const resetTemplate = resetPassword(OTP, user.full_name);  
+        const resetTemplate = resetPassword(OTP, user.full_name);
         await this.EmailService.sendEmail(lowercasedEmail, 'Reset Password', resetTemplate.html);
 
         return { message: 'OTP has been sent to your registered email', data: { reference_id: otpId } };
@@ -684,25 +685,25 @@ export class AuthService {
     async adminLoginDetails(device_type: string, input: AdminLoginDto): Promise<ApiResponse.ApiOK> {
         try {
           const { email, password, user_type } = input;
-      
+
           // Validate user_type if provided. Only allow admins to log in
           if (user_type !== USER_TYPE.ADMIN) {
             throw { statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: "Invalid user type, only admins can login" };
           }
-      
+
           // Convert email to lowercase for consistency
           const checkIfEmailExist = await this.userRepositoryService.checkAdminEmail(email.toLowerCase());
-      
+
           if (!checkIfEmailExist) {
             throw { statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: "Admin email does not exist" };
           }
-      
+
           // Verify the password against the hashed password in the database
           const isPasswordCorrect = await checkPasswordHash(password, checkIfEmailExist.password);
           if (!isPasswordCorrect) {
             throw { statusCode: ERROR_CODES.ERROR_UNKNOWN_SHOW_TO_USER, message: LOGIN_MSG.INVALID_CREDENTIALS };
           }
-      
+
           // Generate tokens for login (you can modify as needed)
           const token_data = {
             loginBy: LOGIN_BY.EMAIL,
@@ -710,9 +711,9 @@ export class AuthService {
             user_id: checkIfEmailExist.id,
             user_type: checkIfEmailExist.user_type,
           };
-      
+
           const { jwt_token, refresh_token } = await this.LoginService.getLoginToken(token_data);
-      
+
           const data = {
             access_token: jwt_token,
             refresh_token,
@@ -721,16 +722,16 @@ export class AuthService {
             email: checkIfEmailExist.email,
             reference_id: checkIfEmailExist.id,
           };
-      
+
           return { message: LOGIN_MSG.LOGIN_SUCCESS, data };
         } catch (error) {
           console.error("Admin login error:", error);
           throw error;
         }
       }
-      
-  
-  
+
+
+
 //   async sendEmail(input:MailSendDto){
 //     try{
 //         const { email } = input;

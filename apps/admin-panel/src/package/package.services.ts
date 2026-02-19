@@ -121,9 +121,14 @@ export class PackageService {
     async addCategory(input: CreatePackageCategoryDto, file?) {
         try {
             if (file) {
-                const filePath = `categories/${Date.now()}-${file.originalname}`;
-                const s3Url = await this.s3FileService.s3FileUpload(file.buffer, filePath);
-                input.category_image = s3Url;
+                // this is for s3 setup
+                // const filePath = `categories/${Date.now()}-${file.originalname}`;
+                // const s3Url = await this.s3FileService.s3FileUpload(file.buffer, filePath);
+                // input.category_image = s3Url;
+
+              // this service is taking an array of files so we have to pass using array syntex for single file also
+              const url=await this.s3FileService.uploadImagesAndVideosToExternalAPI([file]);
+              input.category_image=url[0];
             }
             const result = await this.packageCategoryRepositoryService.insertCategory(input);
             return { message: `Package Category Created Successfully`, data: result };
@@ -199,7 +204,7 @@ export class PackageService {
 
     async addPkgDay(body: CreatePackageDayDto) {
         try {
-            const result = await this.packageDayRepositoryService.insetDay(body);
+            const result = await this.packageDayRepositoryService.insertDay(body);
             return { message: `Package Day's Created Successfully`, data: result };
         } catch (error) {
             console.log("Package Day's Error.", error);

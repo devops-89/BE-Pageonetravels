@@ -22,7 +22,7 @@ export class PackageRepositoryService {
 
     async insertPackage(body:any){
         try{
-           const checkPkgType  =  await this.packageDayRepositoryService.findDayExist(body.package_day);
+           const checkPkgType  =  await this.packageDayRepositoryService.findDayNightExist(body.package_days,body.package_nights);
            const checkCategory = await this.packageCategoryRepositoryService.findCategory(body.package_type);
           //  const fetchAmenites = await this.packageAmeniteRepositoryService.checkAmenite(body.amenities);
 
@@ -33,9 +33,9 @@ export class PackageRepositoryService {
                     package_name : body.package_name,
                     short_description:body.short_description,
                     description:body.description,
-                    main_image: body.main_image,                       
-                    gallery_image: body.gallery_image,  
-                    banner_image: body.banner_image,             
+                    main_image: body.main_image,
+                    gallery_image: body.gallery_image,
+                    banner_image: body.banner_image,
                     package_slug:body.package_slug,
                     package_day:body.package_day,
                     package_price:body.package_price,
@@ -107,13 +107,6 @@ export class PackageRepositoryService {
   }
 }
 
-
-
-
-
-
-
-
     async getPackageUpdate(id,body:any){
         try{
             const existingPackage = await this.pkgRepository.findOne({ where: { id: id }  });
@@ -141,7 +134,7 @@ export class PackageRepositoryService {
     }
 
 
-    
+
 
 }
 

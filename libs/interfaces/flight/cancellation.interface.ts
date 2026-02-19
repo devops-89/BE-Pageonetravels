@@ -35,9 +35,13 @@ export interface TicketCRInfo {
 export interface SendChangeRequestResponse {
     Response: {
         B2B2BStatus: boolean;
-        TicketCRInfo: TicketCRInfo[];
+        TicketCRInfo: any[];          // <-- set as any since structure isn't confirmed
         ResponseStatus: number;
         TraceId: string;
+        Error: {
+            ErrorCode: number;
+            ErrorMessage: string;
+        };
     };
 }
 export interface GetChangeRequestResponse {
@@ -75,4 +79,4 @@ export interface CancellationRequest {
     ticketIds?: number[];
     remarks?: string;
     userEmail?: string;
-} 
+}

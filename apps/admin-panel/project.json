@@ -16,7 +16,7 @@
                 "tsConfig": "apps/admin-panel/tsconfig.app.json",
                 "assets": ["apps/admin-panel/src/assets"],
                 "isolatedConfig": true,
-                "webpackConfig": "apps/admin-panel/webpack.config.js"
+                "webpackConfig": "apps/admin-panel/webpack.config.cjs"
             },
             "configurations": {
                 "development": {},

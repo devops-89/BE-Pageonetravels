@@ -57,10 +57,10 @@ export class PaginationDto {
 }
 
 export class UserFilterDto {
-  @IsOptional() 
+  @IsOptional()
   @IsEnum(USER_TYPE)
-  user_type: USER_TYPE; 
-  
+  user_type: USER_TYPE;
+
   @IsOptional()
   @IsString()
   search: string;
@@ -68,7 +68,7 @@ export class UserFilterDto {
   @IsOptional()
   @IsEnum(USER_ACCOUNT_STATUS)
   status: USER_ACCOUNT_STATUS;
-} 
+}
 
 export class notificationData {
 
@@ -104,7 +104,7 @@ export class VerifyDto {
   @IsString()
   reference_id: string;
 
-  
+
   @IsString()
   @IsOptional()
   device_type: DEVICE_TYPE
@@ -134,46 +134,49 @@ export class VerifyPhoneNoDto {
   otp: string;
 }
 
+
+
 export class UpdatePersonalDetailDto {
-  @IsOptional()
-  @IsString()
-  full_name: string;
+    @IsOptional()
+    @IsString()
+    full_name?: string;
 
-  @IsOptional()
-  @IsString()
-  password: string;
+    @IsOptional()
+    @IsString()
+    password?: string;
 
-  @IsOptional()
-  @IsEmail()
-  email: string;
+    @IsOptional()
+    @IsEmail()
+    email?: string;
 
-  @IsOptional()
-  @IsString()
-  phone_number: string;
+    @IsOptional()
+    @IsString()
+    phone_number?: string;
 
-  @IsOptional()
-  @IsString()
-  reference_id: string;
+    @IsOptional()
+    @IsString()
+    reference_id?: string;
 
-  @IsOptional()
-  @IsString()
-  country_code: string;
+    @IsOptional()
+    @IsString()
+    country_code?: string;
 
-  // @IsOptional()
-  // @IsString()
-  // countryName: string;
+    // @IsOptional()
+    // @IsString()
+    // countryName?: string;
 
-  @IsOptional()
-  @IsString()
-  zipCode: string;
+    @IsOptional()
+    @IsString()
+    zipCode?: string;
 
-  @IsOptional()
-  @IsString()
-  designation: string
+    @IsOptional()
+    @IsString()
+    designation?: string;
 
-  @IsOptional()
-  @IsNumber()
-  user_id: number
+    @IsOptional()
+    @Type(() => Number)   // 👈 ensures proper casting
+    @IsNumber()
+    user_id?: number;
 }
 
 // renewToken.dto.ts
@@ -203,8 +206,8 @@ export class ChangePasswordDto {
   // @IsString()
   // @IsNotEmpty()
   // reference_id: string;
-  
-  
+
+
   @IsString()
   @IsOptional()
   device_type: DEVICE_TYPE
@@ -245,7 +248,7 @@ export class RegisterDto {
   @IsOptional()
   user_type: USER_TYPE;
 
-  
+
   @IsOptional()
   @IsString()
   country_code: string;

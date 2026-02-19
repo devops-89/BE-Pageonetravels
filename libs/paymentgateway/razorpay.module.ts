@@ -8,7 +8,8 @@ import { ConfigModule } from '../../libs/config/config.module';
   providers: [
     RazorpayService,
     ResponseHandlerModule
-    ]
+    ],
+    exports:[RazorpayService]
 })
 export class RazorpayModule { }
 

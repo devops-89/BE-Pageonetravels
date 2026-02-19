@@ -3,10 +3,10 @@ export interface IDashboardStats {
     totalHotels: number;
     totalCancelHotels: number;
     totalCancelFlights: number;
-    totalPackages: number;
+    totalSelfDrive: number;
     totalCabs: number;
     totalFlights: number;
-    totalHoteliers: number;
+    totalHelicopters:number;
 }
 
 export interface IFlightStats {
@@ -17,15 +17,25 @@ export interface IFlightStats {
 export interface IHotelStats {
     totalCancelHotels: number;
     totalHotels: number;
-    totalHoteliers: number;
+
 }
 
 export interface IUserStats {
     totalUsers: number;
 }
 
-export interface IPackageStats {
-    totalPackages: number;
+export interface ISelfDriveStats {
+    data: {
+        totalSelfDrive: number;
+    };
+    message: string;
+}
+
+export interface IHelicopterStats{
+    data: {
+        totalHelicopter:number;
+    };
+    message:string;
 }
 
 export interface ICabStats {
@@ -33,4 +43,4 @@ export interface ICabStats {
         totalCabs: number;
     };
     message: string;
-} 
+}

@@ -1,3 +1,4 @@
 export interface InsertDays {
-        pkgday_duration:string,
+        days:number,
+       nights:number
 }

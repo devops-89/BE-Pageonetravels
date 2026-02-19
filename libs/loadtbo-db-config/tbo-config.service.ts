@@ -1,79 +1,81 @@
-import { FLIGHTDATA } from "../../libs/config/config.interface";
+import { FLIGHTDATA } from '../../libs/config/config.interface';
 import { Injectable } from '@nestjs/common';
-import { SettingRepositoryService } from "../../libs/database/src/repositories/setting.repository";
-import { ConfigService } from "../../libs/config/config.service";
+import { SettingRepositoryService } from '../../libs/database/src/repositories/setting.repository';
+import { ConfigService } from '../../libs/config/config.service';
 
 @Injectable()
 export class TBO_CredentialsService {
-  constructor(
-    private readonly settingRepo: SettingRepositoryService,
-    private readonly configService: ConfigService
-  ) {}
+    constructor(private readonly settingRepo: SettingRepositoryService, private readonly configService: ConfigService) {}
 
-
-    async getSettingValues(){
+    async getSettingValues() {
         try {
-          const result = await this.settingRepo.getFlightKeysAndValues();
-          console.log("this code run here for flight config",result);
-          const flightConfig = result.value as any;
-          console.log("flightConfig",flightConfig);
-          const hotel_result = await this.settingRepo.getHotelKeysAndValues();
-          const hotelConfig = hotel_result.value as any
+            const result = await this.settingRepo.getFlightKeysAndValues();
+            console.log('this code run here for flight config', result);
+            const flightConfig = result.value as any;
+            console.log('flightConfig', flightConfig);
+            const hotel_result = await this.settingRepo.getHotelKeysAndValues();
+            const hotelConfig = hotel_result.value as any;
 
             this.configService.setTBOConfig({
-              FLIGHT_CANCEL_TICKET : flightConfig.FLIGHT_CANCEL_TICKET,
-            FLIGHT_PARTIAL_CANCELLATION : flightConfig.FLIGHT_PARTIAL_CANCELLATION,
-            FLIGHT_BOOK_TICKET : flightConfig.FLIGHT_BOOK_TICKET,
-            FLIGHT_ROUND_BOOKING : flightConfig.FLIGHT_ROUND_BOOKING,
-            FLIGHT_AUTHENTICATION : flightConfig.FLIGHT_AUTHENTICATION,
-            FLIGHT_SEARCH : flightConfig.FLIGHT_SEARCH,
-            FLIGHT_FARERULE : flightConfig.FLIGHT_FARERULE,
-            FLIGHT_FAREQUOTE : flightConfig.FLIGHT_FAREQUOTE,
-            FLIGHT_SSR: flightConfig.FLIGHT_SSR,
-            FLIGHT_BOOKING_API_FORNONLCC : flightConfig.FLIGHT_BOOKING,
-            FLIGHT_TICKET_FORLCC : flightConfig.FLIGHT_TICKET,
-            FLIGHT_BOOKING_DETAILS : flightConfig.FLIGHT_BOOKING_DETAILS,
-            FLIGHT_CALENDER_DETAILS : flightConfig.FLIGHT_CALENDER_DETAILS,
-            FLIGHT_RELEASE_PNR : flightConfig.FLIGHT_RELEASE_PNR,
-            FLIGHT_GET_CANCELLATION_CHARGES : flightConfig.FLIGHT_GET_CANCELLATION_CHARGES,
-            FLIGHT_SEND_CHANGE_REQUEST : flightConfig.FLIGHT_SEND_CHANGE_REQUEST,
-            FLIGHT_GET_CHANGE_REQUEST : flightConfig.FLIGHT_GET_CHANGE_REQUEST,
-            FLIGHT_CLIENT_ID :  flightConfig.FLIGHT_CLIENT_ID,
-            FLIGHT_USERNAME :  flightConfig.FLIGHT_USERNAME,
-            FLIGHT_PASSWORD : flightConfig.FLIGHT_PASSWORD,
-            FLIGHT_ENDUSERIP : flightConfig.FLIGHT_ENDUSERIP,
-            FLIGHT_GET_AGENCY_BALANCE: "",
-            
-            HOTEL_SEARCH : hotelConfig.HOTEL_SEARCH,
-            HOTEL_INFO : hotelConfig.HOTEL_INFO,
-            HOTEL_ROOM_INFO : hotelConfig.HOTEL_ROOM_INFO,
-            HOTEL_BLOCK_ROOM :  hotelConfig.HOTEL_BLOCK_ROOM,
-            COUNTRY_SEARCH :  hotelConfig.COUNTRY_SEARCH,
-            CITY_SEARCH :   hotelConfig.CITY_SEARCH,
-            HOTEL_BOOK : hotelConfig.HOTEL_BOOK,
-            HOTEL_BOOKING_DETAILS : hotelConfig.HOTEL_BOOKING_DETAILS,
-            GET_HOTELSTATICDATA : hotelConfig.GET_HOTELSTATICDATA,
-  
- 
-      })
+                FLIGHT_CANCEL_TICKET: flightConfig.FLIGHT_CANCEL_TICKET,
+                FLIGHT_PARTIAL_CANCELLATION: flightConfig.FLIGHT_PARTIAL_CANCELLATION,
+                FLIGHT_BOOK_TICKET: flightConfig.FLIGHT_BOOK_TICKET,
+                FLIGHT_ROUND_BOOKING: flightConfig.FLIGHT_ROUND_BOOKING,
+                FLIGHT_AUTHENTICATION: flightConfig.FLIGHT_AUTHENTICATION,
+                FLIGHT_SEARCH: flightConfig.FLIGHT_SEARCH,
+                FLIGHT_FARERULE: flightConfig.FLIGHT_FARERULE,
+                FLIGHT_FAREQUOTE: flightConfig.FLIGHT_FAREQUOTE,
+                FLIGHT_SSR: flightConfig.FLIGHT_SSR,
+                FLIGHT_BOOKING_API_FORNONLCC: flightConfig.FLIGHT_BOOKING,
+                FLIGHT_TICKET_FORLCC: flightConfig.FLIGHT_TICKET,
+                FLIGHT_BOOKING_DETAILS: flightConfig.FLIGHT_BOOKING_DETAILS,
+                FLIGHT_CALENDER_DETAILS: flightConfig.FLIGHT_CALENDER_DETAILS,
+                FLIGHT_RELEASE_PNR: flightConfig.FLIGHT_RELEASE_PNR,
+                FLIGHT_GET_CANCELLATION_CHARGES: flightConfig.FLIGHT_GET_CANCELLATION_CHARGES,
+                FLIGHT_SEND_CHANGE_REQUEST: flightConfig.FLIGHT_SEND_CHANGE_REQUEST,
+                FLIGHT_GET_CHANGE_REQUEST: flightConfig.FLIGHT_GET_CHANGE_REQUEST,
+                FLIGHT_CLIENT_ID: flightConfig.FLIGHT_CLIENT_ID,
+                FLIGHT_USERNAME: flightConfig.FLIGHT_USERNAME,
+                FLIGHT_PASSWORD: flightConfig.FLIGHT_PASSWORD,
+                FLIGHT_ENDUSERIP: flightConfig.FLIGHT_ENDUSERIP,
+                FLIGHT_GET_AGENCY_BALANCE: '',
+                FLIGHT_PAYMENT_CALLBACK_URL:flightConfig.FLIGHT_PAYMENT_CALLBACK_URL,
 
-      console.log('Configuration updated successfully');
+                HOTEL_SEARCH: hotelConfig.HOTEL_SEARCH,
+                HOTEL_TBO_CODE_LIST: hotelConfig.HOTEL_TBO_CODE_LIST,
+                HOTEL_INFO: hotelConfig.HOTEL_INFO,
+                HOTEL_PREBOOK:hotelConfig.HOTEL_PREBOOK,
+                COUNTRY_SEARCH: hotelConfig.COUNTRY_SEARCH,
+                CITY_SEARCH: hotelConfig.CITY_SEARCH,
+                HOTEL_BOOK: hotelConfig.HOTEL_BOOK,
+                HOTEL_BOOKING_DETAILS: hotelConfig.HOTEL_BOOKING_DETAILS,
+                HOTEL_CANCEL_BOOKING:hotelConfig.HOTEL_CANCEL_BOOKING,
+                HOTEL_CANCEL_STATUS:hotelConfig.HOTEL_CANCEL_STATUS,
+                HOTEL_SYNC_COUNTRY:hotelConfig.HOTEL_SYNC_COUNTRY,
+                HOTEL_SYNC_CITY:hotelConfig.HOTEL_SYNC_CITY,
+                HOTEL_SYNC_HOTEL_TBO_CODE:hotelConfig.HOTEL_SYNC_TBO_CODE,
+                HOTEL_STATIC_USERNAME:hotelConfig.HOTEL_STATIC_USERNAME,
+                HOTEL_STATIC_PASSWORD:hotelConfig.HOTEL_STATIC_PASSWORD,
+                HOTEL_DYNAMIC_USERNAME: hotelConfig.HOTEL_DYNAMIC_USERNAME,
+                HOTEL_DYNAMIC_PASSWORD:hotelConfig.HOTEL_DYNAMIC_PASSWORD,
+                HOTEL_PAYMENT_CALLBACK_URL:hotelConfig.HOTEL_PAYMENT_CALLBACK_URL,
+                GET_HOTELSTATICDATA: hotelConfig.GET_HOTELSTATICDATA,
+            });
 
-    } catch (error) {
-      console.log("Error in the getSettingValues from database", error);
-      throw error;
+            console.log('Configuration updated successfully');
+        } catch (error) {
+            console.log('Error in the getSettingValues from database', error);
+            throw error;
+        }
     }
-  }
 
-
-  async getTBOCredentials() {
-    try {
-      const tboConfig = this.configService.get().TBO_CREDENTIALS;
-      return tboConfig as FLIGHTDATA;
-
-    } catch (error) {
-      console.log(error);
-      throw error
+    async getTBOCredentials() {
+        try {
+            const tboConfig = this.configService.get().TBO_CREDENTIALS;
+            return tboConfig as FLIGHTDATA;
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
     }
-  }
 }

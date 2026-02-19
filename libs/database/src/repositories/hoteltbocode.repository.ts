@@ -65,11 +65,29 @@ async saveOrUpdateHotelCodes(city: Partial<HotelCity>, hotels: any[]): Promise<v
     );
   }
 
-  
+
 }
 
   async countHotelsByCity(city_code: string): Promise<number> {
     return this.hotelTboCodeRepository.count({ where: { city_code } });
   }
+
+    /**
+     * Get all city codes and their hotel codes
+     */
+    async getAllCityHotelCodes(): Promise<{ city_code: string; hotel_codes: string }[]> {
+        return this.hotelTboCodeRepository.find({
+            select: ["city_code", "hotel_codes"],
+        });
+    }
+
+    /**
+     * Clear all hotel code from the table
+     */
+    async clearAll(): Promise<void> {
+        await this.hotelTboCodeRepository.clear();
+        console.log("🗑️ Cleared all hotel tbo code  from the table.");
+    }
+
 }
 

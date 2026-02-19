@@ -42,6 +42,7 @@ export class OrderRepositoryService {
                     isLCC: is_LCC,
                     trace_id: payload.TraceId,
                     order_request: payload,
+                  order_request_second: extraInfo,
                     user: { id: reference_id },
                     amount: amount,
                     status: ORDER_STATUS.INIT,

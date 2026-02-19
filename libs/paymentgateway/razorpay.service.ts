@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { ERROR_CODES } from '../../libs/constants/commonConstants';
 import { log } from 'console';
 import axios from 'axios';
+import { CreateRefundDto } from '../dtos/common/refund.dto';
 
 // import { FlightTicketRepositoryService } from '//database/repositories/flightticket.repository';
 
@@ -14,8 +15,9 @@ export class RazorpayService {
     private key: string;
     private secret: string;
     private url: string;
-    constructor(private readonly configService: ConfigService) // private readonly flightTicketService:FlightTicketRepositoryService,
-    {
+    constructor(
+        private readonly configService: ConfigService // private readonly flightTicketService:FlightTicketRepositoryService,
+    ) {
         this.key = this.configService.get().RAZORPAY_CREDENTIAL.RAZORPAY_KEY;
         this.secret = this.configService.get().RAZORPAY_CREDENTIAL.RAZORPAY_KEY_SECRET;
         this.url = this.configService.get().RAZORPAY_CREDENTIAL.CREATE_PAYMENT_LINK;
@@ -26,8 +28,6 @@ export class RazorpayService {
         });
     }
 
-    
-    
     async createPaymentLink(input: {
         amount: number;
         currency: string;
@@ -130,6 +130,34 @@ export class RazorpayService {
         } catch (error) {
             console.error('Razorpay verification error:', error);
             throw error;
+        }
+    }
+
+    async createRefund(input: { paymentId: string; amount: number; speed: string; remarks: string }): Promise<any> {
+        try {
+            const { paymentId, amount, speed, remarks } = input;
+            const refundBaseUrl = 'https://api.razorpay.com/v1';
+            const response = await axios.post(
+                `${refundBaseUrl}/payments/${paymentId}/refund`,
+                {
+                    amount,
+                    speed: speed || 'normal',
+                    notes: { remarks },
+                },
+                {
+                    auth: {
+                        username: this.key,
+                        password: this.secret,
+                    },
+                }
+            );
+
+            return response.data;
+        } catch (error) {
+            throw {
+                message: error.response?.data?.error?.description || error.message,
+                statusCode: error.response?.status || 500,
+            };
         }
     }
 }

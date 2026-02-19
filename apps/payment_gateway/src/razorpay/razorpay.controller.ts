@@ -1,18 +1,20 @@
 import { Body, Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
-import { UserRepositoryService } from '../../../../libs/database/src/repositories/user.repository';
-import { OrderRepositoryService } from '../../../../libs/database/src/repositories/order.repository';
+import { UserRepositoryService } from '../../../../libs/database/src';
+import { OrderRepositoryService } from '../../../../libs/database/src';
 import { LccTicketDto } from '../../../../libs/dtos/flight/flight-ticket.dto';
 import { TokenValidationGuard } from '../../../../libs/middlewares/authMiddleware.guard';
 import { RazorpayService } from './razorpay.service';
 import { Repository } from 'typeorm';
 import { CreateHotelBookingDto } from '../../../../libs/dtos/hotel/hotel-booking.dto';
-import { Order, Payment, User } from '../../../../libs/database/src/entities';
+import { Payment } from '../../../../libs/database/src';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PAYMENT_STATUS } from '../../../../libs/constants/bookingContant';
+
 import { RazorpayService as RazorpayPaymentService } from '../../../../libs/paymentgateway/razorpay.service';
 import { CreatePackageBookingDto } from '../../../../libs/dtos/package/package-booking.dto';
 import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
+
+import { GetAgencyBalanceDto } from '../../../../libs/dtos/flight/flight-detail.dto';
 
 @Controller('razorpay')
 export class RazorpayController {
@@ -68,83 +70,18 @@ export class RazorpayController {
     @UseGuards(TokenValidationGuard)
     async initiateHotelBooking(@Body() body: CreateHotelBookingDto, @Req() req: Request, @Res() res: Response) {
         try {
-            // separating the payload Data
-            const { extraInfo, ...restOfBookingData } = body;
-
-            const cleanedBody = { ...restOfBookingData };
-            console.log('extraInfo', extraInfo);
-            console.log('cleanedBody:', cleanedBody);
-
             const payload = req['userPayload'];
             const { reference_id } = payload;
 
-            //    validate user
-            const refData = await this.userRepositoryService.getUserByUserId(reference_id);
-            if (!refData) throw 'User Not Found!';
+            const paymentResponse = await this.razorpayService.createHotelOrder(reference_id, body);
 
-            // Use amount from body directly
-            const amount = cleanedBody.NetAmount;
-            const hotelPayload = cleanedBody;
-
-            // save order
-            const orderResponse = await this.orderRepositoryService.insertBooking(reference_id, 'HOTEL', hotelPayload, amount, body.BookingCode, undefined, undefined, undefined, undefined, extraInfo);
-
-            console.log('+++++++++++++++Order Response:++++++++++++++++', orderResponse);
-
-            // extract the custom order id from the orderReaponse
-            const custom_order_id = orderResponse.custom_order_id;
-
-            const orderdetails = await this.orderRepositoryService.findOne(custom_order_id);
-
-            console.log('==============orderId not getting: ===================', orderdetails.order_id);
-
-            // create Razorpay Payment Link
-            const paymentLink = await this.razorpayPaymentService.createPaymentLink({
-                amount: Math.round(amount * 100),
-                currency: 'INR',
-                description: 'Payment For Hotel Booking',
-                reference_id: custom_order_id.trim(),
-                customer: {
-                    email: refData.email,
-                },
-                notes: {
-                    module: 'hotel',
-                    order_id: orderdetails.order_id,
-                },
-                callback_url: 'https://dev.page1travels.com/payment/hotel/status',
-            });
-
-            // https://page1-fe.vercel.app/payment/hotel/status
-
-            // save payment record to payment table
-            console.log('Order Details by custom order id: ', orderdetails);
-            const user = reference_id;
-
-            const orderRef = new Order();
-            orderRef.order_id = orderdetails.order_id;
-
-            const userRef = new User();
-            userRef.id = user;
-
-            console.log(10);
-
-            // Create the payment entity
-            const paymentEntity = this.paymentRepository.create({
-                razorpay_link_response: JSON.stringify(paymentLink),
-                user: { id: user },
-                order: { order_id: orderdetails.order_id },
-                amount: orderdetails.amount,
-                payment_gateway: 'Razorpay',
-                payment_status: paymentLink.status,
-                status: PAYMENT_STATUS.IN_PROGRESS,
-            });
-
-            // Save the entity (ensures relations are handled)
-            await this.paymentRepository.save(paymentEntity);
+            if (!paymentResponse.success) {
+                return this.responsehandlderservice.sendErrorResponse(res, paymentResponse);
+            }
 
             return this.responsehandlderservice.sendSuccessResponse(res, {
-                message: 'Hotel Booking Initialized. Proceed to payment.',
-                data: paymentLink,
+                message: paymentResponse.message,
+                data: paymentResponse.data,
             });
         } catch (error) {
             console.log('Hotel Booking Error: ', error);
@@ -178,7 +115,7 @@ export class RazorpayController {
 
     @Get('/payment/verify')
     // @UseGuards(TokenValidationGuard)
-    async verifySignatue(@Req() req: Request, @Res() res: Response, @Query() query: any) {
+    async verifySignatue(@Req() req: Request, @Res() res: Response, @Query() query) {
         try {
             console.log('>>>>>>>>>> >>', query);
             console.log('Query Parameters:', query);
@@ -207,6 +144,30 @@ export class RazorpayController {
         } catch (error) {
             console.log(error);
             return this.responsehandlderservice.sendErrorResponse(res, error);
+        }
+    }
+
+    @Post('get-agency-balance')
+    async getAgencyBalance(@Body() body: GetAgencyBalanceDto, @Res() res: Response) {
+        try {
+            const result = await this.razorpayService.getAgencyBalance(body);
+
+            if (!result.success) {
+                return this.responsehandlderservice.sendErrorResponse(res, result);
+            }
+
+            return this.responsehandlderservice.sendSuccessResponse(res, {
+                statusCode: result.statusCode,
+                message: result.message,
+                data: result.data,
+                success: true,
+            });
+        } catch (error) {
+            return this.responsehandlderservice.sendErrorResponse(res, {
+                statusCode: 500,
+                message: error.message || 'Internal server error',
+                extraError: error,
+            });
         }
     }
 }

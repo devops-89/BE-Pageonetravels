@@ -1,9 +1,15 @@
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString,IsNumber,Min, IsUUID } from "class-validator";
 
 export class CreatePackageDayDto {
     @IsNotEmpty()
-    @IsString()
-    pkgday_duration: string;
+    @IsNumber()
+    @Min(1)
+    days: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Min(0)
+    nights: number;
 }
 
 

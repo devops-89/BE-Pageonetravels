@@ -3,18 +3,20 @@ import { LOGO } from '../constants/commonConstants';
 export const bookingConTemplate = (bookingData: any, user_name: string) => {
     const response = bookingData.Response.Response;
     const flight = response.FlightItinerary;
+    const totalSSRCharges: number = flight.Fare.TotalBaggageCharges + flight.Fare.TotalMealCharges + flight.Fare.TotalSeatCharges;
+    const convenienceCharge = Number(flight.Fare.OtherCharges) + Number(flight.Fare.ServiceFee) + Number(flight.Fare.AdditionalTxnFeePub);
     const outboundSegment = flight.Segments.find((s: any) => s.TripIndicator === 1);
     const inboundSegment = flight.Segments.find((s: any) => s.TripIndicator === 2);
     const passengers = flight.Passenger;
-    
-    // Format date and time for outbound flight
+
+    // OUTBOUND Time formatting
     const outDepDate = new Date(outboundSegment.Origin.DepTime).toLocaleDateString();
     const outDepTime = new Date(outboundSegment.Origin.DepTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const outArrDate = new Date(outboundSegment.Destination.ArrTime).toLocaleDateString();
     const outArrTime = new Date(outboundSegment.Destination.ArrTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    // Format date and time for inbound flight if exists 
-    let inboundHtml = ''; 
+    // RETURN (if exists)
+    let inboundHtml = '';
     if (inboundSegment) {
         const inDepDate = new Date(inboundSegment.Origin.DepTime).toLocaleDateString();
         const inDepTime = new Date(inboundSegment.Origin.DepTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -22,227 +24,217 @@ export const bookingConTemplate = (bookingData: any, user_name: string) => {
         const inArrTime = new Date(inboundSegment.Destination.ArrTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         inboundHtml = `
-            <div class="section">
-                <h3>Return Flight Details</h3>
-                <div class="flight-info">
-                    <div>
-                        <h4>${inboundSegment.Origin.Airport.AirportName} (${inboundSegment.Origin.Airport.AirportCode})</h4>
-                        <p>${inDepDate}</p>
-                        <p><strong>${inDepTime}</strong></p>
-                        <p>Terminal: ${inboundSegment.Origin.Airport.Terminal}</p>
-                    </div>
-                    
-                    <div>
-                        <p>→</p>
-                        <p>Duration: ${Math.floor(inboundSegment.Duration / 60)}h ${inboundSegment.Duration % 60}m</p>
-                    </div>
-                    
-                    <div>
-                        <h4>${inboundSegment.Destination.Airport.AirportName} (${inboundSegment.Destination.Airport.AirportCode})</h4>
-                        <p>${inArrDate}</p>
-                        <p><strong>${inArrTime}</strong></p>
-                        <p>Terminal: ${inboundSegment.Destination.Airport.Terminal}</p>
-                    </div>
-                </div>
-                <p>Airline: ${inboundSegment.Airline.AirlineName} (${inboundSegment.Airline.AirlineCode} ${inboundSegment.Airline.FlightNumber})</p>
-            </div>
+        <div style="font-weight:bold; font-size:16px; margin-top:30px; text-transform:uppercase; text-decoration:underline;">
+            Return Flight Details
+        </div>
+
+        <table style="width:100%; border-collapse:collapse; margin-top:15px; font-size:15px;">
+            <thead>
+                <tr>
+                    <th style="border:1px solid #000; padding:8px 10px; background-color:#3b5570; color:#fff;">Departure</th>
+                    <th style="border:1px solid #000; padding:8px 10px; background-color:#3b5570; color:#fff;">Arrival</th>
+                    <th style="border:1px solid #000; padding:8px 10px; background-color:#3b5570; color:#fff;">Duration</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td style="border:1px solid #000; padding:8px 10px;">
+                        <strong>${inboundSegment.Origin.Airport.AirportName}</strong> (${inboundSegment.Origin.Airport.AirportCode})<br>
+                        ${inDepDate} — <strong>${inDepTime}</strong><br>
+                        Terminal: ${inboundSegment.Origin.Airport.Terminal}
+                    </td>
+                    <td style="border:1px solid #000; padding:8px 10px;">
+                        <strong>${inboundSegment.Destination.Airport.AirportName}</strong> (${inboundSegment.Destination.Airport.AirportCode})<br>
+                        ${inArrDate} — <strong>${inArrTime}</strong><br>
+                        Terminal: ${inboundSegment.Destination.Airport.Terminal}
+                    </td>
+                    <td style="border:1px solid #000; padding:8px 10px;">
+                        ${Math.floor(inboundSegment.Duration / 60)}h ${inboundSegment.Duration % 60}m
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p style="font-size:15px; margin-top:10px;"><strong>Airline:</strong>
+        ${inboundSegment.Airline.AirlineName}
+        (${inboundSegment.Airline.AirlineCode} ${inboundSegment.Airline.FlightNumber})</p>
         `;
     }
 
-    // Calculate total fare
+    // Total Fare
     const totalFare = flight.Fare.PublishedFare.toFixed(2);
-    
-    const html = `<!DOCTYPE html>
-<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
+
+
+    // FINAL TEMPLATE (converted)
+    const html = `
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Booking Confirmation</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="UTF-8">
+    <title>Flight Booking Confirmation</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-        a {
-            color: #2051A0;
-            text-decoration: none;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #ffffff;
-        }
-        .header {
-            padding: 20px;
-            text-align: center;
-            background: #f8f8f8;
-        }
-        .content {
-            padding: 20px;
-        }
-        .section {
-            margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 20px;
-        }
-        .flight-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: #f0f7ff;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-        .flight-details {
-            text-align: center;
-            margin: 15px 0;
-        }
-        .passenger-table {
-            width: 100%;
-            border: 1px solid #ddd;
-            margin-top: 15px;
-        }
-        .passenger-table th, .passenger-table td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-        .passenger-table th {
-            background-color: #2051A0;
-            color: white;
-        }
-        .footer {
-            padding: 20px;
-            background: #2051A0;
-            color: white;
-            text-align: center;
-        }
-        .total-fare {
-            font-size: 18px;
-            font-weight: bold;
-            color: #2051A0;
-            margin-top: 20px;
-        }
-        .flight-type {
-            color: #2051A0;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        @media (max-width: 600px) {
-            .flight-info {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
-    </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <img src="${LOGO}" alt="Company Logo" width="200">
-        </div>
-        
-        <div class="content">
-            <div class="section">
-                <h2>Dear ${user_name},</h2>
-                <p>Your booking has been confirmed. Thank you for choosing us as your travel partner!</p>
-                <p>Below are the details of your flight booking:</p>
-            </div>
-            
-            <div class="section">
-                <h3>Booking Reference: ${flight.PNR}</h3>
-                <p>Booking ID: ${flight.BookingId}</p>
-            </div>
-            
-            <div class="section">
-                <h3 class="flight-type">Outbound Flight (Departure)</h3>
-                <div class="flight-info">
-                    <div>
-                        <h4>${outboundSegment.Origin.Airport.AirportName} (${outboundSegment.Origin.Airport.AirportCode})</h4>
-                        <p>${outDepDate}</p>
-                        <p><strong>${outDepTime}</strong></p>
-                        <p>Terminal: ${outboundSegment.Origin.Airport.Terminal}</p>
-                    </div>
-                    
-                    <div>
-                        <p>→</p>
-                        <p>Duration: ${Math.floor(outboundSegment.Duration / 60)}h ${outboundSegment.Duration % 60}m</p>
-                    </div>
-                    
-                    <div>
-                        <h4>${outboundSegment.Destination.Airport.AirportName} (${outboundSegment.Destination.Airport.AirportCode})</h4>
-                        <p>${outArrDate}</p>
-                        <p><strong>${outArrTime}</strong></p>
-                        <p>Terminal: ${outboundSegment.Destination.Airport.Terminal}</p>
-                    </div>
-                </div>
-                <p>Airline: ${outboundSegment.Airline.AirlineName} (${outboundSegment.Airline.AirlineCode} ${outboundSegment.Airline.FlightNumber})</p>
-            </div>
-            
-            ${inboundHtml}
-            
-            <div class="section">
-                <h3>Passenger Details</h3>
-                <table class="passenger-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Type</th>
-                            <th>Ticket No.</th>
-                            <th>Baggage</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${passengers.map(passenger => `
-                        <tr>
-                            <td>${passenger.Title} ${passenger.FirstName} ${passenger.LastName}</td>
-                            <td>${passenger.PaxType === 1 ? 'Adult' : passenger.PaxType === 2 ? 'Child' : 'Infant'}</td>
-                            <td>${passenger.Ticket.TicketNumber}</td>
-                            <td>${passenger.SegmentAdditionalInfo[0].Baggage}</td>
-                        </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="section">
-                <h3>Fare Summary</h3>
-                <p>Base Fare: INR ${flight.Fare.BaseFare.toFixed(2)}</p>
-                <p>Taxes & Fees: INR ${flight.Fare.Tax.toFixed(2)}</p>
-                <div class="total-fare">
-                    Total: INR ${totalFare}
-                </div>
-            </div>
-            
-            <div class="section">
-                <h3>Important Information</h3>
-                <ul>
-                    <li>Please check-in online or arrive at the airport at least 2 hours before departure.</li>
-                    <li>Carry a printed copy of this confirmation or show it on your mobile device at check-in.</li>
-                    <li>Ensure all passengers have valid ID proof as per airline requirements.</li>
-                    ${inboundSegment ? '<li>Remember to check the return flight details above.</li>' : ''}
-                </ul>
-            </div>
-        </div>
-        
-        <div class="footer">
-            <h3>Need Assistance?</h3>
-            <p>Contact our customer support:</p>
-            <p>Email: support@yourcompany.com</p>
-            <p>Phone: +1 (123) 456-7890</p>
-            <p>© ${new Date().getFullYear()} Page1 Travel. All rights reserved.</p>
-        </div>
+
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color:#fff; color:#000;">
+<div style="width: 800px; margin: 40px auto; border: 1px solid #000; padding: 30px; box-sizing: border-box;">
+
+    <!-- HEADER -->
+    <div style="text-align:left; margin-bottom:10px;">
+        <img src="${LOGO}" width="200" />
+        <hr>
     </div>
+
+    <!-- TOP ROW -->
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:15px;">
+        <div><strong>Booking ID:</strong> ${flight.BookingId}</div>
+        <div><strong>Invoice Date:</strong> ${new Date().toLocaleDateString()}</div>
+    </div>
+    <hr>
+
+    <!-- HEADING -->
+    <div style="width:100%; background:#3b5570; color:#fff; padding:6px 0; text-align:center;
+        font-size:16px; font-weight:bold; margin:15px 0 25px 0; text-transform:uppercase;">
+        Booking Confirmation
+    </div>
+
+    <!-- GREETING -->
+    <p style="font-size:15px;"><strong>Dear ${user_name},</strong></p>
+    <p style="font-size:15px;">Your flight booking has been confirmed. Please find your itinerary below.</p>
+
+
+    <!-- OUTBOUND SECTION -->
+    <div style="font-weight:bold; font-size:16px; margin-top:20px; text-transform:uppercase; text-decoration:underline;">
+        Outbound Flight Details
+    </div>
+
+    <table style="width:100%; border-collapse:collapse; margin-top:15px; font-size:15px;">
+        <thead>
+            <tr>
+                <th style="border:1px solid #000; padding:8px 10px; background:#3b5570; color:#fff;">Departure</th>
+                <th style="border:1px solid #000; padding:8px 10px; background:#3b5570; color:#fff;">Arrival</th>
+                <th style="border:1px solid #000; padding:8px 10px; background:#3b5570; color:#fff;">Duration</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td style="border:1px solid #000; padding:8px 10px;">
+                    <strong>${outboundSegment.Origin.Airport.AirportName}</strong> (${outboundSegment.Origin.Airport.AirportCode})<br>
+                    ${outDepDate} — <strong>${outDepTime}</strong><br>
+                    Terminal: ${outboundSegment.Origin.Airport.Terminal}
+                </td>
+
+                <td style="border:1px solid #000; padding:8px 10px;">
+                    <strong>${outboundSegment.Destination.Airport.AirportName}</strong> (${outboundSegment.Destination.Airport.AirportCode})<br>
+                    ${outArrDate} — <strong>${outArrTime}</strong><br>
+                    Terminal: ${outboundSegment.Destination.Airport.Terminal}
+                </td>
+
+                <td style="border:1px solid #000; padding:8px 10px;">
+                    ${Math.floor(outboundSegment.Duration / 60)}h ${outboundSegment.Duration % 60}m
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p style="font-size:15px; margin-top:10px;"><strong>Airline:</strong>
+        ${outboundSegment.Airline.AirlineName}
+        (${outboundSegment.Airline.AirlineCode} ${outboundSegment.Airline.FlightNumber})
+    </p>
+
+    <!-- RETURN SECTION IF EXISTS -->
+    ${inboundHtml}
+
+    <!-- PASSENGERS -->
+    <div style="font-weight:bold; font-size:16px; margin-top:30px;
+        text-transform:uppercase; text-decoration:underline;">Passenger Details</div>
+
+    <table style="width:100%; border-collapse:collapse; margin-top:15px; font-size:15px;">
+        <thead>
+            <tr>
+                <th style="border:1px solid #000; padding:8px 10px; background:#3b5570; color:#fff;">Name</th>
+                <th style="border:1px solid #000; padding:8px 10px; background:#3b5570; color:#fff;">Type</th>
+                <th style="border:1px solid #000; padding:8px 10px; background:#3b5570; color:#fff;">Ticket No.</th>
+                <th style="border:1px solid #000; padding:8px 10px; background:#3b5570; color:#fff;">Baggage</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            ${passengers.map(p => `
+                <tr>
+                    <td style="border:1px solid #000; padding:8px 10px;">${p.Title} ${p.FirstName} ${p.LastName}</td>
+                    <td style="border:1px solid #000; padding:8px 10px;">
+                        ${p.PaxType === 1 ? "Adult" : p.PaxType === 2 ? "Child" : "Infant"}
+                    </td>
+                    <td style="border:1px solid #000; padding:8px 10px;">${p.Ticket.TicketNumber}</td>
+                    <td style="border:1px solid #000; padding:8px 10px;">${p.SegmentAdditionalInfo[0].Baggage}</td>
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+
+
+    <!-- FARE SUMMARY -->
+    <div style="font-weight:bold; font-size:16px; margin-top:30px;
+        text-transform:uppercase; text-decoration:underline;">Fare Summary</div>
+
+    <table style="width:100%; border-collapse:collapse; margin-top:15px; font-size:15px;">
+        <tbody>
+            <tr>
+                <td style="border:1px solid #000; padding:8px 10px;"><strong>Base Fare:</strong></td>
+                <td style="border:1px solid #000; padding:8px 10px;">₹${flight.Fare.BaseFare.toFixed(2)}</td>
+            </tr>
+
+            <tr>
+                <td style="border:1px solid #000; padding:8px 10px;"><strong>Taxes & Fees:</strong></td>
+                <td style="border:1px solid #000; padding:8px 10px;">₹${flight.Fare.Tax.toFixed(2)}</td>
+            </tr>
+
+            <tr>
+            <td style="border:1px solid #000; padding:8px 10px;"><strong>Convenience Fee:</strong></td>
+            <td style="border:1px solid #000; padding:8px 10px;">₹${convenienceCharge.toFixed(2)}</td>
+          </tr>
+
+           <tr>
+            <td style="border:1px solid #000; padding:8px 10px;"><strong>Add-ons (Meal + Seat + Baggage):</strong></td>
+            <td style="border:1px solid #000; padding:8px 10px;">₹${totalSSRCharges.toFixed(2)}</td>
+          </tr>
+
+            <tr>
+                <td style="border:1px solid #000; padding:8px 10px;"><strong>Total Fare:</strong></td>
+                <td style="border:1px solid #000; padding:8px 10px; font-weight:bold;">
+                    ₹${totalFare}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- IMPORTANT INFO -->
+    <div style="font-weight:bold; font-size:16px; margin-top:30px; text-transform:uppercase; text-decoration:underline;">
+        Important Information
+    </div>
+
+    <ul style="font-size:15px; margin-top:10px;">
+        <li>Please arrive at the airport at least 2 hours before departure.</li>
+        <li>Carry a valid government ID proof for all passengers.</li>
+        <li>Online check-in is recommended for a smooth travel experience.</li>
+        ${inboundSegment ? "<li>Please verify your return flight timing carefully.</li>" : ""}
+    </ul>
+
+    <hr style="margin-top:30px;">
+
+    <div style="text-align:center; font-size:14px; margin-top:15px;">
+        <strong>Need Help?</strong><br>
+        Email: info@page1travels.com<br>
+        Phone: +91 7977512494<br><br>
+        © ${new Date().getFullYear()} Page1Travels. All Rights Reserved.
+    </div>
+
+</div>
 </body>
-</html>`;
+</html>
+`;
+
     return html;
-}
+};

@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { HotelDetails } from "../entities";
+import { HotelDetails, HotelRatingEnum } from "../entities";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 
@@ -10,65 +10,107 @@ export class HotelDetailsRepositoryService {
         private readonly hotelDetailsRepository: Repository<HotelDetails>,
     ) { }
 
-    async createDetails(
-        countryname: string,
-        countrycode: string,
-        hotel_city_code: string,
-        hoteldetails: any
-    ) {
-        // Check if any required field is empty or undefined
-        if (
-            !countryname ||
-            !countrycode ||
-            !hotel_city_code ||
-            !hoteldetails?.[0]?.HotelCode ||
-            !hoteldetails
-        ) {
-            
+    // saving multiple hotelDetails of multiple hotel Codes
+    async saveHotelDetailsList(apiResponse: any): Promise<HotelDetails[]> {
+        const hotels = apiResponse?.HotelDetails || [];
+
+        if (!Array.isArray(hotels) || hotels.length === 0) {
+            throw new Error("HotelDetails array is empty or invalid");
         }
-    
-        const details = {
-            country_name: countryname,
-            country_code: countrycode,
-            city_code: hotel_city_code,
-            hotel_code: hoteldetails[0].HotelCode,
-            hotel_details: hoteldetails
+
+        const results = [];
+
+        for (const hotelData of hotels) {
+            const saved = await this.saveSingleHotel(hotelData);
+            results.push(saved);
+        }
+
+        return results;
+    }
+
+    //  now this method saves a single hotel record
+    private async saveSingleHotel(hotelData: any): Promise<HotelDetails> {
+        const {
+            HotelCode,
+            HotelName,
+            Description,
+            HotelFacilities,
+            Attractions,
+            Image,
+            Images,
+            RoomID,
+            Address,
+            PinCode,
+            CityId,
+            CityName,
+            CountryName,
+            CountryCode,
+            PhoneNumber,
+            FaxNumber,
+            HotelRating,
+            Map,
+            CheckInTime,
+            CheckOutTime,
+        } = hotelData;
+
+        const ratingEnum: HotelRatingEnum =
+            Number(HotelRating) >= 1 && Number(HotelRating) <= 5
+                ? (Number(HotelRating) as HotelRatingEnum)
+                : null;
+
+        const payload: Partial<HotelDetails> = {
+            hotelCode: String(HotelCode),
+            hotelName: HotelName || null,
+            description: Description || null,
+            hotelFacilities: HotelFacilities || [],
+            attractions: Attractions || null,
+            image: Image || null,
+            images: Images || [],
+            roomIds: RoomID || [],
+            address: Address || null,
+            pinCode: PinCode || null,
+            cityId: CityId || null,
+            cityName: CityName || null,
+            countryName: CountryName || null,
+            countryCode: CountryCode || null,
+            phoneNumber: PhoneNumber || null,
+            faxNumber: FaxNumber || null,
+            hotelRating: ratingEnum,
+            map: Map || null,
+            checkInTime: CheckInTime || null,
+            checkOutTime: CheckOutTime || null,
         };
-    
-        return await this.hotelDetailsRepository.save(details);
-    }
-    
 
-    async fetchcity() {
-        try {
-            // Using query builder for maximum flexibility
-            const distinctCities = await this.hotelDetailsRepository
-                                    .createQueryBuilder('hotel')
-                                    .select('DISTINCT(hotel.city_code)', 'city_code')
-                                    .where('hotel.city_code != :empty', { empty: '' })  // Exclude empty strings
-                                    .andWhere('hotel.city_code != :zero', { zero: '0' }) // Exclude '0' values
-                                    .andWhere('hotel.city_code IS NOT NULL') // Exclude NULL values if needed
-                                    .orderBy('city_code', 'ASC')
-                                    .getRawMany();
-    
-            return distinctCities.map(item => item.city_code);
-            
-        } catch (error) {
-            throw new Error(`Failed to fetch distinct cities: ${error.message}`);
-        }
-    }
-
-    async fetchDetails(city:string){ 
-        const hotels = await this.hotelDetailsRepository.find({
-            where: { city_code: city },
-            select: [
-                "hotel_details"
-            ]
+        // UPSERT by hotelCode
+        let existing = await this.hotelDetailsRepository.findOne({
+            where: { hotelCode: HotelCode },
         });
 
-        return hotels;
 
+        if (existing) {
+            this.hotelDetailsRepository.merge(existing, payload);
+            return await this.hotelDetailsRepository.save(existing);
+        } else {
+            const created = this.hotelDetailsRepository.create(payload);
+            return await this.hotelDetailsRepository.save(created);
+        }
     }
+
+//     single hotelCode hotelDetail Search using hotelCode
+    async getHotelDetailByCode(hotelCode: string): Promise<HotelDetails | null> {
+        return this.hotelDetailsRepository.findOne({
+            where: { hotelCode },
+        });
+    }
+
+    /**
+     * Clear all hotel details from the table
+     */
+    async clearAll(): Promise<void> {
+        await this.hotelDetailsRepository.clear();
+        console.log("🗑️ Cleared all hotel details from the table.");
+    }
+
 
 
 }

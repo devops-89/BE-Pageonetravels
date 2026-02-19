@@ -12,7 +12,7 @@ import { PackageBooking } from "./package-booking.entity";
 @Entity('payment')
 export class Payment {
     @PrimaryGeneratedColumn("uuid")
-    payment_id: string;  
+    payment_id: string;
 
 
     @OneToOne(() => Order,{ nullable: true })
@@ -70,7 +70,7 @@ export class Payment {
 
     @Column({type:'text',nullable:true})
     razorpay_link_response:string;
-     
+
     @Column({type:'text',nullable:true})
     razorpay_webhook_response:string;
 
@@ -88,20 +88,45 @@ export class Payment {
     @IsString()
     @IsOptional()
     @Column({ type: 'varchar', nullable: true })
+    refund_id?: string;
+
+    @Column({ type: 'bigint', nullable: true })
+    refund_amount?: number;
+
+    @IsString()
+    @IsOptional()
+    @Column({ type: 'varchar', nullable: true })
+    refund_currency?: string;
+
+    @IsString()
+    @IsOptional()
+    @Column({ type: 'varchar', nullable: true })
+    refund_speed?: string;
+
+    @Column({ type: 'json', nullable: true })
+    refund_notes?: Record<string, string>;
+
+    @Column({ type: 'timestamp', nullable: true })
+    refund_created_at?: Date;
+
+
+    @IsString()
+    @IsOptional()
+    @Column({ type: 'varchar', nullable: true })
     payment_notes?: string;
 
     @Column({
             type:'enum',
-            enum:PAYMENT_STATUS, 
+            enum:PAYMENT_STATUS,
             default: PAYMENT_STATUS.PENDING,
         })
     status: PAYMENT_STATUS;
-    
+
 
     @CreateDateColumn()
     created_at: Date;
 
     @UpdateDateColumn()
     updated_at: Date;
-    
+
 }

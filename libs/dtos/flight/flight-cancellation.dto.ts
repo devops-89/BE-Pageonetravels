@@ -1,4 +1,4 @@
-import {IsString, IsNumber, IsOptional, IsArray, ValidateNested, IsIn, IsNotEmpty, IsBoolean } from 'class-validator';
+import {IsString, IsNumber,IsIP, IsOptional, IsArray, ValidateNested, IsIn, IsNotEmpty, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class ReleasePNRRequestDto {
@@ -13,7 +13,7 @@ export class ReleasePNRRequestDto {
     @IsString()
     @IsNotEmpty()
     TokenId: string;
-   
+
     @IsString()
     @IsNotEmpty()
     Source: string;
@@ -42,38 +42,17 @@ export class CancellationChargesRequestDto {
 export class SendChangeRequestDto {
     @IsString()
     @IsNotEmpty()
-    BookingId: string;
-
-    @IsNumber()
-    @IsIn([1, 2], { message: 'RequestType must be 1 (Full Cancellation) or 2 (Partial Cancellation)' })
-    RequestType: number; // 1 for Full Cancellation, 2 for Partial Cancellation
-
-    @IsNumber()
-    @IsIn([1, 2, 3], { message: 'CancellationType must be 1, 2, or 3' })
-    CancellationType: number; // 1: Full, 2: Partial, 3: Sector
-
-    @IsOptional()
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => SectorDto)
-    Sectors?: SectorDto[]; // Required for partial cancellation
-
-    @IsOptional()
-    @IsArray()
-    TicketId?: number[]; // Required for partial cancellation
-
-    @IsString()
-    @IsOptional()
-    Remarks?: string;
+    remarks: string;
 
     @IsString()
     @IsNotEmpty()
-    EndUserIp: string;
+    orderId: string;
 
-    @IsString()
+    @IsIP()
     @IsNotEmpty()
-    TokenId: string;
+    ip: string;
 }
+
 export class SectorDto {
     @IsString()
     @IsNotEmpty()
@@ -161,4 +140,4 @@ export class GetCancellationChargesDto {
     @IsString()
     @IsNotEmpty()
     tokenId: string;
-} 
+}

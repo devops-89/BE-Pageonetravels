@@ -1,26 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
 import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
 import { FlightDetailRequestDto, FlightRuleDto } from '../../../../libs/dtos/flight/flight-detail.dto';
-import { GenerateTokenService } from '../search-flight/generateToken.service';
+
+import { TokenProviderService } from '../../../../libs/token-provider-handler/tokenProvider.service';
 import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 import { JOURNEYTYPE, JOURNEY } from '../../../../libs/constants/flightConstant';
-import { CommissionRepositoryService } from '../../../../libs/database/src';
+import { CommissionRepositoryService, Order, OrderRepositoryService } from '../../../../libs/database/src';
 import { COMMISSION_TYPE } from '../../../../libs/constants/autenticationConstants/userContants';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 import { tbo_credentials } from '../../../../libs/constants/tboCredentials';
 import { cancellationConfirmationTemplate } from '../../../../libs/templates/cancellationTemplate';
 import { EmailService } from '../../../../libs/email-service/email.service';
-import { ApiResponse } from '../../../../libs/interfaces/commonTypes/apiResponse.interface';
-import FlightData = ApiResponse.FlightData;
-// import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
-
+import { ORDER_STATUS } from '../../../../libs/constants/bookingContant';
+import { SendChangeRequestDto } from '../../../../libs/dtos/flight/flight-cancellation.dto';
 @Injectable()
 export class FlightDetailService {
     constructor(
         private readonly httptboapiservice: HTTPSTboAPIService,
+        private readonly orderRepositoryService: OrderRepositoryService,
         private readonly tboConfigService: TBO_CredentialsService,
-        private readonly generateTokenService: GenerateTokenService,
+        private readonly generateTokenService: TokenProviderService,
         private readonly redisCacheService: RedisCacheService,
         private readonly commissionRepositoryService: CommissionRepositoryService,
         private readonly EmailService: EmailService
@@ -50,70 +50,6 @@ export class FlightDetailService {
         } catch (error) {
             console.log('Error in the fare rule function', error);
             throw error;
-        }
-    }
-
-    // get Agency Balance
-    async getAgencyBalance(body: { ClientId: string; TokenAgencyId: string; TokenMemberId: string; EndUserIp: string; TokenId: string }) {
-        try {
-            const tbo_credentials = await this.tboConfigService.getTBOCredentials();
-            const base_url: string = tbo_credentials.FLIGHT_GET_AGENCY_BALANCE || 'http://Sharedapi.tektravels.com/SharedData.svc/rest/GetAgencyBalance';
-            const payload = {
-                ClientId: body.ClientId,
-                TokenAgencyId: body.TokenAgencyId,
-                TokenMemberId: body.TokenMemberId,
-                EndUserIp: body.EndUserIp,
-                TokenId: body.TokenId,
-            };
-            const response = await this.httptboapiservice.httpAPICall(base_url, payload);
-            console.log('Agency Balance API response:', response);
-            // Case 1: Successfull Response
-            if (response?.Status === 1) {
-                return {
-                    success: true,
-                    message: 'Agency Balance fetched successfully',
-                    data: {
-                        AgencyType: response.AgencyType,
-                        CashBalance: response.CashBalance,
-                        CreditBalance: response.CreditBalance,
-                    },
-                };
-            }
-            // Case 2 : API Returned Failure
-            else if (response?.Status === 2) {
-                const errorCode: number = response?.Error?.ErrorCode ?? 'UNKNOWN';
-                const errorMessage: string = response?.Error?.ErrorMessage || 'Unknown error occurred.';
-
-                return {
-                    success: false,
-                    message: 'Failed to Fetch Agency Balance From API!',
-                    data: {
-                        status: response.Status,
-                        code: errorCode,
-                        message: errorMessage,
-                    },
-                };
-            }
-            // case 3: Unexpected Status or missing response
-            else {
-                return {
-                    success: false,
-                    message: 'Unexpected API response while fetching agency balance',
-                    error: { status: response?.Status ?? 'UNKNOWN' },
-                };
-            }
-            // Store in Redis with a key based on AgencyId
-            // await this.redisCacheService.setCache(`AgencyBalance:${body.TokenAgencyId}`, JSON.stringify(response), 3600);
-        } catch (error) {
-            console.error('Error in Calling getAgencyBalance API:', error);
-            return {
-                success: false,
-                message: 'Error while fetching agency balance!',
-                error: {
-                    type: error.name || 'FetchError',
-                    message: error.message || 'Unknown error occurred while calling TBO API',
-                },
-            };
         }
     }
 
@@ -513,46 +449,102 @@ export class FlightDetailService {
         }
     }
 
-    async sendChangeRequest(body: {
-        bookingId: string;
-        requestType: number;
-        cancellationType: number;
-        sectors?: Array<{ origin: string; destination: string }>;
-        ticketIds?: number[];
-        remarks?: string;
-        userEmail?: string;
-    }) {
+// {
+//     bookingId: string;
+//     requestType: number;
+//     cancellationType: number;
+//     sectors?: Array<{ origin: string; destination: string }>;
+//     ticketIds?: number[];
+//     remarks?: string;
+//     userEmail?: string;
+// }
+    async sendChangeRequest(body: SendChangeRequestDto) {
         try {
+            const { orderId, remarks, ip } = body;
+
+            // 1. Fetch order
+            let orderDetails:Order = await this.orderRepositoryService.find(orderId);
+            if (!orderDetails) {
+                throw new Error('Order not found');
+            }
+
+            // 2. Parse success response (this contains BookingId)
+            let parsedResponse: any = {};
+            try {
+                parsedResponse = JSON.parse(orderDetails.success_response || '{}');
+            } catch (e) {
+                throw new Error(`Invalid success_response JSON for order ${orderId}`);
+            }
+
+
+            // 2. Extract bookingId correctly
+            const bookingId = parsedResponse?.Response?.Response?.BookingId;
+
+            // ✅ Ensure BookingId exists
+            if (!bookingId) {
+                throw { statusCode: 400, message: 'BookingId missing in success_response' };
+            }
+
+            // 3. Extract all Ticket IDs (array)
+            const passengers =
+                parsedResponse?.Response?.Response?.FlightItinerary?.Passenger || [];
+
+            const ticketIdsArray = passengers
+                .map((p: any) => p?.Ticket?.TicketId)
+                .filter(Boolean);
+
+           // 4. Convert to CSV format (required by TBO)
+            const ticketIds = ticketIdsArray.join(",");
+
+            if (!ticketIds) {
+                throw { statusCode: 400, message: 'TicketId missing in success_response' };
+            }
+
+
+            // 3. Get token
+            const { token } = await this.generateTokenService.getToken(ip);
+
+            const payload = {
+                BookingId: bookingId,
+                RequestType: 1,
+                CancellationType: 0,
+                // TicketId: ticketIds, // dont send in full cancellation, required for partial cancellation
+                Remarks: remarks || 'Cancellation request',
+                EndUserIp: ip,
+                TokenId: token,
+            };
+
+            // extracting the url for cancellation
             const tbo_credentials = await this.tboConfigService.getTBOCredentials();
             const base_url = tbo_credentials.FLIGHT_SEND_CHANGE_REQUEST;
 
-            const payload = {
-                BookingId: body.bookingId,
-                RequestType: body.requestType,
-                CancellationType: body.cancellationType,
-                Sectors: body.sectors?.map((s) => ({
-                    Origin: s.origin,
-                    Destination: s.destination,
-                })),
-                TicketId: body.ticketIds,
-                Remarks: body.remarks || 'Cancellation request',
-                EndUserIp: tbo_credentials.FLIGHT_ENDUSERIP,
-                TokenId: await this.getToken(),
-            };
 
             const result = await this.httptboapiservice.sendChangeRequest(base_url, payload);
 
-            const changeRequestId = result.Response.TicketCRInfo?.[0]?.ChangeRequestId;
+            // Extract top-level Response
+            const apiResponse = result?.Response;
 
-            return {
-                success: result.Response.ResponseStatus === 1,
-                data: result.Response,
-                changeRequestId: changeRequestId,
-                error: result.Response.ResponseStatus !== 1 ? 'Failed to send change request' : undefined,
-            };
-        } catch (error) {
-            console.error('Error in send Change Request:', error);
-            throw Error(`Failed to send change request: ${error.message}`);
+// Ensure Response exists
+            if (!apiResponse) {
+                throw new Error("Invalid SendChangeRequest API response");
+            }
+
+// 5. Update status only if success
+            if (apiResponse.ResponseStatus === 1) {
+                // TicketCRInfo may contain multiple items, take first one
+                const changeRequestId = apiResponse.TicketCRInfo?.[0]?.ChangeRequestId || null;
+
+                orderDetails = await this.orderRepositoryService.updateOrderStatus(
+                    orderId,
+                    ORDER_STATUS.CANCELLING,
+                    changeRequestId
+                );
+            }
+
+            return result;
+        } catch (error: any) {
+            console.error('Error in cancelBooking:', error.message || error);
+            throw error;
         }
     }
 
@@ -579,6 +571,47 @@ export class FlightDetailService {
         } catch (error) {
             console.error('Error in get Change Request Status:', error);
             throw Error(`Failed to get change request status: ${error.message}`);
+        }
+    }
+
+    async bookingDetails(orderId: string, ip: string) {
+        try {
+            // 1. Fetch booking record by order_id from DB
+            const orderDetails = await this.orderRepositoryService.find(orderId);
+            console.log('Order Details:', orderDetails);
+            if (!orderDetails) throw new NotFoundException('Order is Not Found!');
+
+            // Prepare common response fields
+            const commonResponse = {
+                bookingStatus: orderDetails.status,
+                paymentStatus: orderDetails.payment_status,
+            };
+
+            const { token } = await this.generateTokenService.getToken(ip);
+            console.log('Generated Token:', token);
+
+            if (orderDetails.status === ORDER_STATUS.COMPLETED) {
+                // 2. Prepare GetBookingDetails payload
+                console.log("Order completed booking details called.");
+                const payload = {
+                    EndUserIp: ip,
+                    TokenId: token,
+                    TraceId: orderDetails.trace_id,
+                };
+
+                const tbo_credentials = await this.tboConfigService.getTBOCredentials();
+                console.log('++++payload:', tbo_credentials.FLIGHT_BOOKING_DETAILS, payload);
+
+                // 3. Call TBO API
+                const bookingDetails = await this.httptboapiservice.httpAPICall(tbo_credentials.FLIGHT_BOOKING_DETAILS, payload);
+
+                return { ...commonResponse, bookingDetails };
+            }
+            // For incomplete bookings, return only status and payment info
+            return commonResponse;
+        } catch (error) {
+            console.error('Error iin booking details:', error.message);
+            throw error;
         }
     }
 

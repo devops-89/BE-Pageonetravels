@@ -16,7 +16,7 @@
                 "tsConfig": "apps/hotel_management/tsconfig.app.json",
                 "assets": ["apps/hotel_management/src/assets"],
                 "isolatedConfig": true,
-                "webpackConfig": "apps/hotel_management/webpack.config.js"
+                "webpackConfig": "apps/hotel_management/webpack.config.cjs"
             },
             "configurations": {
                 "development": {},

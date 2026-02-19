@@ -2,41 +2,43 @@ import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, isString } from 
 
 export class InsertAddressDto {
     @IsString()
-    // @IsNotEmpty({ message: 'Street is required' })
+    @IsNotEmpty({ message: 'Street is required' })
     street: string;
-  
+
     @IsString()
-    // @IsNotEmpty({ message: 'House No is required' })
+    @IsNotEmpty({ message: 'House No is required' })
     house_number: string;
 
     @IsString()
-    // @IsNotEmpty({ message: 'City is required' })
+    @IsNotEmpty({ message: 'City is required' })
     city: string;
 
     @IsString()
-    // @IsNotEmpty({ message: 'City is required' })
+    @IsNotEmpty({ message: 'State is required' })
     state: string;
 
     @IsString()
-    // @IsNotEmpty({ message: 'Country is required' })
+    @IsNotEmpty({ message: 'Country is required' })
     country: string;
 
-
     @IsString()
-    // @IsNotEmpty({ message: 'PostalCode is required' })
+    @IsNotEmpty({ message: 'Postal Code is required' })
     postal_code: string;
 
     @IsBoolean()
     @IsOptional()
-    isdefault:boolean
+    isdefault?: boolean;
 
     @IsString()
     @IsOptional()
-    address_id:string
+    address_id?: string;
 
+    // If you want to add address type later:
     // @IsString()
-    // address_type: string
-  }
+    // @IsOptional()
+    // address_type?: string;
+}
+
 
 
   export class RemoveAddressDto {
@@ -54,7 +56,7 @@ export class InsertAddressDto {
     @IsOptional()
     // @IsNotEmpty({ message: 'Street is required' })
     street: string;
-  
+
     @IsString()
     @IsOptional()
     // @IsNotEmpty({ message: 'House No is required' })

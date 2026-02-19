@@ -40,7 +40,7 @@ export class HotelPassengerDto {
   @IsOptional()
   @IsString()
   PassportExpDate?: string;
-  
+
  @ValidateIf((o) => o.Phoneno !== null)
   @IsOptional()
   @IsString()
@@ -112,10 +112,13 @@ export class ExtraInformationDto {
   tax: number;
 
   @IsNumber()
+  totalAmount:number;
+
+  @IsNumber()
   serviceFees: number;
 
   @IsString()
-  checkIn: string;  
+  checkIn: string;
 
   @IsString()
   checkOut: string;
@@ -140,6 +143,9 @@ export class CreateHotelBookingDto {
 
   @IsNumber()
   NetAmount: number;
+
+
+
 
   @IsArray()
   @ValidateNested({ each: true })
@@ -169,5 +175,5 @@ export class CreateBookingDto {
 export class CancelHotelBookingDto {
   @IsNotEmpty()
   @IsString()
-  reason: string;
+  reason:string;
 }

@@ -1,7 +1,7 @@
 import { Processor, Process } from "@nestjs/bull";
 import { SearchHotelService } from "../../search-hotel/search-hotel.service";
 
-@Processor("sync-hotel-codes")
+@Processor("sync-hotel-tbo-codes")
 export class HotelTBOCodeSyncProcessor {
   constructor(private readonly searchHotelService: SearchHotelService) {}
 

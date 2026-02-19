@@ -61,12 +61,20 @@ export class PassengerDto {
     @IsDateString()
     passport_expiry?: string | null;
 
+    @IsOptional()
+    @IsString()
+    passport_issue_date?: string | null;
+
+    @IsOptional()
+    @IsString()
+    passport_issue_country_code?: string | null;
+
     @IsString()
     @IsNotEmpty()
     contact_no: string;
 
+    @IsOptional()
     @IsString()
-    @IsNotEmpty()
     email: string;
 
     @IsBoolean()
@@ -164,6 +172,7 @@ export class FareDto {
     ServiceFee: number;
 }
 
+
 export class FareBreakdownDto {
     @IsString()
     Currency: string;
@@ -191,6 +200,36 @@ export class FareBreakdownDto {
 }
 
 
+export class DuplicateBookingPassengerDto{
+    @IsString()
+   first_name:string;
+    @IsString()
+   last_name:string;
+    @IsString()
+    title:string;
+}
+
+export  class DuplicateBookingSegmentDto{
+    @IsString()
+    OriginCityCode:string;
+    @IsString()
+    DestinationCityCode:string;
+    @IsString()
+    AirlineCode:string;
+    @IsNumber()
+    FlightNumber:number;
+    @IsString()
+    DepTime:string;
+    @IsString()
+    ArrTime	: string;
+}
+
+export class DuplicateBookingDto{
+    passengerDetailsArray: DuplicateBookingPassengerDto[];
+    segment_details: DuplicateBookingSegmentDto[];
+}
+
+
 
 export class BookingNonLccDto {
     @IsString()
@@ -202,15 +241,15 @@ export class BookingNonLccDto {
     @IsString()
     cell_country_code: string;
 
-    @IsEnum(JOURNEYTYPE, { 
-        message: `type must be one of the following: ${Object.values(JOURNEYTYPE).join(', ')}` 
+    @IsEnum(JOURNEYTYPE, {
+        message: `type must be one of the following: ${Object.values(JOURNEYTYPE).join(', ')}`
     })
     @IsNotEmpty()
     journey_type: JOURNEYTYPE;
-    
-    
-    @IsEnum(JOURNEY, { 
-      message: `type must be one of the following: ${Object.values(JOURNEY).join(', ')}` 
+
+
+    @IsEnum(JOURNEY, {
+      message: `type must be one of the following: ${Object.values(JOURNEY).join(', ')}`
     })
     @IsNotEmpty()
     journey: JOURNEY;
@@ -222,7 +261,7 @@ export class BookingNonLccDto {
 
     @IsBoolean()
     @IsOptional()
-    is_LCC_round ?: boolean;    
+    is_LCC_round ?: boolean;
 
 
     @IsString()
@@ -237,6 +276,7 @@ export class BookingNonLccDto {
     @IsString()
     country: string;
 
+    @IsOptional()
     @IsString()
     address: string;
 
@@ -244,6 +284,7 @@ export class BookingNonLccDto {
     @IsString()
     nationality: string;
 
+    @IsOptional()
     @IsString()
     email: string;
 
@@ -281,13 +322,17 @@ export class BookingNonLccDto {
     @IsNotEmpty()
     fare: FareDto[];
 
+    @ValidateNested({each:true})
+    @Type(()=>DuplicateBookingDto)
+    order_request_second:DuplicateBookingDto
+
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => FareBreakdownDto)
     @IsNotEmpty()
     fareBreakdown: FareBreakdownDto[];
 
-    
+
 }
 
 export class TicketDto {
@@ -309,11 +354,11 @@ export class TicketDto {
 
 
 
-  
 
 
 
-export class BookingDto{ 
+
+export class BookingDto{
     @IsString()
     result_index: string;
 
@@ -321,26 +366,26 @@ export class BookingDto{
     ip_address: string;
 
 
-    @IsEnum(JOURNEYTYPE, { 
-        message: `type must be one of the following: ${Object.values(JOURNEYTYPE).join(', ')}` 
+    @IsEnum(JOURNEYTYPE, {
+        message: `type must be one of the following: ${Object.values(JOURNEYTYPE).join(', ')}`
     })
     @IsNotEmpty()
     journey_type: JOURNEYTYPE;
-    
-    
-    @IsEnum(JOURNEY, { 
-      message: `type must be one of the following: ${Object.values(JOURNEY).join(', ')}` 
+
+
+    @IsEnum(JOURNEY, {
+      message: `type must be one of the following: ${Object.values(JOURNEY).join(', ')}`
     })
     @IsNotEmpty()
-    journey: JOURNEY; 
+    journey: JOURNEY;
 
     @IsBoolean()
     @IsNotEmpty()
     is_LCC: boolean;
 
     @IsString()
-    cell_country_code: string; 
-    
+    cell_country_code: string;
+
 
     @IsString()
     country_code: string;
@@ -354,6 +399,7 @@ export class BookingDto{
     @IsString()
     country: string;
 
+    @IsOptional()
     @IsString()
     address: string;
 
@@ -403,7 +449,7 @@ export class BookingDto{
     @Type(() => FareBreakdownDto)
     @IsNotEmpty()
     fareBreakdown: FareBreakdownDto[];
-   
+
 }
 
 
@@ -412,7 +458,6 @@ export class BookingDto{
 
 export class BaggageDto {
     @IsString()
-    @IsOptional()
     AirlineCode?: string;
 
     @IsString()
@@ -440,7 +485,6 @@ export class BaggageDto {
     Currency?: string;
 
     @IsNumber()
-    @IsOptional()
     Price?: number;
 
     @IsString()
@@ -486,7 +530,6 @@ export class MealDynamicDto {
     Currency?: string;
 
     @IsNumber()
-    @IsOptional()
     Price?: number;
 
     @IsString()
@@ -560,7 +603,6 @@ export class SeatDynamicDto {
     Currency?: string;
 
     @IsNumber()
-    @IsOptional()
     Price?: number;
 }
 

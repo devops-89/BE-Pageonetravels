@@ -16,7 +16,7 @@
                 "tsConfig": "apps/flight/tsconfig.app.json",
                 "assets": ["apps/flight/src/assets"],
                 "isolatedConfig": true,
-                "webpackConfig": "apps/flight/webpack.config.js"
+                "webpackConfig": "apps/flight/webpack.config.cjs"
             },
             "configurations": {
                 "development": {},

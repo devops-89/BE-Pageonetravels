@@ -8,19 +8,30 @@ import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-se
 import { JOURNEYTYPEMAPPING, TimeFilter } from '../../../../libs/constants/flightConstant';
 import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 import { FlightValidator } from './search-utility';
+import {CommissionRepositoryService} from '../../../../libs/database/src';
 import { AirportType } from '../../../../libs/interfaces/flight/search.interface';
 import path from 'path';
 import * as fs from 'fs';
+import { COMMISSION_TYPE } from '../../../../libs/constants/autenticationConstants/userContants';
 // import { arrayUnique } from 'class-validator';
+ enum journeyType{
+    ONEWAY=1,
+    ROUNDTRIP=2,
+    MULTICITY=3
+}
 
 @Injectable()
 export class SearchFlightService {
+
     constructor(
         private readonly searchrepositoryService: SearchRepositoryService,
         private readonly generateTokenService: GenerateTokenService,
         private readonly httptboapiservice: HTTPSTboAPIService,
-        private readonly rediscacheservice: RedisCacheService
+        private readonly rediscacheservice: RedisCacheService,
+        private readonly commissionRepositoryService:CommissionRepositoryService
     ) {}
+
+
 
     async searchAirport(page: number, pageSize: number, search_query: string): Promise<ApiResponse.ApiOK> {
         try {
@@ -132,20 +143,24 @@ export class SearchFlightService {
             // }
 
             const { token, TBO_data } = await this.generateTokenService.getToken(ip_address);
-
-            const { FLIGHT_SEARCH: base_url, FLIGHT_ENDUSERIP: base_ip } = TBO_data;
-
-            const responsefromTBO = await this.httptboapiservice.searchFlightAPI(token, base_url, base_ip, {
+            console.log("++++++++++token and ipp_ADDRESS:++++++++++++++++",token,ip_address);
+            // const { FLIGHT_SEARCH: base_url, FLIGHT_ENDUSERIP: base_ip } = TBO_data;
+         const {FLIGHT_SEARCH: base_url}=TBO_data;
+            const responsefromTBO = await this.httptboapiservice.searchFlightAPI(token, base_url, ip_address, {
                 ...body,
                 journey_type: assigned_journey_type,
                 preferred_time: preferredTimeValue,
             });
+
+            console.log("response from TBO:", responsefromTBO.Response);
 
             if (responsefromTBO && responsefromTBO.Response && responsefromTBO.Response.Error.ErrorMessage) {
                 throw { message: responsefromTBO.Response.Error.ErrorMessage, statusCode: ERROR_CODES.BAD_REQUEST };
             }
 
             // session timeout handling session creation in redis code start
+            console.log("Responnnse from TBO :",responsefromTBO);
+            console.log("Responnnse from TBO Trace ID:",responsefromTBO?.Response);
 
             const traceId = responsefromTBO?.Response?.TraceId;
 
@@ -157,7 +172,7 @@ export class SearchFlightService {
             const sessionData = {
                 traceId,
                 createdAt: new Date().toISOString(),
-                expiresAt: new Date(Date.now() + 12 * 60 * 1000).toISOString(), 
+                expiresAt: new Date(Date.now() + 12 * 60 * 1000).toISOString(),
                 journeyType: assigned_journey_type,
                 origin,
                 destination,
@@ -200,7 +215,7 @@ export class SearchFlightService {
 
             //Oneway
             if (journey_type === 1) {
-                const segments = await this.handleFlightListingSegments(result);
+
 
                 let type = '';
                 let country = [];
@@ -222,6 +237,8 @@ export class SearchFlightService {
                     type = 'INTERNATIONAL';
                 }
 
+                const segments = await this.handleFlightListingSegments(result,type,journeyType[journey_type]);
+
                 return { segments, origin, destination, trace_id, type };
             }
 
@@ -229,21 +246,21 @@ export class SearchFlightService {
             if (journey_type === 2) {
                 if (response.Response?.Results?.length === 1) {
                     //international flights
-
-                    const { flightData } = await this.handleFlightListingSegments(result);
+                    const type = 'INTERNATIONAL';
+                    const { flightData } = await this.handleFlightListingSegments(result,type,journeyType[journey_type]);
                     flightList['departure_flights'] = flightData;
 
-                    const type = 'INTERNATIONAL';
+
                     return { flight_list: flightList, origin, destination, trace_id, type };
                 } else {
                     //domestic flights
-
-                    const segment1 = await this.handleFlightListingSegments(result);
-                    const segment2 = await this.handleFlightListingSegments(roundtrip_dometic_result);
+                    const type = 'DOMESTIC';
+                    const segment1 = await this.handleFlightListingSegments(result,type,journeyType[journey_type]);
+                    const segment2 = await this.handleFlightListingSegments(roundtrip_dometic_result,type,journeyType[journey_type]);
 
                     flightList['departure_flights'] = segment1;
                     flightList['arrival_flights'] = segment2;
-                    const type = 'DOMESTIC';
+
 
                     return { flight_list: flightList, origin, destination, trace_id, type };
                 }
@@ -251,7 +268,7 @@ export class SearchFlightService {
 
             // Multicity
             if (journey_type === 3) {
-                const segment = await this.handleFlightListingSegmentsForMulticity(result);
+
                 let type = '';
                 let country = [];
                 for (const flight of result) {
@@ -271,6 +288,9 @@ export class SearchFlightService {
                 } else if (hasInternational) {
                     type = 'INTERNATIONAL';
                 }
+
+                const segment = await this.handleFlightListingSegmentsForMulticity(result,type,journeyType[journey_type]);
+
                 return { flight_list: segment, origin, destination, trace_id, type };
             }
 
@@ -281,11 +301,28 @@ export class SearchFlightService {
         }
     }
 
-    async handleFlightListingSegmentsForMulticity(searchflight) {
+    async handleFlightListingSegmentsForMulticity(searchflight,type,journey_type) {
         try {
             const flightData = [];
             const uniqueFlight = this.extractUniqueFlightNumber(searchflight);
             for (const segment of uniqueFlight) {
+
+                const baseFare:number=segment.Fare.BaseFare;
+                const publishedFare:number=segment.Fare.PublishedFare;
+                // Extracting the commission start
+                const flightType = `FLIGHT_${journey_type}_${type}` as COMMISSION_TYPE;
+                const commissionType = await this.commissionRepositoryService.getCommissionbytype(flightType);
+                let commission:number=0;
+                if (commissionType.commission_type === "FIXED") {
+                    commission = parseFloat(commissionType.percentage);
+                } else if (commissionType.commission_type === "PERCENTAGE") {
+                    const percentValue = parseFloat(commissionType.percentage);
+                    commission = (baseFare * percentValue) / 100;
+                }
+// Extracting the commission end
+                const totalFare:number=publishedFare+commission;
+
+
                 const seg = segment.Segments;
                 for (const img of seg) {
                     for (let i = 0; i < img.length; i++) {
@@ -298,7 +335,7 @@ export class SearchFlightService {
 
                 const data = {
                     ResultIndex: segment.ResultIndex,
-                    TotalFare: segment.Fare.PublishedFare,
+                    TotalFare:totalFare,
                     Tax: segment.Fare.Tax,
                     Currency: segment.Currency,
                     AirlineCode: segment.AirlineCode,
@@ -351,18 +388,35 @@ export class SearchFlightService {
         }
     }
 
-    async handleFlightListingSegments(searchflight) {
+    async handleFlightListingSegments(searchflight, type, journey_type) {
         try {
             const flightData = [];
 
             const uniqueFlight = this.extractUniqueFlightNumber(searchflight);
             for (const flight of uniqueFlight) {
+                const baseFare:number=flight.Fare.BaseFare;
+                const tax:number = flight.Fare.Tax;
+                const publishedFare:number = flight.Fare.PublishedFare; // Base + Tax
+                // Extracting the commission start
+                const flightType = `FLIGHT_${journey_type}_${type}` as COMMISSION_TYPE;
+                const commissionType = await this.commissionRepositoryService.getCommissionbytype(flightType);
+                let commission=0;
+                if (commissionType.commission_type === "FIXED") {
+                    commission = parseFloat(commissionType.percentage);
+                } else if (commissionType.commission_type === "PERCENTAGE") {
+                    const percentValue = parseFloat(commissionType.percentage);
+                    commission = (baseFare * percentValue) / 100;
+                }
+// Extracting the commission end
+                const totalFare:number=publishedFare+commission;
+
+
                 const departure = flight.Segments && flight.Segments.length > 0 ? flight.Segments[0] : [];
                 const arrival = flight.Segments && flight.Segments.length > 1 ? flight.Segments[1] : [];
 
                 const flightJson = {
                     ResultIndex: flight.ResultIndex,
-                    TotalFare: flight.Fare.PublishedFare,
+                    TotalFare: totalFare,
                     Tax: flight.Fare.Tax,
                     Currency: flight.Fare.Currency,
                     AirlineCode: flight.AirlineCode,

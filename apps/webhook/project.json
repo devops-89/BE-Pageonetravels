@@ -16,7 +16,7 @@
                 "tsConfig": "apps/webhook/tsconfig.app.json",
                 "assets": ["apps/webhook/src/assets"],
                 "isolatedConfig": true,
-                "webpackConfig": "apps/webhook/webpack.config.js"
+                "webpackConfig": "apps/webhook/webpack.config.cjs"
             },
             "configurations": {
                 "development": {},

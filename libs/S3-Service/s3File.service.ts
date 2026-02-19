@@ -3,6 +3,58 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '../config/config.service';
 // AWS SDK for interacting with Amazon S3
 import { S3 } from 'aws-sdk';
+import { Readable } from 'stream';
+import axios from 'axios';
+import FormData from "form-data";
+
+
+type VideoMulterFile = {
+    fieldname: string;
+    originalname: string;
+    encoding: string;
+    mimetype: string;
+    buffer: Buffer;
+    size: number;
+
+
+}
+
+// Helper function
+const extractFileUrls = (responseData: any, baseURL: string): string[] => {
+    try {
+        console.log('🔍 Full API Response:', JSON.stringify(responseData, null, 2));
+
+        let uploadedPaths: any[] = [];
+
+        if (Array.isArray(responseData?.data?.uploaded)) {
+            uploadedPaths = responseData.data.uploaded;
+        } else if (Array.isArray(responseData?.data?.filePath?.uploaded)) {
+            uploadedPaths = responseData.data.filePath.uploaded;
+        } else if (Array.isArray(responseData?.data?.filePath)) {
+            uploadedPaths = responseData.data.filePath;
+        } else {
+            console.warn('⚠️ Unexpected response:', responseData);
+            return [];
+        }
+
+        return uploadedPaths
+            .map((item: any) => {
+                if (typeof item === 'string') {
+                    return item.startsWith('http') ? item : `${baseURL}/${item.replace(/^\/+/, '')}`;
+                } else if (item?.url) {
+                    return item.url.startsWith('http') ? item.url : `${baseURL}/${item.url.replace(/^\/+/, '')}`;
+                } else if (item?.path) {
+                    return `${baseURL}/${item.path.replace(/^\/+/, '')}`;
+                } else {
+                    return '';
+                }
+            })
+            .filter(Boolean);
+    } catch (err) {
+        console.error('❌ Failed to parse responseData:', err);
+        return [];
+    }
+};
 
 @Injectable() // Marks this class as a provider that can be injected elsewhere
 export class S3FileService {
@@ -72,4 +124,64 @@ export class S3FileService {
       throw error;
     }
   }
+
+    // this is the function for external function required for local storage
+    async uploadImagesAndVideosToExternalAPI (files: VideoMulterFile[]): Promise<string[]>  {
+        const uploadUrl = process.env.UPLOAD_IMAGE_VIDEO_URL!;
+        const baseURL = process.env.UPLOAD_BASE_URL!;
+        const headers = {
+            companyId: 'D3A17C9B-52EF-4F89-9A12-6B8F4F0C92AB', // ✅ required by your document-service
+        };
+
+        try {
+            if (!files || files.length === 0) {
+                console.warn('⚠️ No files to upload');
+                return [];
+            }
+
+            const finalUrls: string[] = [];
+
+            for (const file of files) {
+                console.log(`📤 Uploading: ${file.originalname}`);
+
+                // ✅ Convert buffer to stream (required for Busboy)
+                const stream = Readable.from(file.buffer);
+
+                const formData = new FormData();
+                formData.append('files[]', stream, {
+                    filename: file.originalname,
+                    contentType: file.mimetype,
+                });
+
+                // Extra metadata fields
+                formData.append('name', 'Himanshu');
+                formData.append('phoneNumber', '9999999999');
+                formData.append('email', 'test@example.com');
+
+                const response = await axios.post(uploadUrl, formData, {
+                    headers: {
+                        ...headers,
+                        ...formData.getHeaders(),
+                    },
+                    timeout: 180000, // ⏳ 3-minute timeout for big files
+                    maxBodyLength: Infinity,
+                    maxContentLength: Infinity,
+                });
+
+                const urls = extractFileUrls(response.data, baseURL);
+                finalUrls.push(...urls);
+            }
+
+            console.log('✅ All uploaded file URLs:', finalUrls);
+            return finalUrls;
+        } catch (error: any) {
+            console.error('❌ External file upload failed:', error.response?.data || error.message);
+            throw {
+                message: error.response?.data?.message || error.message || 'External file upload failed',
+                statusCode: error.response?.status || 500,
+            };
+        }
+    };
+
+
 }

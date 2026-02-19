@@ -12,6 +12,10 @@ export const hotelBookingTemplate = (bookingData: any, user_name: string, extraI
     const serviceFees = parseFloat(extraInfo?.serviceFees?.toFixed(2) || '0');
     const Net_amount = (price + tax + serviceFees).toFixed(2);
 
+    // calculate showing base fare, tax, total amount
+    const showingBaseAmount:Number=Number(extraInfo?.totalAmount)-Number(extraInfo?.tax);
+    const showingTax:Number=Number(extraInfo?.tax);
+    const showingTotalAmount:Number=Number(extraInfo?.totalAmount);
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,24 +81,7 @@ export const hotelBookingTemplate = (bookingData: any, user_name: string, extraI
         </tbody>
       </table>
 
-      <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 15px;">
-        <thead>
-          <tr>
-            <th style="border: 1px solid #000; padding: 8px 10px; background-color: #3b5570; color: #fff; font-weight: bold;">Stay Duration</th>
-            <th style="border: 1px solid #000; padding: 8px 10px; background-color: #3b5570; color: #fff; font-weight: bold;">Price</th>
-            <th style="border: 1px solid #000; padding: 8px 10px; background-color: #3b5570; color: #fff; font-weight: bold;">Tax</th>
-            <th style="border: 1px solid #000; padding: 8px 10px; background-color: #3b5570; color: #fff; font-weight: bold;">Service Fees</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="border: 1px solid #000; padding: 8px 10px;">${extraInfo.stayDuration || '1'}</td>
-            <td style="border: 1px solid #000; padding: 8px 10px;">₹${price}</td>
-            <td style="border: 1px solid #000; padding: 8px 10px;">₹${tax}</td>
-            <td style="border: 1px solid #000; padding: 8px 10px;">₹${serviceFees}</td>
-          </tr>
-        </tbody>
-      </table>
+
     </div>
 
     <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 15px; border: 1px solid black; padding: 10px; margin-top: 15px;">
@@ -106,25 +93,20 @@ export const hotelBookingTemplate = (bookingData: any, user_name: string, extraI
       <div style="font-weight: bold; font-size: 16px; margin-bottom: 8px; text-transform: uppercase; text-decoration: underline;">
         Billing Summary
       </div>
-      <p><strong>Issued By:</strong> PAGE ONE TRAVELS PRIVATE LIMITED</p>
-      <p><strong>Billed By:</strong> PAGE ONE TRAVELS PRIVATE LIMITED</p>
+
       <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 15px;">
         <tbody>
           <tr>
-            <td style="border: 1px solid #000; padding: 8px 10px;"><strong>Add Price:</strong></td>
-            <td style="border: 1px solid #000; padding: 8px 10px;">₹${price}</td>
+            <td style="border: 1px solid #000; padding: 8px 10px;"><strong>Base Price:</strong></td>
+            <td style="border: 1px solid #000; padding: 8px 10px;">₹${showingBaseAmount.toFixed(2)}</td>
           </tr>
           <tr>
             <td style="border: 1px solid #000; padding: 8px 10px;"><strong>Add Tax:</strong></td>
-            <td style="border: 1px solid #000; padding: 8px 10px;">₹${tax}</td>
-          </tr>
-          <tr>
-            <td style="border: 1px solid #000; padding: 8px 10px;"><strong>Add Service Fees:</strong></td>
-            <td style="border: 1px solid #000; padding: 8px 10px;">₹${serviceFees}</td>
+            <td style="border: 1px solid #000; padding: 8px 10px;">₹${showingTax.toFixed(2)}</td>
           </tr>
           <tr>
             <td style="border: 1px solid #000; padding: 8px 10px;"><strong>Total Amount:</strong></td>
-            <td style="border: 1px solid #000; padding: 8px 10px;">₹${Net_amount}</td>
+            <td style="border: 1px solid #000; padding: 8px 10px;">₹${showingTotalAmount.toFixed(2)}</td>
           </tr>
         </tbody>
       </table>

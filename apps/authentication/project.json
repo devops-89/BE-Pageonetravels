@@ -20,7 +20,7 @@
           "apps/authentication/src/assets"
         ],
         "isolatedConfig": true,
-        "webpackConfig": "apps/authentication/webpack.config.js"
+        "webpackConfig": "apps/authentication/webpack.config.cjs"
       },
       "configurations": {
         "development": {},

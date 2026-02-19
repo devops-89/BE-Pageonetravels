@@ -7,7 +7,8 @@ import { SearchFlightModule } from '../search-flight/search-flight.module';
 import { ResponseHandlerModule } from '../../../../libs/response-handler/response-handler.module';
 import { RedisCacheServiceModule } from '../../../../libs/redis-cache-service/redis-cache-module';
 import { TBOConfigModule } from '../../../../libs/loadtbo-db-config/tbo-config.module';
-import { GenerateTokenService } from '../search-flight/generateToken.service';
+import {GenerateTokenService} from '../search-flight/generateToken.service';
+import {TokenProviderService} from "../../../../libs/token-provider-handler/tokenProvider.service";
 import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
 import { RazorpayModule } from '../../../../libs/paymentgateway/razorpay.module'
 import { RazorpayService } from "../../../../libs/paymentgateway/razorpay.service";
@@ -30,18 +31,18 @@ import { EmailService } from '../../../../libs/email-service/email.service';
              TransactionManager,
              JwtService,
              TokenValidationMiddleware,
-             EmailService              
+             EmailService
         ]),
         ConfigModule,
         RazorpayModule,
         SearchFlightModule,
         ResponseHandlerModule,
         RedisCacheServiceModule,
-        TBOConfigModule.register(),    
+        TBOConfigModule.register(),
     ],
     controllers: [FlightdetailController],
-    providers: [FlightDetailService, GenerateTokenService, Order, OrderRepositoryService, TransactionManager, HTTPSTboAPIService, RazorpayService, UserRepositoryService, JwtService, TokenValidationMiddleware,EmailService],
+    providers: [FlightDetailService, GenerateTokenService,TokenProviderService , Order, OrderRepositoryService, TransactionManager, HTTPSTboAPIService, RazorpayService, UserRepositoryService, JwtService, TokenValidationMiddleware,EmailService],
 })
 
 
-export class FlightDetailModule{} 
+export class FlightDetailModule{}

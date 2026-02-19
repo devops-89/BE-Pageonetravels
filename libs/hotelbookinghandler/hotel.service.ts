@@ -1,31 +1,51 @@
 import { Injectable } from '@nestjs/common';
-import { TBO_CredentialsService } from '../loadtbo-db-config/tbo-config.service';
-import { ConfigService } from '../../libs/config/config.service';
-import { HTTPSTboAPIService } from '../../libs/http-api-service/tbo-api-service';
 import { OrderRepositoryService } from '../../libs/database/src/repositories/order.repository';
 import { EmailService } from '../../libs/email-service/email.service';
 import { PDFGenerateService } from '../../libs/pdf-generate/pdf-generate.service';
 import { UserRepositoryService } from '../../libs/database/src';
-
 import { hotelBookingTemplate } from '../../libs/templates/hotelBookingConfirmation';
 import { S3FileService } from '../../libs/S3-Service/s3File.service';
-
+import   {TBO_CredentialsService} from '../loadtbo-db-config/tbo-config.service';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { FLIGHTDATA } from '../config/config.interface';
 
 @Injectable()
 export class HotelService {
+    private tboCredentials:FLIGHTDATA;
+    private staticAuthHeader:string;
+    private dynamicAuthHeader:string;
     constructor(
-        private readonly tboConfigService: TBO_CredentialsService,
         private readonly pdfGenerateService: PDFGenerateService,
-        private readonly httptboapiservice: HTTPSTboAPIService,
+        private readonly tboConfigService: TBO_CredentialsService,
         private readonly userRepositoryService: UserRepositoryService,
         private readonly orderRepositoryService: OrderRepositoryService,
         private readonly EmailService: EmailService,
-        private readonly configService: ConfigService,
+
         private readonly httpService: HttpService,
         private readonly s3FileService: S3FileService
     ) {}
+
+    async onModuleInit(){
+        this.tboCredentials=await this.tboConfigService.getTBOCredentials();
+        const staticUsername = this.tboCredentials.HOTEL_STATIC_USERNAME;
+        const staticPassword=  this.tboCredentials.HOTEL_STATIC_PASSWORD;
+        const dynamicUsername=this.tboCredentials.HOTEL_DYNAMIC_USERNAME;
+        const dynamicPassword=this.tboCredentials.HOTEL_DYNAMIC_PASSWORD;
+        this.staticAuthHeader= `Basic ${Buffer.from(`${staticUsername}:${staticPassword}`).toString('base64')}`;
+        this.dynamicAuthHeader=`Basic ${Buffer.from(`${dynamicUsername}:${dynamicPassword}`).toString('base64')}`;
+
+    }
+
+    private getHeaders(type:"static" | "dynamic"="dynamic") {
+        const authHeader=type==="static"? this.staticAuthHeader : this.dynamicAuthHeader;
+        return {
+            Authorization: authHeader,
+            'Content-Type': 'application/json',
+        };
+    }
+
+
 
     async hotelHandler(order_id, custom_order_id, order_request, user, order_request_second) {
         try {
@@ -33,14 +53,9 @@ export class HotelService {
             const extraInfo = JSON.parse(order_request_second);
             const userDetails = await this.userRepositoryService.getUserByUserId(user);
 
-            const url = 'https://HotelBE.tektravels.com/hotelservice.svc/rest/book/';
-            const username = 'Pageone';
-            const password = 'Pageone@1234';
-            const credentials = Buffer.from(`${username}:${password}`).toString('base64');
-            const headers = {
-                Authorization: `Basic ${credentials}`,
-                'Content-Type': 'application/json',
-            };
+            const url = this.tboCredentials.HOTEL_BOOK;
+
+            const headers=this.getHeaders("dynamic");
 
             const result = await this.httpAPICall(url, payload, headers);
             console.log('Hotel Booking Response:', result);
@@ -71,8 +86,11 @@ export class HotelService {
 
     private async handlePostBookingTasks(order_id, bookResult, userDetails, extraInfo) {
         try {
-            const bookingSuccessTemplate = await hotelBookingTemplate(bookResult, userDetails?.full_name, extraInfo);
+            const bookingSuccessTemplate = hotelBookingTemplate(bookResult, userDetails?.full_name, extraInfo);
             const pdfBuffer = await this.pdfGenerateService.generateHTMLToPDF(bookingSuccessTemplate);
+
+            await this.EmailService.sendEmail(userDetails.email, 'Hotel Booking Confirmation - Page1Travels', bookingSuccessTemplate);
+            console.log('Confirmation email sent');
 
             if (pdfBuffer) {
                 const ticketPath = `hotel-invoice/${Date.now()}-invoice-${order_id}.pdf`;
@@ -81,8 +99,7 @@ export class HotelService {
                 console.log('PDF uploaded:', s3Url);
             }
 
-            await this.EmailService.sendEmail(userDetails.email, 'Booking Confirmation - Page1Travels', bookingSuccessTemplate);
-            console.log('Confirmation email sent');
+
         } catch (error) {
             // Don't rethrow — just log it so booking stays successful
             console.error('Post-booking task failed:', error.message || error);

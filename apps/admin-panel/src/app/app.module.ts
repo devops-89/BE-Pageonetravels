@@ -7,10 +7,11 @@ import { HomeModule } from './home/home.module';
 import { HotelierModule } from '../hotelier/hotelier.module';
 import { PackageModule } from '../package/package.module';
 import { CustomerModule } from '../customer/customer.module';
-
+import { ProfileModule } from '../profile/profile.module';
+import { RefundModule } from '../refund/refund.module';
 
 @Module({
-    imports: [CommissionModule, HomeModule, HotelierModule, PackageModule, CustomerModule],
+    imports: [CommissionModule, HomeModule, HotelierModule, PackageModule, CustomerModule, ProfileModule, RefundModule],
     controllers: [AppController],
     providers: [AppService],
 })

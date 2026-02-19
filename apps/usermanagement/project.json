@@ -16,7 +16,7 @@
                 "tsConfig": "apps/usermanagement/tsconfig.app.json",
                 "assets": ["apps/usermanagement/src/assets"],
                 "isolatedConfig": true,
-                "webpackConfig": "apps/usermanagement/webpack.config.js"
+                "webpackConfig": "apps/usermanagement/webpack.config.cjs"
             },
             "configurations": {
                 "development": {},

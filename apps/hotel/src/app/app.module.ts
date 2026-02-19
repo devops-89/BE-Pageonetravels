@@ -11,6 +11,8 @@ import { SyncCronService } from './bull/sync-cron.service';
 import { CountrySyncProcessor } from './bull/country-sync.queue';
 import { CitySyncProcessor } from './bull/city-sync.queue';
 import { HotelTBOCodeSyncProcessor } from './bull/hotelTBOCodeSync.queue';
+import { HotelCodeTableSyncProcessor } from "./bull/hotelCodeSync.queue";
+import {HotelDetailSyncProcessor} from './bull/hotelDetailSync.queue';
 
 @Module({
     imports: [
@@ -41,12 +43,18 @@ import { HotelTBOCodeSyncProcessor } from './bull/hotelTBOCodeSync.queue';
         name:"sync-city"
        }),
        BullModule.registerQueue({
-        name:"sync-hotel-codes"
+        name:"sync-hotel-tbo-codes"
        }),
+        BullModule.registerQueue({
+            name:"sync-hotel-code-table"
+        }),
+        BullModule.registerQueue({
+            name:"sync-hotel-details-table"
+        }),
        ScheduleModule.forRoot(),
-       
+
     ],
     controllers: [AppController],
-    providers: [AppService,SyncCronService,CountrySyncProcessor,CitySyncProcessor,HotelTBOCodeSyncProcessor],
+    providers: [AppService,SyncCronService,CountrySyncProcessor,CitySyncProcessor,HotelTBOCodeSyncProcessor,HotelCodeTableSyncProcessor,HotelDetailSyncProcessor],
 })
 export class AppModule {}

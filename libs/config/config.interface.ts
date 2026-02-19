@@ -61,14 +61,14 @@ export interface PaypalPaymentGatewayCred
   PAYPAL_CLIENT_SECRET: string,
 }
 
-export interface TWILIO_SECRETE 
+export interface TWILIO_SECRETE
 {
     TWILIO_ACCOUNT_SID: string;
     TWILIO_AUTH_TOKEN: string;
     SERVICE_ID: string;
     TWILIO_PHONE_NUMBER: string;
 }
-export interface RAZORPAY 
+export interface RAZORPAY
 {
   RAZORPAY_KEY: string;
   RAZORPAY_KEY_SECRET: string;
@@ -134,13 +134,25 @@ export interface FLIGHTDATA {
   FLIGHT_PASSWORD : string
   FLIGHT_ENDUSERIP : string,
   FLIGHT_GET_AGENCY_BALANCE: string;
+  FLIGHT_PAYMENT_CALLBACK_URL:string;
   HOTEL_SEARCH: string;
+  HOTEL_TBO_CODE_LIST:string;
   HOTEL_INFO: string;
-  HOTEL_ROOM_INFO: string;
-  HOTEL_BLOCK_ROOM: string;
+  HOTEL_PREBOOK:string;
   HOTEL_BOOK: string;
   HOTEL_BOOKING_DETAILS: string;
+  HOTEL_CANCEL_BOOKING:string;
+  HOTEL_CANCEL_STATUS:string;
+  HOTEL_SYNC_COUNTRY:string;
+  HOTEL_SYNC_CITY:string;
+  HOTEL_SYNC_HOTEL_TBO_CODE:string;
+  HOTEL_STATIC_USERNAME:string;
+  HOTEL_STATIC_PASSWORD:string;
+  HOTEL_DYNAMIC_USERNAME:string;
+  HOTEL_DYNAMIC_PASSWORD:string;
+  HOTEL_PAYMENT_CALLBACK_URL:string;
   GET_HOTELSTATICDATA: string;
-  COUNTRY_SEARCH : string; 
-  CITY_SEARCH :  string
+  COUNTRY_SEARCH : string;
+  CITY_SEARCH :  string,
+
 }

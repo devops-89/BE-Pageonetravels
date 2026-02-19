@@ -13,12 +13,14 @@ export class PackageDayRepositoryService {
             private readonly pkdDayRepository: Repository<PackageDay>,
     ) {}
 
-    async insetDay(input:InsertDays){
+    async insertDay(input:InsertDays){
         try{
             const details = this.pkdDayRepository.create({
-                pkgday_duration : input.pkgday_duration
+               pkgday_days:input.days,
+                pkgday_nights:input.nights
+
             });
-    
+
             const result = await this.pkdDayRepository.save(details);
             return result;
         }catch(error){
@@ -64,11 +66,11 @@ export class PackageDayRepositoryService {
             throw error;
         }
     }
-    
 
-    async findDayExist(pkddayduartion:string){
+
+    async findDayNightExist(pkddayduartion:number,pkgnightduration:number){
         try{
-            const result = await this.pkdDayRepository.findOne({where: { pkgday_duration: pkddayduartion }});
+            const result = await this.pkdDayRepository.findOne({where: { pkgday_days: pkddayduartion,pkgday_nights:pkgnightduration }});
             if(!result){
                 throw {message:`package day's not Match`, statusCode: ERROR_CODES.BAD_REQUEST }
             }

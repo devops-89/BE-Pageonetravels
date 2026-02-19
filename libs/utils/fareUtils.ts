@@ -27,10 +27,10 @@ export const calculateFare = (passengerType: number, fareBreakdown: any[], fare:
 
 // Function to process passengers
 export const processPassengers = (
-    passengerList: any[], 
-    paxType: number, 
-    fareBreakdown: any[], 
-    fare: any[], 
+    passengerList: any[],
+    paxType: number,
+    fareBreakdown: any[],
+    fare: any[],
     additionalInfo: any
 ) => {
     const calculatedFare = calculateFare(paxType, fareBreakdown, fare);
@@ -45,6 +45,8 @@ export const processPassengers = (
         Gender: passenger.gender === "Male" ? 1 : 2,
         PassportNo: passenger.passport_no || "",
         PassportExpiry: passenger.passport_expiry ? `${passenger.passport_expiry}T00:00:00` : "",
+        PassportIssueDate:passenger.passport_issue_date? `${passenger.passport_issue_date}T00:00:00` : "",
+        PassportIssueCountryCode:passenger.passport_issue_country_code? passenger.passport_issue_country_code : "",
         AddressLine1: additionalInfo.address,
         AddressLine2: "",
         Fare: calculatedFare,

@@ -33,3 +33,4 @@ export * from './footer.repository';
 export * from './hotelier-inventory.repository';
 export * from './package-booking.repository';
 export * from "./hoteltbocode.repository";
+export * from "./hotelCode.repository";

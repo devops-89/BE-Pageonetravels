@@ -27,7 +27,7 @@ export class SearchFlightController {
 
     @Get('/search-airport/:search_query')
     async searchAirport(
-        // @Param('search_query ') searchQuery :string, 
+        // @Param('search_query ') searchQuery :string,
         @Req() req : Request, @Res() res : Response, @Query('page') page :number, @Query('pageSize') pageSize:number){
         try {
             const {search_query} = req['params'];

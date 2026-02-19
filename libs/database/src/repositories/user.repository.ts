@@ -82,10 +82,10 @@ export class UserRepositoryService {
                 is_phone_verified: true,
                 is_email_verified: true
             };
-            
+
             const user = await this.userRepository.findOne({ where: { email } });
-            
-            
+
+
 
             return (user as any) || null;
         } catch (error) {
@@ -103,7 +103,7 @@ export class UserRepositoryService {
         }
     }
 
-    
+
     async emailIsExistsOrNot(email: string): Promise<boolean> {
         try {
             const doc = await this.userRepository.count({ where: { email: email} });
@@ -138,7 +138,7 @@ export class UserRepositoryService {
             throw error;
         }
     }
-    
+
 
     async insertDefaultUser(input: UserI.InsertDefaultUser): Promise<User> {
         try {
@@ -153,25 +153,26 @@ export class UserRepositoryService {
         }
     }
 
-    async addOrUpdateUser(input: UserI.AddOrUpdateUser, includeLastLogin?:boolean): Promise<string | null> { 
+    async addOrUpdateUser(input: UserI.AddOrUpdateUser, includeLastLogin?:boolean): Promise<string | null> {
         try {
-            const { phone_number, avatar, id, user_type, email, password, full_name, is_email_verified, verify_status} = input;
-    
+            const { phone_number, avatar, id, user_type, email, password,country_code, full_name, is_email_verified, verify_status} = input;
 
-            const insertVal = { 
-                phone_number, 
-                avatar, 
-                user_type, 
-                email, 
-                password, 
-                full_name, 
+
+            const insertVal = {
+                phone_number,
+                avatar,
+                user_type,
+                email,
+                password,
+                full_name,
+                country_code,
                 is_email_verified,
                 verify_status,
                 status:'ACTIVE'
             };
-    
+
             const fields = this.mapObject(insertVal);
-    
+
             console.log(user_type);
             let user_id = null;
             if (id) {
@@ -194,7 +195,15 @@ export class UserRepositoryService {
                     user_id = userJson.identifiers[0].id;
                 }
             }
-    
+            else if (user_type === "ADMIN") {
+                fields.verify_status = 'VERIFIED';
+                const user = await this.userRepository.insert(this.userRepository.create(fields));
+                const userJson = JSON.parse(JSON.stringify(user));
+                if (userJson.identifiers && userJson.identifiers.length > 0 && userJson.identifiers[0].id) {
+                    user_id = userJson.identifiers[0].id;
+                }
+            }
+
             return user_id;
         } catch (error) {
             throw error;
@@ -210,7 +219,7 @@ export class UserRepositoryService {
         }
     }
 
-    
+
     async addOrUpdateByEmail(input: UserI.InsertUserByEmail): Promise<User | null> {
         try {
             const { email, verify_status, password, status, full_name,user_type, country_code,phone_number } = input;
@@ -220,7 +229,7 @@ export class UserRepositoryService {
 
             await this.userRepository.save(this.userRepository.create(insertVal));
             const user = await this.userRepository.findOne({ where: { email }, select: { password: false } });
-            return user || null; 
+            return user || null;
         } catch (error) {
             throw error;
         }
@@ -302,12 +311,12 @@ export class UserRepositoryService {
                 created_at: true,
             };
             if (showPassword) selectFields.password = true;
-            
+
             const user = await this.userRepository.createQueryBuilder('user')
                 .where('user.id = :user_id', { user_id })
                 .andWhere('user.verify_status = :verify_status', { verify_status: USER_VERIFY_STATUS.VERIFIED })
                 .getOne();
-               
+
             //const user = await this.userRepository.findOne({where :{ id : user_id, verify_status : USER_VERIFY_STATUS.VERIFIED}})
             //console.log("User  found", user);
                 if (!user) {
@@ -326,7 +335,7 @@ export class UserRepositoryService {
                     result[key] = user[key];
                 }
             }
-            
+
             return result as UserI.UserSchema;
         } catch (error) {
             console.error("Error in Fetching User Details:", error);
@@ -356,11 +365,11 @@ export class UserRepositoryService {
                 created_at: true,
             };
             if (showPassword) selectFields.password = true;
-            
+
             const user = await this.userRepository.createQueryBuilder('user')
                 .where('user.id = :user_id', { user_id })
                 .getOne();
-               
+
             //const user = await this.userRepository.findOne({where :{ id : user_id, verify_status : USER_VERIFY_STATUS.VERIFIED}})
             console.log("User  found", user);
                 if (!user) {
@@ -408,10 +417,10 @@ export class UserRepositoryService {
     //     try {
     //         // Prepare the fields for the update
     //         const fields = address_id ? { address: { id: address_id } } : {};
-    
+
     //         // Update the user record with the new address reference
     //         const savedAdd = await this.userRepository.update({ id: user_id }, fields);
-    
+
     //         // Return the updated record or status
     //         return savedAdd;
     //     } catch (error) {
@@ -419,45 +428,45 @@ export class UserRepositoryService {
     //         throw error;
     //     }
     // }
-    
+
 
     async getUsersWithFilters(filter: UserFilterDto, pagination: PaginationDto): Promise<IPaginationObject> {
-        try {   
+        try {
             const { user_type, search, status } = filter;
             const { page = 1, limit = 10 } = pagination;
-        
+
             const queryBuilder = this.userRepository.createQueryBuilder('user')
                 .leftJoinAndSelect('user.login_sessions', 'loginSession')
                 .orderBy('user.created_at', 'DESC')
                 .skip((page - 1) * limit)
                 .take(limit);
-            
+
             if(user_type) {
                 queryBuilder.andWhere('user.user_type = :user_type', { user_type });
             }
-        
+
             if (status) {
                 queryBuilder.andWhere('user.status = :status', { status });
             } else {
                 queryBuilder.andWhere('user.status != :status', { status: 'INACTIVE' })  // Exclude inactive status
             }
-  
+
             if (search) {
                 queryBuilder.andWhere(
                     '(user.full_name LIKE :search OR user.email LIKE :search OR user.phone_number LIKE :search)',
                     { search: `%${search}%` }
                 );
             }
-        
+
             const [data, count] = await queryBuilder.getManyAndCount();
-            
-            const userList = data.map(user => {   
-                const last_login = user.login_sessions.length   
-                    ? user.login_sessions.reduce((latest, session) => {  
-                        return session.created_at > latest ? session.created_at : latest;  
-                    }, user.login_sessions[0].created_at)  
-                    : null; 
-        
+
+            const userList = data.map(user => {
+                const last_login = user.login_sessions.length
+                    ? user.login_sessions.reduce((latest, session) => {
+                        return session.created_at > latest ? session.created_at : latest;
+                    }, user.login_sessions[0].created_at)
+                    : null;
+
                 return {
                     ...user,
                     last_login,
@@ -468,7 +477,7 @@ export class UserRepositoryService {
                 const { login_sessions, ...sanitizedUser } = user;
                 return sanitizedUser;
             });
-        
+
             const paginateObject: IPaginationObject = {
                 docs: sanitizedUserList,
                 limit: limit,
@@ -477,7 +486,7 @@ export class UserRepositoryService {
                 hasPrevPage: page > 1,
                 hasNextPage: (page * limit) < count,
             };
-        
+
             return paginateObject;
         }
         catch(error){
@@ -495,4 +504,11 @@ export class UserRepositoryService {
             throw error;
         }
     }
-}    
+
+    async getAdminInfo(): Promise<User | null> {
+        return await this.userRepository.findOne({
+            where: { user_type: USER_TYPE.ADMIN }
+        });
+    }
+
+}

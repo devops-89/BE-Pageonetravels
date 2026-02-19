@@ -16,7 +16,7 @@
                 "tsConfig": "apps/payment_gateway/tsconfig.app.json",
                 "assets": ["apps/payment_gateway/src/assets"],
                 "isolatedConfig": true,
-                "webpackConfig": "apps/payment_gateway/webpack.config.js"
+                "webpackConfig": "apps/payment_gateway/webpack.config.cjs"
             },
             "configurations": {
                 "development": {},

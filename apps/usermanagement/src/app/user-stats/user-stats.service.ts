@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { UserStatsRepositoryService } from '../../../../../libs/database/src/repositories/user-stats.repository';
 import { HotelStatsRepositoryService } from '../../../../../libs/database/src/repositories/hotel-stats.repository';
 import { FlightStatsRepositoryService } from '../../../../../libs/database/src/repositories/flight-stats.repository';
-import { PackageStatsRepositoryService } from '../../../../../libs/database/src/repositories/package-stats.repository';
+import {SelfDriveStatsRepositoryService} from '../../../../../libs/database/src/repositories/selfdrive-stats.repository';
 import { CabStatsRepositoryService } from '../../../../../libs/database/src/repositories/cab-stats.repository';
+import {HelicopterStatsRepositoryService} from '../../../../../libs/database/src/repositories/helicopter-stats.repository';
 import { ApiResponse } from '../../../../../libs/interfaces/commonTypes/apiResponse.interface';
 import { ERROR_CODES } from '../../../../../libs/constants/commonConstants';
 import { IDashboardStats } from '../../../../../libs/interfaces/dashboard/dashboard.interface';
@@ -17,8 +18,9 @@ export class UserStatsService {
         private readonly userStatsRepository: UserStatsRepositoryService,
         private readonly hotelStatsRepository: HotelStatsRepositoryService,
         private readonly flightStatsRepository: FlightStatsRepositoryService,
-        private readonly packageStatsRepository: PackageStatsRepositoryService,
+        private readonly selfDriveStatsRepository: SelfDriveStatsRepositoryService,
         private readonly cabStatsRepository: CabStatsRepositoryService,
+        private readonly helicopterStatsRepository:HelicopterStatsRepositoryService,
         private readonly orderRepository: OrderRepositoryService
     ) {}
 
@@ -42,13 +44,15 @@ export class UserStatsService {
                 userStats,
                 hotelStats,
                 flightStats,
-                packageStats,
+                selfDriveStats,
+                helicopterStats,
                 cabStats
             ] = await Promise.all([
                 this.userStatsRepository.getUserStats(),
                 this.hotelStatsRepository.getHotelStats(),
                 this.flightStatsRepository.getFlightStats(),
-                this.packageStatsRepository.getPackageStats(),
+                this.selfDriveStatsRepository.getSelfDriveStats(),
+                 this.helicopterStatsRepository.getHelicopterStats(),
                 this.cabStatsRepository.getCabStats()
             ]);
 
@@ -57,10 +61,10 @@ export class UserStatsService {
                 totalHotels: hotelStats.totalHotels,
                 totalCancelHotels: hotelStats.totalCancelHotels,
                 totalCancelFlights: flightStats.totalCancelFlights,
-                totalPackages: packageStats.totalPackages,
+                totalSelfDrive: selfDriveStats.data.totalSelfDrive,
                 totalCabs: cabStats.data.totalCabs,
                 totalFlights: flightStats.totalFlights,
-                totalHoteliers: hotelStats.totalHoteliers,
+                totalHelicopters: helicopterStats.data.totalHelicopter,
 
             };
 
@@ -74,7 +78,7 @@ export class UserStatsService {
         }
     }
 
-    
+
 
 // get user Booking (filter applied on the basis of various factors)
         async getUserBookings(userId: string, pagination: PaginationDto, filter: BookingFilterDto): Promise<ApiResponse.ApiOK> {
@@ -92,7 +96,7 @@ export class UserStatsService {
 
 // get all booking based on order type
 async getAllBookings(
-  pagination: PaginationDto, 
+  pagination: PaginationDto,
   filter: BookingFilterDto
 ): Promise<ApiResponse.ApiOK> {
   try {
@@ -104,7 +108,7 @@ async getAllBookings(
     };
   } catch (error) {
     console.error('Error in getAllBookings service:', error);
-    throw error; 
+    throw error;
   }
 }
-} 
+}

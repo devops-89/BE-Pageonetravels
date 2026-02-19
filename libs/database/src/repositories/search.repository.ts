@@ -63,51 +63,23 @@ export class SearchRepositoryService {
     }
 
 
-    // async searcflight( body: IFlightSearch){
-    //     try{
-
-    //     }catch(error){
-
-    //     }
-    // }
-    // async findAllAirports(): Promise<{ message: string; success: boolean; data: Airport[] }> {
-    //     try {
-    //         const expirationTime = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
-
-    //         let airportList = await this.cacheManager.get('airportList') as any;
-
-    //         if (!airportList) {
-    //             let airportdata = await this.AirportModel.find();
-
-    //             await this.cacheManager.set('airportList', airportdata, expirationTime);
-
-    //             return { message: 'Airport Codes searched Successfully', success: true, data: airportdata };
-    //         }
-    //         return { message: 'Airport Codes searched Successfully', success: true, data: airportList };
-
-    //     } catch (err) {
-    //         console.log(err);
-    //         throw new InternalServerException('Internal Server Error')
-    //     }
-
-    // }
 
 
     async uploadExcelData(filePath) {
         try {
             // Step 1: Read the Excel file
-            
+
             const workbook = XLSX.readFile(filePath);
             const sheetName = workbook.SheetNames[0]; // Get the first sheet
             const sheet = workbook.Sheets[sheetName];
 
             // Step 2: Convert Excel sheet to JSON
             const jsonData = XLSX.utils.sheet_to_json(sheet) as any;
-            
+
             // Step 3: Insert data into the database with UPSERT
             for (const row of jsonData) {
                 const { iata_code, airport_name, city_name, city_code, country_code } = row;
-                
+
                 if (!iata_code || !airport_name) {
                     console.log("Missing IATA code in row:", iata_code, airport_name);
                     continue; // Skip this row if there's no IATA code

@@ -1,9 +1,9 @@
-import { Controller, Post, Get, Req, Res, ValidationPipe, Body, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Get, Req, Res, ValidationPipe, Body, Param } from '@nestjs/common';
 import { FlightDetailService } from './flightdetail.service';
 import { ResponseHandlerService } from '../../../../libs/response-handler/response-handler.service';
 import { FlightDetailRequestDto, FlightRuleDto } from '../../../../libs/dtos/flight/flight-detail.dto';
 import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
-import { OrderRepositoryService } from '../../../../libs/database/src';
+import {SendChangeRequestDto} from '../../../../libs/dtos/flight/flight-cancellation.dto';
 import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
 
 import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
@@ -16,9 +16,8 @@ export class FlightdetailController {
 
         private readonly responseHandler: ResponseHandlerService,
         private readonly tboConfigService: TBO_CredentialsService,
-        private readonly orderRepositoryService: OrderRepositoryService,
         private readonly httptboapiservice: HTTPSTboAPIService,
-        private readonly generateTokenService: GenerateTokenService,
+        private readonly generateTokenService: GenerateTokenService
     ) {}
 
     @Post('/farerule')
@@ -40,26 +39,6 @@ export class FlightdetailController {
         } catch (error) {
             console.log('Internal Server Error', error);
             return this.responseHandler.sendErrorResponse(res, ERROR_CODES.INVALID_BASE_URL);
-        }
-    }
-
-    // get Agency Balance
-     @Post('get-agency-balance')
-    async getAgencyBalance(
-        @Body() body: {
-            ClientId: string;
-            TokenAgencyId: string;
-            TokenMemberId: string;
-            EndUserIp: string;
-            TokenId: string;
-        },
-        @Res() res: Response
-    ) {
-        try {
-            const result = await this.flightdetailservice.getAgencyBalance(body);
-            return this.responseHandler.sendSuccessResponse(res, result);
-        } catch (error) {
-            return this.responseHandler.sendErrorResponse(res, error);
         }
     }
 
@@ -109,30 +88,49 @@ export class FlightdetailController {
         }
     }
 
-    @Post('verify-booking')
-    async verifyPayment(@Body() body: {order_id:string,ip:string}) {
+    @Post('getBookingDetails')
+    async verifyPayment( @Req() req: Request, @Res() res: Response,@Body() body: { order_id: string; ip: string }) {
+      try{
         const { order_id, ip } = body;
 
-        // 1. Fetch booking record by order_id from DB
-        const orderDetails = await this.orderRepositoryService.findOne({ where: { order_id: order_id } });
-        if (!orderDetails) throw new NotFoundException('Order is Not Found!');
+        // 🔍 Validate input
+        if (!order_id || !ip) {
+          return this.responseHandler.sendErrorResponse(res, {
+            statusCode: 400,
+            message: 'Both order_id and ip are required.',
+            success: false,
+          });
+        }
 
-         const { token } = await this.generateTokenService.getToken(ip);
 
-        // 2. Prepare GetBookingDetails payload
-        const payload = {
-            EndUserIp: ip,
-            TokenId: token,
-            TraceId: orderDetails.trace_id,
-        };
 
-        const tbo_credentials = await this.tboConfigService.getTBOCredentials();
-        console.log("payload:",tbo_credentials.FLIGHT_BOOKING_DETAILS,payload);
+        // Fetch Booking Detaills
+        const result=await this.flightdetailservice.bookingDetails(order_id,ip);
 
-        // 3. Call TBO API
-        const response = await this.httptboapiservice.httpAPICall(tbo_credentials.FLIGHT_BOOKING_DETAILS, payload);
+        //  Send success response
+        return this.responseHandler.sendSuccessResponse(res, {
+          message: 'Flight booking status fetched successfully.',
+          data: result,
+        });
 
-        return { success: true, booking: response.data };
+
+      }
+      catch (error) {
+        //  Log error for diagnostics
+        console.error(' Error in /getBookingDetails:', error);
+
+        return this.responseHandler.sendErrorResponse(res, {
+          statusCode: error?.statusCode || 500,
+          message:
+            error?.message ||
+            (typeof error === 'string' ? error : 'Unexpected error occurred.'),
+          success: false,
+        });
+      }
+
+
+
+
     }
 
     //   @Post('get-cancellation-charges')
@@ -160,21 +158,17 @@ export class FlightdetailController {
     @Post('send-change-request')
     async sendChangeRequest(
         @Body()
-        body: {
-            bookingId: string;
-            requestType: number;
-            tokenId: string;
-            cancellationType: number;
-            sectors?: Array<{ origin: string; destination: string }>;
-            ticketIds?: number[];
-            remarks?: string;
-            userEmail?: string;
-        },
+        body: SendChangeRequestDto,
         @Res() res: Response
     ) {
         try {
             const result = await this.flightdetailservice.sendChangeRequest(body);
-            return this.responseHandler.sendSuccessResponse(res, result);
+            return this.responseHandler.sendSuccessResponse(res, {
+                statusCode: 200,
+                message: "Cancellation request sent successfully",
+                success: true,
+                data: result
+            });
         } catch (error) {
             return this.responseHandler.sendErrorResponse(res, error);
         }

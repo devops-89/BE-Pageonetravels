@@ -12,11 +12,12 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 // import { TBO_CredentialsService } from '../../../libs/loadtbo-db-config/tbo-config.service';
 
 async function bootstrap() {
-  
+
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+
     app.useStaticAssets(join(__dirname, './assets'))
-    
+    app.set('trust proxy', true);
     app.enableCors({
         origin: "*",
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
@@ -37,7 +38,7 @@ async function bootstrap() {
     //     },
     //   }),
     // );
-    
+
    app.useGlobalPipes(
   new ValidationPipe({
     whitelist: true,

@@ -2,25 +2,90 @@ import { Inject, Injectable } from '@nestjs/common';
 import { GenerateTokenService } from './generateToken.service';
 import { HotelTBOAPIService } from '../../../../libs/http-api-service/hoteltbo-api-service';
 import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
-// import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
-import { HotelTboCodeRepositoryService } from '../../../../libs/database/src/repositories/hoteltbocode.repository';
-import { HotelCountryRepositoryService } from '../../../../libs/database/src/repositories/hotelCountry.repository';
-import { CommissionRepositoryService } from '../../../../libs/database/src/repositories/commission.repository';
-import { HotelDetailsRepositoryService } from '../../../../libs/database/src/repositories/hotelDetails.repository';
-import { HotelCityRepositoryService } from '../../../../libs/database/src/repositories/hotelCity.repository';
+import { HotelCity, HotelCode } from '../../../../libs/database/src';
+import { HotelTboCodeRepositoryService } from '../../../../libs/database/src';
+import { HotelCodeRepositoryService } from '../../../../libs/database/src';
+import { HotelCountryRepositoryService } from '../../../../libs/database/src';
+import { CommissionRepositoryService } from '../../../../libs/database/src';
+import { HotelDetailsRepositoryService } from '../../../../libs/database/src';
+import { HotelCityRepositoryService } from '../../../../libs/database/src';
 import { OrderRepositoryService } from '../../../../libs/database/src';
 import { COMMISSION_TYPE } from '../../../../libs/constants/autenticationConstants/userContants';
-import { CreateHotelBookingDto } from '../../../../libs/dtos/hotel/hotel-booking.dto';
+import { ERROR_CODES } from '../../../../libs/constants/commonConstants';
 import { HotelDetailDto, GetBookingDetailDto } from '../../../../libs/dtos/hotel/search-hotel.dto';
-
+import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import axios from 'axios';
 import { ORDER_STATUS } from '../../../../libs/constants/bookingContant';
+import { FLIGHTDATA } from '../../../../libs/config/config.interface';
+
+// type SearchResult = {
+//     name: string;
+//     code: string;
+//     type: 'city' | 'hotel';
+// };
+
+// Custom chunk function (replaces lodash.chunk)
+function chunkArray<T>(arr: T[], size: number): T[][] {
+    const result: T[][] = [];
+    for (let i = 0; i < arr.length; i += size) {
+        result.push(arr.slice(i, i + size));
+    }
+    return result;
+}
+
+// Custom concurrency limiter (replaces p-limit)
+function createLimiter(limit: number) {
+    let active = 0;
+    const queue: (() => void)[] = [];
+
+    const runNext = () => {
+        if (active >= limit || queue.length === 0) return;
+        active++;
+        const fn = queue.shift();
+        fn();
+    };
+
+    return async <T>(fn: () => Promise<T>): Promise<T> => {
+        return new Promise<T>((resolve, reject) => {
+            queue.push(async () => {
+                try {
+                    const result = await fn();
+                    resolve(result);
+                } catch (err) {
+                    reject(err);
+                } finally {
+                    active--;
+                    runNext();
+                }
+            });
+            runNext();
+        });
+    };
+}
+
+type CityResult = {
+    cityName: string;
+    cityCode: string;
+    countryName: string;
+    type: 'city';
+};
+
+type HotelResult = {
+    hotelName: string;
+    hotelCode: string;
+    cityCode: number;
+    countryName: string;
+    type: 'hotel';
+};
+
+export type SearchResult = (CityResult | HotelResult)[];
 
 @Injectable()
 export class SearchHotelService {
     constructor(
+        private readonly tboConfigService: TBO_CredentialsService,
         private readonly hotelTBOAPIService: HotelTBOAPIService,
         private readonly commissionRepositoryService: CommissionRepositoryService,
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
@@ -30,6 +95,7 @@ export class SearchHotelService {
         private readonly hotelCityRepositoryService: HotelCityRepositoryService,
         private readonly generateTokenService: GenerateTokenService,
         private readonly hotelTboCodeRepositoryService: HotelTboCodeRepositoryService,
+        private readonly hotelCodeRepositoryService: HotelCodeRepositoryService,
         private readonly rediscacheservice: RedisCacheService
     ) {}
 
@@ -47,6 +113,35 @@ export class SearchHotelService {
         }
     }
 
+    // search the cities codes by city, country name
+    async getSearchCodesByCityAndHotel(query: string): Promise<SearchResult> {
+        // return this.hotelCityRepositoryService.searchCities(query);
+        //     getting the top 50 city results
+        const cityResults: Partial<HotelCity>[] = await this.hotelCityRepositoryService.searchCities(query);
+        //     getting top 50 hotel results
+        const hotelResults: Partial<HotelCode>[] = await this.hotelCodeRepositoryService.searchHotels(query);
+
+        //     Map cities => unified or same keys to return
+        const cities = cityResults.map((city) => ({
+            cityName: city.city_name,
+            cityCode: city.city_code,
+            countryName: city.country_name,
+            type: 'city' as const,
+        }));
+
+        //     Map hotels => unified or same keys to return
+        const hotels = hotelResults.map((hotel) => ({
+            hotelName: hotel.hotelName,
+            hotelCode: hotel.hotelCode,
+            cityCode: hotel.cityCode,
+            countryName: hotel.countryName,
+            type: 'hotel' as const,
+        }));
+
+        // Balanced merging → 50 cities + 50 hotels
+        return [...cities, ...hotels];
+    }
+
     async searchCity() {
         try {
             const city_list_from_cache = (await this.rediscacheservice.getCache('CityList')) as string;
@@ -57,9 +152,9 @@ export class SearchHotelService {
 
             const countryCodes = await this.hotelCountryRepositoryService.getCountryCode();
 
-            const city_search_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/CityList';
+            // const city_search_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/CityList';
 
-            const city_list = await this.hotelTBOAPIService.fetchCityList(city_search_base_url, countryCodes);
+            const city_list = await this.hotelTBOAPIService.fetchCityList(countryCodes);
 
             if (city_list && city_list.length) {
                 await this.rediscacheservice.setCache('CityList', JSON.stringify(city_list), 88000);
@@ -72,53 +167,108 @@ export class SearchHotelService {
         }
     }
 
+    // hotel details api fetching from the hotel Detail Database
+    // async ClientHotelDetails(body: { hotelCode: string }) {
+    //     if (!body.hotelCode) {
+    //         const error = new Error('hotelCode is required.');
+    //         (error as any).statusCode = ERROR_CODES.BAD_REQUEST;
+    //         throw error;
+    //     }
+    //
+    //     try {
+    //         const hotel_details = await this.hotelDetailsRepositoryService.getHotelDetailByCode(body.hotelCode);
+    //
+    //         if (!hotel_details) {
+    //             const error = new Error(`No details found for hotelCode: ${body.hotelCode}`);
+    //             (error as any).statusCode = ERROR_CODES.NOT_FOUND;
+    //             throw error;
+    //         }
+    //
+    //         const CountryCode:string = hotel_details.countryCode;
+    //         const commissionType = await this.commissionRepositoryService.getCommissionbytype(CountryCode === 'IN' ? COMMISSION_TYPE.HOTEL_DOMESTIC : COMMISSION_TYPE.HOTEL_INTERNATIONAL);
+    //
+    //         const response = {
+    //             ...hotel_details,
+    //             COMMISSION: commissionType
+    //         };
+    //
+    //
+    //
+    //         return { message: 'Hotel Details fetched successfully', data: response };
+    //     } catch (error: any) {
+    //         console.error('Error in ClientHotelDetails:', error.message || error);
+    //
+    //         // Preserve the statusCode if already set, otherwise fallback to UNEXPECTED_ERROR
+    //         const statusCode = error.statusCode || ERROR_CODES.UNEXPECTED_ERROR;
+    //         const err = new Error(error.message || 'Failed to fetch the hotel details.');
+    //         (err as any).statusCode = statusCode;
+    //
+    //         throw err;
+    //     }
+    // }
+
+    // client Hotel Details from the api calling
     async ClientHotelDetails(body: HotelDetailDto) {
         try {
             const hotel_details = await this.hotelTBOAPIService.fetchClientHotelDetails(body);
-            return { message: 'Hotel Details fetched successfully', data: hotel_details };
-        } catch (error) {
-            console.error('Error in HotelDetails:', error.message || error);
-            throw new Error(error.message || 'Failed to fetch the hotel details.');
-        }
-    }
-
-    async HotelDetails() {
-        try {
-            // const { hotel_city_code } = body;
-
-            const hotelcodelist_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/hotelcodelist';
-            const code_list = await this.hotelTBOAPIService.fetchHotelCityCodeList(hotelcodelist_base_url);
-            console.log('>>>>>>', code_list);
-
-            const hotelDetailsList = [];
-            for (const city of code_list.HotelCodes) {
-                const hotel_details_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/Hoteldetails';
-                const hotel_details = await this.hotelTBOAPIService.fetchHotelDetails(hotel_details_base_url, city);
-                console.log('>>>>>>>>>>> >>>> >', hotel_details);
-                hotelDetailsList.push(hotel_details);
+            if (!hotel_details) {
+                const error = new Error(`No details found for hotelCode`);
+                (error as any).statusCode = ERROR_CODES.NOT_FOUND;
+                throw error;
             }
 
-            return { message: 'Hotel Details fetched successfully', data: hotelDetailsList };
+            const CountryCode: string = hotel_details.countryCode;
+            const commissionType = await this.commissionRepositoryService.getCommissionbytype(CountryCode === 'IN' ? COMMISSION_TYPE.HOTEL_DOMESTIC : COMMISSION_TYPE.HOTEL_INTERNATIONAL);
+            const response = {
+                ...hotel_details,
+                COMMISSION: commissionType,
+            };
+
+            return { message: 'Hotel Details fetched successfully', data: response };
         } catch (error) {
             console.error('Error in HotelDetails:', error.message || error);
             throw new Error(error.message || 'Failed to fetch the hotel details.');
         }
     }
 
-    async CityHotelDetails(body) {
-        try {
-            const { city_code } = body;
+    // hotel details api to be used in the preebook api
+    // async HotelDetails() {
+    //     try {
+    //         // const { hotel_city_code } = body;
+    //
+    //         const hotelcodelist_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/hotelcodelist';
+    //         const code_list = await this.hotelTBOAPIService.fetchHotelCityCodeList(hotelcodelist_base_url);
+    //         console.log('>>>>>>', code_list);
+    //
+    //         const hotelDetailsList = [];
+    //         for (const city of code_list.HotelCodes) {
+    //             const hotel_details_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/Hoteldetails';
+    //             const hotel_details = await this.hotelTBOAPIService.fetchHotelDetails(hotel_details_base_url, city);
+    //             console.log('>>>>>>>>>>> >>>> >', hotel_details);
+    //             hotelDetailsList.push(hotel_details);
+    //         }
+    //
+    //         return { message: 'Hotel Details fetched successfully', data: hotelDetailsList };
+    //     } catch (error) {
+    //         console.error('Error in HotelDetails:', error.message || error);
+    //         throw new Error(error.message || 'Failed to fetch the hotel details.');
+    //     }
+    // }
 
-            const city_hotel_details = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/TBOHotelCodeList';
-
-            const hotel_details = await this.hotelTBOAPIService.fetchCityHotelDetails(city_hotel_details, city_code);
-
-            return { message: 'Hotel Details fetched successfully', data: hotel_details };
-        } catch (error) {
-            console.error('Error in CityHotelDetails:', error.message || error);
-            throw new Error(error.message || 'Failed to fetch the city hotel details.');
-        }
-    }
+    // async CityHotelDetails(body) {
+    //     try {
+    //         const { city_code } = body;
+    //
+    //         const city_hotel_details = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/TBOHotelCodeList';
+    //
+    //         const hotel_details = await this.hotelTBOAPIService.fetchCityHotelDetails(city_hotel_details, city_code);
+    //
+    //         return { message: 'Hotel Details fetched successfully', data: hotel_details };
+    //     } catch (error) {
+    //         console.error('Error in CityHotelDetails:', error.message || error);
+    //         throw new Error(error.message || 'Failed to fetch the city hotel details.');
+    //     }
+    // }
 
     async HotelCityCodeList() {
         try {
@@ -149,11 +299,13 @@ export class SearchHotelService {
         try {
             const allResponses = [];
 
-            const city_hotel_details_api = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/TBOHotelCodeList';
+            const tbo_credentials: Promise<FLIGHTDATA> = this.tboConfigService.getTBOCredentials();
+            const hotelTboCodeListApi: string = (await tbo_credentials).HOTEL_TBO_CODE_LIST;
+            console.log('+++++++++++tbo_code_list+++++++++++', hotelTboCodeListApi);
             console.log('++++++++++++++++++++++++++++body payload:', body);
 
             // Get hotel list for the city
-            const hotel_details = await this.hotelTBOAPIService.fetchCityHotelDetails(city_hotel_details_api, body.CityCodes);
+            const hotel_details = await this.hotelTBOAPIService.fetchCityHotelDetails(hotelTboCodeListApi, body.CityCodes);
             console.log('++++++++++++++++++++++++++++hotel_details:', hotel_details.Hotels.length);
 
             const { CountryCode } = hotel_details.Hotels[0];
@@ -221,9 +373,8 @@ export class SearchHotelService {
 
     async preBook(body) {
         try {
-            const hotel_prebook_url = 'https://affiliate.tektravels.com/HotelAPI/PreBook';
             const data = body.BookingCode;
-            const response = await this.hotelTBOAPIService.handlePreBook(hotel_prebook_url, data);
+            const response = await this.hotelTBOAPIService.handlePreBook(data);
             return { message: 'Hotel Pre Book fetched successfully', data: response };
         } catch (error) {
             console.log('Error in PreBook', error);
@@ -231,81 +382,9 @@ export class SearchHotelService {
         }
     }
 
-    async getCitylist() {
-        const CACHE_KEY = 'cityData';
-
-        try {
-            const cachedCities = await this.cacheManager.get(CACHE_KEY);
-
-            if (cachedCities) {
-                console.log('Returning data from Redis cache');
-                return {
-                    message: 'Hotel City list fetched successfully from cache',
-                    data: cachedCities,
-                };
-            }
-
-            console.log('Data not in cache - fetching from database');
-            const freshData = await this.hotelCityRepositoryService.getAllCities();
-
-            await this.cacheManager.set(CACHE_KEY, freshData);
-
-            return {
-                message: 'Hotel City list fetched successfully from database',
-                data: freshData,
-            };
-        } catch (error) {
-            console.error('Error in getCitylist:', error);
-            throw error;
-        }
-    }
-
-    async fetchDetails() {
-        try {
-            const citylist = await this.hotelDetailsRepositoryService.fetchcity();
-            console.log(citylist);
-            for (const cityCode of citylist) {
-                const hotelcityDetails = await this.hotelDetailsRepositoryService.fetchDetails(cityCode);
-                await this.cacheManager.set(cityCode, hotelcityDetails);
-                console.log('stored data in cache database', cityCode);
-            }
-
-            return { message: 'Hotel Details set successfully', data: citylist };
-        } catch (error) {
-            console.log(error);
-            throw error;
-        }
-    }
-
-    async bookingHotel(body: CreateHotelBookingDto, reference_id: string) {
-        try {
-            console.log('📦 Booking Request Payload:', body);
-
-            // 1. Insert booking request to DB first (for logging/tracking)
-            const order_type = 'HOTEL';
-            const amount = body.NetAmount.toString();
-            const is_LCC = '';
-            const journey = '';
-            const journey_type = '';
-
-            const savedOrder = await this.orderRepository.insertBooking(reference_id, order_type, body, amount, is_LCC, journey, journey_type, 'FIXED', '350.00');
-            console.log('💾 Order Saved:', savedOrder);
-
-            // 2. Call TBO Booking API
-            const url = 'https://HotelBE.tektravels.com/hotelservice.svc/rest/book/';
-            const tboBookingResponse = await this.hotelTBOAPIService.hotelBook(url, body); //  actual booking API call
-
-            // 3. Return the response from TBO
-            return tboBookingResponse;
-        } catch (error) {
-            console.error('❌ Booking failed:', error);
-            throw error;
-        }
-    }
-
     async bookingDetails(orderId: string, ip: string) {
         try {
-            const url = 'https://hotelbe.tektravels.com/hotelservice.svc/rest/Getbookingdetail';
+            // const url = 'https://hotelbe.tektravels.com/hotelservice.svc/rest/Getbookingdetail';
 
             // Fetch order details
             const orderDetails = await this.orderRepository.find(orderId);
@@ -339,7 +418,7 @@ export class SearchHotelService {
                     BookingId: parsedResponse?.BookingId || 0,
                 };
 
-                const bookingDetails = await this.hotelTBOAPIService.hotelBookingDetails(url, payload);
+                const bookingDetails = await this.hotelTBOAPIService.hotelBookingDetails(payload);
                 console.log('Hotel Booking Details from API:', bookingDetails);
 
                 return {
@@ -375,8 +454,8 @@ export class SearchHotelService {
                 'Content-Type': 'application/json',
             };
 
-            // const baseURL = "https://affiliate.tektravels.com/HotelAPI/Search";
-            const baseURL = 'https://affiliate.tektravels.com/HotelAPI/Search';
+            const tbo_credentials: Promise<FLIGHTDATA> = this.tboConfigService.getTBOCredentials();
+            const baseURL: string = (await tbo_credentials).HOTEL_SEARCH;
 
             const config = { headers };
             const result = await axios.post(baseURL, payload, config);
@@ -450,9 +529,12 @@ export class SearchHotelService {
             ChangeRequestId,
         };
 
-        const url = 'https://HotelBE.tektravels.com/hotelservice.svc/rest/GetChangeRequestStatus';
-        const response = await axios.post(url, payload);
-        const result = response.data?.HotelChangeRequestStatusResult;
+        // const url = 'https://HotelBE.tektravels.com/hotelservice.svc/rest/GetChangeRequestStatus';
+
+        // 4. Call hotel cancellation API
+        const response = await this.hotelTBOAPIService.getChangeRequestStatus(payload);
+        // const response = await axios.post(url, payload);
+        const result = response?.HotelChangeRequestStatusResult;
 
         if (!result) {
             throw new Error('No response from TBO SendChangeRequest API');
@@ -475,7 +557,6 @@ export class SearchHotelService {
                     orderDetails.status = ORDER_STATUS.UNKNOWN;
             }
 
-          
             await this.orderRepository.save(orderDetails);
 
             return result;
@@ -484,11 +565,9 @@ export class SearchHotelService {
         }
     }
 
-    // syncing services
-
+    // all syncing services
     async syncCountryData() {
-        const country_search_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/CountryList';
-        const country_list = await this.hotelTBOAPIService.fetchCountryList(country_search_base_url);
+        const country_list = await this.hotelTBOAPIService.fetchCountryList();
         if (country_list.Status.Code === 200) {
             await this.hotelCountryRepositoryService.createCountry(country_list.CountryList);
         }
@@ -497,7 +576,6 @@ export class SearchHotelService {
 
     async syncCityData() {
         const countryCodes = await this.hotelCountryRepositoryService.getCountryCode();
-        const city_search_base_url = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/CityList';
 
         // Helper to remove duplicate city codes
         const removeDuplicateCities = (cities: any[]) => {
@@ -512,7 +590,7 @@ export class SearchHotelService {
 
         const allPromises = countryCodes.map(async (country) => {
             try {
-                const citiesResponse = await this.hotelTBOAPIService.fetchCityList(city_search_base_url, [country]);
+                const citiesResponse = await this.hotelTBOAPIService.fetchCityList([country]);
                 if (!citiesResponse || !citiesResponse[0]?.CityList?.length) {
                     console.log(`No cities for country: ${country.code}`);
                     return;
@@ -544,6 +622,10 @@ export class SearchHotelService {
     async syncHotelTBOCodeData(chunkSize = 80) {
         const summary = { synced: 0, skipped: 0, failed: 0, failedCities: [] };
 
+        // 1️⃣ Clear existing hotel details before syncing
+        await this.hotelTboCodeRepositoryService.clearAll();
+        console.log('🗑️ Cleared all existing hotel tbo code');
+
         try {
             const cities = await this.hotelCityRepositoryService.getAllCities();
             if (!cities?.length) {
@@ -563,35 +645,28 @@ export class SearchHotelService {
                     return;
                 }
 
-                const hotelCodeListUrl = 'http://api.tbotechnology.in/TBOHolidays_HotelAPI/TBOHotelCodeList';
-                const maxRetries = 3;
+                try {
+                    const tbo_credentials: Promise<FLIGHTDATA> = this.tboConfigService.getTBOCredentials();
+                    const hotelTboCodeListApi: string = (await tbo_credentials).HOTEL_TBO_CODE_LIST;
 
-                for (let attempt = 1; attempt <= maxRetries; attempt++) {
-                    try {
-                        const cityHotels = await this.hotelTBOAPIService.fetchCityHotelDetails(hotelCodeListUrl, city.city_code);
+                    const cityHotels = await this.hotelTBOAPIService.fetchCityHotelDetails(hotelTboCodeListApi, city.city_code);
 
-                        if (!cityHotels?.Hotels?.length) {
-                            console.warn(`⚠️ No hotels found for city: ${city.city_name} (${city.city_code})`);
-                            return;
-                        }
-
-                        await this.hotelTboCodeRepositoryService.saveOrUpdateHotelCodes(city, cityHotels.Hotels);
-                        console.log(`✅ Saved ${cityHotels.Hotels.length} hotels for city: ${city.city_name}`);
-                        summary.synced++;
-                        return; // success, exit retry loop
-                    } catch (err: any) {
-                        const status = err.response?.status || 'NO_RESPONSE';
-                        const message = err.response?.data?.message || err.message || 'Unknown error';
-
-                        console.warn(`⚠️ Attempt ${attempt} failed for ${city.city_name} (${city.city_code}) - Status: ${status}, Message: ${message}`);
-
-                        if (attempt < maxRetries) await new Promise((r) => setTimeout(r, attempt * 3000)); // exponential backoff
-                        else {
-                            console.error(`❌ Failed to sync city after ${maxRetries} attempts: ${city.city_name} (${city.city_code})`);
-                            summary.failed++;
-                            summary.failedCities.push(city.city_name);
-                        }
+                    if (!cityHotels?.Hotels?.length) {
+                        console.warn(`⚠️ No hotels found for city: ${city.city_name} (${city.city_code})`);
+                        summary.skipped++;
+                        return;
                     }
+
+                    await this.hotelTboCodeRepositoryService.saveOrUpdateHotelCodes(city, cityHotels.Hotels);
+                    console.log(`✅ Saved ${cityHotels.Hotels.length} hotels for city: ${city.city_name}`);
+                    summary.synced++;
+                } catch (err: any) {
+                    const status = err.response?.status || 'NO_RESPONSE';
+                    const message = err.response?.data?.message || err.message || 'Unknown error';
+
+                    console.error(`❌ Failed to sync city: ${city.city_name} (${city.city_code}) - Status: ${status}, Message: ${message}`);
+                    summary.failed++;
+                    summary.failedCities.push(city.city_name);
                 }
             };
 
@@ -610,6 +685,230 @@ export class SearchHotelService {
             return summary;
         } catch (error) {
             console.error('❌ Error syncing Hotel TBO codes:', error?.message || error);
+            throw error;
+        }
+    }
+
+    // sync hotel code table for all hotel city table city code
+    async syncHotelCodeData(chunkSize = 80) {
+        const summary = { synced: 0, skipped: 0, failed: 0, failedCities: [] };
+
+        // 1️⃣ Clear existing hotel codes before syncing
+        await this.hotelCodeRepositoryService.clearAll();
+        console.log('🗑️ Cleared all existing hotel codes.');
+
+        try {
+            const cities = await this.hotelCityRepositoryService.getAllCities();
+            if (!cities?.length) {
+                console.log('⚠️ No cities found in DB to sync hotel codes.');
+                return summary;
+            }
+
+            console.log(`▶️ Starting hotel code sync for ${cities.length} cities.`);
+
+            const limit = createLimiter(10); // limit concurrency to 10 cities at a time
+
+            const fetchAndSaveCityHotels = async (city) => {
+                if (!city.city_code) return;
+
+                const existingHotels = await this.hotelCodeRepositoryService.countByCity?.(city.city_code);
+                if (existingHotels > 0) {
+                    console.log(`⏩ Skipping city ${city.city_name} (${city.city_code}) — already synced`);
+                    summary.skipped++;
+                    return;
+                }
+
+                try {
+                    const tbo_credentials: Promise<FLIGHTDATA> = this.tboConfigService.getTBOCredentials();
+                    const hotelTboCodeListApi: string = (await tbo_credentials).HOTEL_TBO_CODE_LIST;
+
+                    const cityHotels = await this.hotelTBOAPIService.fetchCityHotelDetails(hotelTboCodeListApi, city.city_code);
+
+                    if (!cityHotels?.Hotels?.length) {
+                        console.warn(`⚠️ No hotels found for city: ${city.city_name} (${city.city_code})`);
+                        summary.skipped++;
+                        return;
+                    }
+
+                    await this.hotelCodeRepositoryService.saveAllOneByOne(city, cityHotels.Hotels);
+                    console.log(`✅ Saved ${cityHotels.Hotels.length} hotels for city: ${city.city_name}`);
+                    summary.synced++;
+                } catch (err: any) {
+                    const tboCode = err?.Status?.Code;
+                    const tboDesc = err?.Status?.Description;
+
+                    if (tboCode === 500 && tboDesc === 'No Hotels Found') {
+                        console.log(`⚠️ No inventory for city: ${city.city_name} (${city.city_code}) — skipping.`);
+                        summary.skipped++;
+                        return;
+                    }
+
+                    const status = err?.response?.status || 'NO_STATUS';
+                    const msg = err?.response?.data?.message || err?.message || tboDesc || 'Unknown error';
+
+                    console.error(`❌ Failed to sync city: ${city.city_name} (${city.city_code}) - Status: ${status}, Message: ${msg}`);
+                    summary.failed++;
+                    summary.failedCities.push(city.city_name);
+                }
+            };
+
+            // 2️⃣ Process cities in chunks of `chunkSize`
+            for (let i = 0; i < cities.length; i += chunkSize) {
+                const chunk = cities.slice(i, i + chunkSize);
+
+                // Run with concurrency limit
+                await Promise.all(chunk.map((city) => limit(() => fetchAndSaveCityHotels(city))));
+
+                console.log(`▶️ Completed chunk ${i / chunkSize + 1} / ${Math.ceil(cities.length / chunkSize)}`);
+            }
+
+            console.log(`✅ Hotel code sync completed. Synced: ${summary.synced}, Skipped: ${summary.skipped}, Failed: ${summary.failed}`);
+            if (summary.failedCities.length) {
+                console.log(`❌ Failed cities: ${summary.failedCities.join(', ')}`);
+            }
+
+            return summary;
+        } catch (error) {
+            console.error('Error syncing Hotel codes:', error?.message || error);
+            throw error;
+        }
+    }
+
+    // sync hotel code table for perticular city code
+    async syncSingleCityHotelCode(cityCode: string) {
+        if (!cityCode) {
+            throw new Error('City code is required');
+        }
+
+        const city = await this.hotelCityRepositoryService.getCityByCode(cityCode);
+
+        if (!city) {
+            throw new Error(`City not found: ${cityCode}`);
+        }
+
+        try {
+            // STEP 1: check existing hotel codes for city
+            const existingHotels = await this.hotelCodeRepositoryService.countByCity(Number(cityCode));
+
+            if (existingHotels > 0) {
+                console.log(`🔄 Existing ${existingHotels} hotel codes found for city ${city.city_name}. Deleting...`);
+                await this.hotelCodeRepositoryService.deleteByCityCode(Number(cityCode));
+                console.log(`🗑️ Deleted existing hotel codes for city ${city.city_name}`);
+            }
+
+            // STEP 2: Fetch new API data
+            const tbo_credentials: FLIGHTDATA = await this.tboConfigService.getTBOCredentials();
+            const apiUrl = tbo_credentials.HOTEL_TBO_CODE_LIST;
+
+            const cityHotels = await this.hotelTBOAPIService.fetchCityHotelDetails(apiUrl, cityCode);
+
+            if (!cityHotels?.Hotels?.length) {
+                return {
+                    message: `No hotels found for ${city.city_name} (${cityCode})`,
+                    status: 'empty',
+                };
+            }
+
+            // STEP 3: Save fresh hotel codes
+            await this.hotelCodeRepositoryService.saveAllOneByOne(city, cityHotels.Hotels);
+
+            return {
+                message: `Synced ${cityHotels.Hotels.length} hotels for city: ${city.city_name}`,
+                status: 'success',
+                total: cityHotels.Hotels.length,
+            };
+        } catch (err: any) {
+            console.error('Single city sync failed:', err.message);
+            throw new Error(`Sync failed for city ${cityCode}`);
+        }
+    }
+
+    // sync hotelDetail table by calling the syncHotelDetail method for all city codes in hotelCityCode table
+    async syncAutoHotelDetail() {
+        const summary = { synced: 0, failed: 0, failedHotels: [] };
+
+        try {
+            // 1️⃣ Clear existing hotel details before syncing
+            await this.hotelDetailsRepositoryService.clearAll();
+            console.log('🗑️ Cleared all existing hotel details.');
+
+            // 2️⃣ Fetch city codes + hotel codes
+            const cityHotelCodes = await this.hotelTboCodeRepositoryService.getAllCityHotelCodes();
+            if (!cityHotelCodes?.length) {
+                console.log('⚠️ No hotel codes found in hotelTboCode table.');
+                return summary;
+            }
+
+            console.log(`▶️ Starting auto hotel detail sync for ${cityHotelCodes.length} cities.`);
+
+            // 3️⃣ Chunk city codes into groups of 100
+            const cityChunks = chunkArray(cityHotelCodes, 100);
+
+            // Limit concurrency (e.g. 5 parallel city batches at a time)
+            const limit = createLimiter(5);
+
+            for (const cityBatch of cityChunks) {
+                await Promise.all(
+                    cityBatch.map((cityRow) =>
+                        limit(async () => {
+                            const { city_code, hotel_codes } = cityRow;
+                            if (!city_code || !hotel_codes) return;
+
+                            console.log(`🏙️ Processing city ${city_code}`);
+
+                            try {
+                                // Split hotel codes into chunks of 20
+                                const hotelCodeArray = hotel_codes.split(',');
+                                const hotelCodeChunks = chunkArray(hotelCodeArray, 20);
+
+                                for (const hotelChunk of hotelCodeChunks) {
+                                    const body: HotelDetailDto = {
+                                        Hotelcodes: hotelChunk.join(','), // 20 codes max
+                                        Language: 'EN',
+                                    };
+
+                                    const hotelDetailApiResponse = await this.hotelTBOAPIService.fetchClientHotelDetails(body);
+
+                                    await this.hotelDetailsRepositoryService.saveHotelDetailsList(hotelDetailApiResponse);
+                                }
+
+                                console.log(`✅ Synced hotel details for City ${city_code}`);
+                                summary.synced++;
+                            } catch (err: any) {
+                                const msg = err?.response?.data?.message || err?.message || 'Unknown error';
+
+                                console.error(`❌ Failed to sync hotels for City ${city_code} - ${msg}`);
+                                summary.failed++;
+                                summary.failedHotels.push(city_code);
+                            }
+
+                            console.log(`🏁 Completed city ${city_code}`);
+                        })
+                    )
+                );
+            }
+
+            console.log(`✅ Auto hotel detail sync completed. Synced: ${summary.synced}, Failed: ${summary.failed}`);
+            if (summary.failedHotels.length) {
+                console.log(`❌ Failed cities: ${summary.failedHotels.join(', ')}`);
+            }
+
+            return summary;
+        } catch (error) {
+            console.error('Error in Auto Hotel Detail Sync:', error?.message || error);
+            throw error;
+        }
+    }
+
+    async syncHotelDetailData(body: HotelDetailDto) {
+        try {
+            const hotelDetailApiResponse = await this.hotelTBOAPIService.fetchClientHotelDetails(body);
+
+            await this.hotelDetailsRepositoryService.saveHotelDetailsList(hotelDetailApiResponse);
+
+            return hotelDetailApiResponse;
+        } catch (error) {
+            console.error('Error syncing Hotel Details:', error?.message || error);
             throw error;
         }
     }
