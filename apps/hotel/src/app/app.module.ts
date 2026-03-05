@@ -17,7 +17,7 @@ import {HotelDetailSyncProcessor} from './bull/hotelDetailSync.queue';
 @Module({
     imports: [
         SearchHotelModule,
-        MongoDBModule,
+        // MongoDBModule,
         CacheModule.registerAsync({
             isGlobal: true,
             useFactory: () => ({

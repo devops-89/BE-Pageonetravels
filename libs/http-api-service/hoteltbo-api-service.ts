@@ -254,7 +254,8 @@ export class HotelTBOAPIService {
         try {
 
             const prebook_url: string = this.tboCredentials.HOTEL_PREBOOK;
-            console.log(data);
+            console.log("Preebook url:",prebook_url);
+            console.log("payload:",data);
             const headers = this.getHeaders('dynamic');
             const payload = {
                 BookingCode: data,

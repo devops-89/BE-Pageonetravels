@@ -42,7 +42,7 @@ export class GenerateTokenService {
     try {
         const tbo_credentials = await this.getTBOCredentials();
         const base_url = tbo_credentials.FLIGHT_AUTHENTICATION;
-
+        console.log("ip for authentication:",ip_address);
         const payload = {
             ClientId: tbo_credentials.FLIGHT_CLIENT_ID,
             UserName: tbo_credentials.FLIGHT_USERNAME,
@@ -78,7 +78,7 @@ export class GenerateTokenService {
 
     async getToken(ip_address: string) {
         try {
-            
+            console.log("Generating token for ip address:",ip_address);
             let token = await this.rediscacheservice.getCache(`tboToken:${ip_address}`);
             
             const tbo_credentials = await this.getTBOCredentials();

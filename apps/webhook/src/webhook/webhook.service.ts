@@ -230,29 +230,56 @@ async processWebhookEvent(signature: string, body: any) {
         }
     }
 
+    // async handleHotelPaymentdata(body: any) {
+    //     try {
+    //         const orderid = body.payload.payment.entity.order_id;
+    //         const response = await this.getPayment(orderid);
+    //         const orderdetails = await this.orderRepositoryService.findOne(response);
+    //         console.log('id based on the order id for razorpay: ', response);
+
+    //         console.log('=============webhook handlePayment Order Details Fetched: ', orderdetails);
+    //         // this.orderRepositoryService.updatePaymentStatus(orderdetails.order_id, PAYMENT_STATUS.SUCCESS);
+    //         console.log('modify order body:', body);
+    //         const modifyOrder = await this.orderRepositoryService.updateOrder(response, body);
+    //         console.log('modified order Repository:', modifyOrder);
+    //         const updatedPayment = await this.hotelPaymentRepositoryService.findAndUpdate(modifyOrder, body);
+    //         console.log('updated Payment:', updatedPayment);
+
+    //         if (orderdetails) {
+    //             await this.hotelService.hotelHandler(orderdetails.order_id, orderdetails.custom_order_id, orderdetails.order_request, orderdetails.user, orderdetails.order_request_second);
+    //         }
+    //     } catch (error) {
+    //         console.log('Error inside handlePaymentCaptured:', error);
+    //         throw error;
+    //     }
+    // }
+
     async handleHotelPaymentdata(body: any) {
-        try {
-            const orderid = body.payload.payment.entity.order_id;
-            const response = await this.getPayment(orderid);
-            const orderdetails = await this.orderRepositoryService.findOne(response);
-            console.log('id based on the order id for razorpay: ', response);
+    try {
+        const orderid = body.payload.payment.entity.order_id;
+        const receipt = await this.getPayment(orderid);
+        const orderdetails = await this.orderRepositoryService.findOne(receipt);
 
-            console.log('=============webhook handlePayment Order Details Fetched: ', orderdetails);
-            // this.orderRepositoryService.updatePaymentStatus(orderdetails.order_id, PAYMENT_STATUS.SUCCESS);
-            console.log('modify order body:', body);
-            const modifyOrder = await this.orderRepositoryService.updateOrder(response, body);
-            console.log('modified order Repository:', modifyOrder);
-            const updatedPayment = await this.hotelPaymentRepositoryService.findAndUpdate(modifyOrder, body);
-            console.log('updated Payment:', updatedPayment);
-
-            if (orderdetails) {
-                await this.hotelService.hotelHandler(orderdetails.order_id, orderdetails.custom_order_id, orderdetails.order_request, orderdetails.user, orderdetails.order_request_second);
-            }
-        } catch (error) {
-            console.log('Error inside handlePaymentCaptured:', error);
-            throw error;
+        // ✅ CRITICAL CHECK
+        if (orderdetails?.success_response) {
+            console.log("Booking already processed. Skipping.");
+            return;
         }
+
+        // continue booking
+        await this.hotelService.hotelHandler(
+            orderdetails.order_id,
+            orderdetails.custom_order_id,
+            orderdetails.order_request,
+            orderdetails.user,
+            orderdetails.order_request_second
+        );
+
+    } catch (error) {
+        console.log('Error inside handlePaymentCaptured:', error);
+        throw error;
     }
+}
 
 
     

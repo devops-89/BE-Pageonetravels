@@ -65,6 +65,8 @@ export class RazorpayService {
             }
             // const paymentInput = { amount, currency, custom_order_id };
 
+            console.log("callback url:",this.tboCredentials.FLIGHT_PAYMENT_CALLBACK_URL);
+
             const paymentInput = {
                 amount: amount,
                 currency: currency,
@@ -122,7 +124,7 @@ export class RazorpayService {
 
             // Fetch Agency Balance
             const agencyBalanceResponse = await this.getAgencyBalance(agencyBalancePayload);
-
+             console.log("Agency Balance Response:",agencyBalanceResponse);
             if (!agencyBalanceResponse.success) {
                 return {
                     success: false,

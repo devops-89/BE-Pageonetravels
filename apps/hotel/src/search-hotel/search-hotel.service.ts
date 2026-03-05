@@ -217,7 +217,9 @@ export class SearchHotelService {
                 throw error;
             }
 
-            const CountryCode: string = hotel_details.countryCode;
+            const CountryCode: string = hotel_details?.HotelDetails?.[0]?.CountryCode || '';
+           
+            
             const commissionType = await this.commissionRepositoryService.getCommissionbytype(CountryCode === 'IN' ? COMMISSION_TYPE.HOTEL_DOMESTIC : COMMISSION_TYPE.HOTEL_INTERNATIONAL);
             const response = {
                 ...hotel_details,
