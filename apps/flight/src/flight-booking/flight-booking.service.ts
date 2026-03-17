@@ -251,7 +251,8 @@ export class FlightBookingService {
                 TraceId: trace_id
             };
             const extraAmount = calculateTotalPrice(passenger_details);
-            console.log("extraAmount",extraAmount);
+            console.log("extraAmount:", extraAmount);
+            console.log("PublishedFare:", fare[0].PublishedFare);
             // let amount = fare[0].BaseFare + fare[0].Tax + + extraAmount;
             let amount:number=fare[0].PublishedFare+extraAmount;
             const is_LCC = body.is_LCC;
@@ -259,7 +260,7 @@ export class FlightBookingService {
             const journey_type = body.journey_type;
             const flightType = `FLIGHT_${journey_type}_${journey}` as COMMISSION_TYPE;
             let data ;
-            let commissionType ;
+            let commissionType;
             if (Object.values(COMMISSION_TYPE).includes(flightType)) {
                     commissionType = await this.commissionRepositoryService.getCommissionbytype(flightType);
                     if(commissionType.commission_type === "FIXED"){
@@ -273,7 +274,7 @@ export class FlightBookingService {
                     throw { message: "Invalid commission type", statusCode: ERROR_CODES.BAD_REQUEST };
             }
 
-
+            console.log("Data:",data);
             console.log("payload object: ",payload);
             amount = amount + data;
             const order_type = "FLIGHT";

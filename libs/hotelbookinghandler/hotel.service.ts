@@ -57,8 +57,9 @@ export class HotelService {
 
             const headers=this.getHeaders("dynamic");
 
+            console.log("hotel booking payload real",payload);
             const result = await this.httpAPICall(url, payload, headers);
-            console.log('Hotel Booking Response:', result);
+            console.log('Hotel Booking Response real:', result);
 
             //  Step 1: Only handle main booking success/failure
             if (result?.BookResult?.ResponseStatus === 1) {

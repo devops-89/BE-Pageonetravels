@@ -393,7 +393,7 @@ async find(orderId?: string): Promise<Order> {
     }
 
     // change Order Status
-    async updateOrderStatus(orderId:string,status:ORDER_STATUS,ChangeRequestId:number){
+    async updateOrderStatus(orderId:string,status:ORDER_STATUS,ChangeRequestId?:number){
         try{
            const updatedOrder=await this.orderRepository.findOne({
             where:{order_id:orderId},

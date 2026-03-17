@@ -7,7 +7,7 @@ import { FlightTicketRepositoryService } from '../../../../libs/database/src/rep
 import { HotelPaymentRepositoryService } from '../../../../libs/database/src/repositories/hotelPayment.repository';
 import { FlightService } from '../../../../libs/tickethandler/flight.service';
 import { HotelService } from '../../../../libs/hotelbookinghandler/hotel.service';
-import { PAYMENT_STATUS } from '../../../../libs/constants/bookingContant';
+import { ORDER_STATUS, PAYMENT_STATUS } from '../../../../libs/constants/bookingContant';
 
 import * as crypto from 'crypto';
 import { Order } from '../../../../libs/database/src';
@@ -23,7 +23,7 @@ export class WebhookService {
         private readonly hotelPaymentRepositoryService: HotelPaymentRepositoryService,
         private readonly flightService: FlightService,
         private readonly hotelService: HotelService
-    ) {}
+    ) { }
 
     // Handle different Razorpay events
     async handleEvent(event: string, payload: any) {
@@ -42,113 +42,118 @@ export class WebhookService {
         }
     }
 
-async processWebhookEvent(signature: string, body: any) {
-  const webhookSecret = this.configService.get().RAZORPAY_CREDENTIAL.RAZORPAY_WEBHOOK_SECRET;
-  console.log("webhook secret: ", webhookSecret);
+    async processWebhookEvent(signature: string, body: any) {
+        const webhookSecret = this.configService.get().RAZORPAY_CREDENTIAL.RAZORPAY_WEBHOOK_SECRET;
+        console.log("webhook secret: ", webhookSecret);
 
-  const expectedSignature = crypto
-    .createHmac('sha256', webhookSecret)
-    .update(JSON.stringify(body))
-    .digest('hex');
+        const expectedSignature = crypto
+            .createHmac('sha256', webhookSecret)
+            .update(JSON.stringify(body))
+            .digest('hex');
 
-  if (expectedSignature !== signature) {
-    throw new HttpException('Invalid signature', HttpStatus.BAD_REQUEST);
-  }
+        if (expectedSignature !== signature) {
+            throw new HttpException('Invalid signature', HttpStatus.BAD_REQUEST);
+        }
 
-  if (!body?.payload) return { status: 'ignored' };
+        if (!body?.payload) return { status: 'ignored' };
 
-  const event = body.event;
-  const entity = body.payload.payment.entity;
-  const notes = entity?.notes || {};
-  const module = notes?.module;
+        const event = body.event;
 
-  console.log("entity:", entity);
-  console.log("notes:", notes);
-  console.log("module:", module);
-  console.log('+++++++++++++++++++ Webhook Payload Response +++++++++++++++++++++++++++');
-  console.log('Module from webhook:', module);
-  console.log('Received Razorpay Event: ', event);
-  console.log('Razorpay Entity Id: ', entity.id);
-  console.log('Payment Link Id: ', entity.payment_link_id);
-  console.log('Payment Link Reference Id (custom_order_id): ', entity.payment_link_reference_id);
-  console.log('Payment Status: ', entity.status);
-  console.log('Payment Id (Razorpay Order ID):', entity.order_id);
-  console.log('+++++++++++++++++++ Webhook Payload Response +++++++++++++++++++++++++++');
+        // Only process captured payments
+        if (event !== 'payment.captured') {
+            console.log(`Ignoring Razorpay event: ${event}`);
+            return { status: 'ignored' };
+        }
+        const entity = body.payload.payment.entity;
+        const notes = entity?.notes || {};
+        const module = notes?.module;
 
-  // 🔁 Common: Get receipt for hotel/flight only
-  let receipt: string | undefined;
-  let order: Order | null = null;
-  if (module === 'hotel' || module === 'flight') {
-    const razorpayOrderId = entity.order_id;
-    receipt = await this.getPayment(razorpayOrderId);
-     order = await this.orderRepositoryService.findOne(receipt);
-    
-  }
+        console.log("entity:", entity);
+        console.log("notes:", notes);
+        console.log("module:", module);
+        console.log('+++++++++++++++++++ Webhook Payload Response +++++++++++++++++++++++++++');
+        console.log('Module from webhook:', module);
+        console.log('Received Razorpay Event: ', event);
+        console.log('Razorpay Entity Id: ', entity.id);
+        console.log('Payment Link Id: ', entity.payment_link_id);
+        console.log('Payment Link Reference Id (custom_order_id): ', entity.payment_link_reference_id);
+        console.log('Payment Status: ', entity.status);
+        console.log('Payment Id (Razorpay Order ID):', entity.order_id);
+        console.log('+++++++++++++++++++ Webhook Payload Response +++++++++++++++++++++++++++');
 
-  if (event === 'payment.captured') {
-    if (module === 'hotel' || module === 'flight') {
-          await this.orderRepositoryService.updatePaymentStatus(order.order_id, PAYMENT_STATUS.SUCCESS);
-    }
+        // 🔁 Common: Get receipt for hotel/flight only
+        let receipt: string | undefined;
+        let order: Order | null = null;
+        if (module === 'hotel' || module === 'flight') {
+            const razorpayOrderId = entity.order_id;
+            receipt = await this.getPayment(razorpayOrderId);
+            order = await this.orderRepositoryService.findOne(receipt);
 
-    try {
-      if (module === 'hotel') {
-        await this.handleHotelPaymentdata(body);
-      } else if (module === 'flight') {
-        await this.handleFlightPaymentdata(body);
-      } else if (module === 'package') {
-        console.log("notes for package booking:", notes.order_id);
+        }
 
-        await this.packageBookingRepositoryService.updatePaymentStatus(
-          notes.order_id, 
-          PAYMENT_STATUS.SUCCESS
-        );
-        await this.handlePackagePaymentdata(body);
-      } else if (module === 'hoteler') {
-        // await this.hotelerBookingRepositoryService.updatePaymentStatus(notes.order_id, PAYMENT_STATUS.SUCCESS);
-        // await this.handleHotelerPaymentdata(body);
-      } else {
-        console.warn('Unknown module type in webhook:', module);
+        if (event === 'payment.captured') {
+            if (module === 'hotel' || module === 'flight') {
+                await this.orderRepositoryService.updatePaymentStatus(order.order_id, PAYMENT_STATUS.SUCCESS);
+            }
+
+            try {
+                if (module === 'hotel') {
+                    await this.handleHotelPaymentdata(body);
+                } else if (module === 'flight') {
+                    await this.handleFlightPaymentdata(body);
+                } else if (module === 'package') {
+                    console.log("notes for package booking:", notes.order_id);
+
+                    await this.packageBookingRepositoryService.updatePaymentStatus(
+                        notes.order_id,
+                        PAYMENT_STATUS.SUCCESS
+                    );
+                    await this.handlePackagePaymentdata(body);
+                } else if (module === 'hoteler') {
+                    // await this.hotelerBookingRepositoryService.updatePaymentStatus(notes.order_id, PAYMENT_STATUS.SUCCESS);
+                    // await this.handleHotelerPaymentdata(body);
+                } else {
+                    console.warn('Unknown module type in webhook:', module);
+                    return { status: 'ignored' };
+                }
+
+                return { status: 'success' };
+            } catch (error) {
+                console.error('❌ Booking handler failed after payment captured:', error);
+
+                return {
+                    status: 'payment_success_but_booking_failed',
+                    orderId:
+                        module === 'package' || module === 'hoteler'
+                            ? notes.order_id
+                            : receipt, // ✅ fallback receipt for hotel/flight
+                };
+            }
+        } else if (event === 'payment.failed') {
+            if (module === 'hotel' || module === 'flight') {
+                await this.orderRepositoryService.updatePaymentStatus(
+                    receipt,
+                    PAYMENT_STATUS.FAILED
+                );
+            } else if (module === 'package') {
+                await this.packageBookingRepositoryService.updatePaymentStatus(
+                    notes.order_id,
+                    PAYMENT_STATUS.FAILED
+                );
+            }
+            // else if (module === 'hoteler') {
+            //   await this.hotelerBookingRepositoryService.updatePaymentStatus(notes.order_id, PAYMENT_STATUS.FAILED);
+            // }
+
+            console.log(
+                `❌ Payment failed for module: ${module}, ref: ${receipt || notes.order_id
+                }`
+            );
+            return { status: 'failed', orderId: receipt || notes.order_id };
+        }
+
         return { status: 'ignored' };
-      }
-
-      return { status: 'success' };
-    } catch (error) {
-      console.error('❌ Booking handler failed after payment captured:', error);
-
-      return {
-        status: 'payment_success_but_booking_failed',
-        orderId:
-          module === 'package' || module === 'hoteler'
-            ? notes.order_id
-            : receipt, // ✅ fallback receipt for hotel/flight
-      };
     }
-  } else if (event === 'payment.failed') {
-    if (module === 'hotel' || module === 'flight') {
-      await this.orderRepositoryService.updatePaymentStatus(
-        receipt,
-        PAYMENT_STATUS.FAILED
-      );
-    } else if (module === 'package') {
-      await this.packageBookingRepositoryService.updatePaymentStatus(
-        notes.order_id,
-        PAYMENT_STATUS.FAILED
-      );
-    }
-    // else if (module === 'hoteler') {
-    //   await this.hotelerBookingRepositoryService.updatePaymentStatus(notes.order_id, PAYMENT_STATUS.FAILED);
-    // }
-
-    console.log(
-      `❌ Payment failed for module: ${module}, ref: ${
-        receipt || notes.order_id
-      }`
-    );
-    return { status: 'failed', orderId: receipt || notes.order_id };
-  }
-
-  return { status: 'ignored' };
-}
 
 
     // Handle payment success
@@ -202,15 +207,31 @@ async processWebhookEvent(signature: string, body: any) {
             const orderid = body.payload.payment.entity.order_id;
             const response = await this.getPayment(orderid);
             const orderdetails = await this.orderRepositoryService.findOne(response);
+
+            // Prevent duplicate booking
+            if (orderdetails.status === ORDER_STATUS.IN_PROGRESS ||
+                orderdetails.status === ORDER_STATUS.COMPLETED) {
+                console.log("⚠️ Duplicate webhook ignored. Booking already completed.");
+                return;
+            }
             console.log('=============webhook handlePayment Order Details Fetched: ', orderdetails);
             // update payment success for flight
-            this.orderRepositoryService.updatePaymentStatus(orderdetails.order_id, PAYMENT_STATUS.SUCCESS);
+            // this.orderRepositoryService.updatePaymentStatus(orderdetails.order_id, PAYMENT_STATUS.SUCCESS);
             console.log('modify order body:', body);
             const modifyOrder = await this.orderRepositoryService.updateOrder(response, body);
             console.log('modified order Repository:', modifyOrder);
             const updatedPayment = await this.flightTicketRepositoryService.findAndUpdate(modifyOrder, body);
             console.log('updated Payment:', updatedPayment);
             if (orderdetails) {
+
+                // 🔴 mark booking as processing
+                await this.orderRepositoryService.updateOrderStatus(
+                    orderdetails.order_id,
+                    ORDER_STATUS.IN_PROGRESS
+                );
+
+                console.log("🚀 Starting flight booking for:", orderdetails.order_id);
+
                 await this.flightService.flightHandler(
                     orderdetails.order_id,
                     orderdetails.custom_order_id,
@@ -255,38 +276,38 @@ async processWebhookEvent(signature: string, body: any) {
     // }
 
     async handleHotelPaymentdata(body: any) {
-    try {
-        const orderid = body.payload.payment.entity.order_id;
-        const receipt = await this.getPayment(orderid);
-        const orderdetails = await this.orderRepositoryService.findOne(receipt);
+        try {
+            const orderid = body.payload.payment.entity.order_id;
+            const receipt = await this.getPayment(orderid);
+            const orderdetails = await this.orderRepositoryService.findOne(receipt);
 
-        // ✅ CRITICAL CHECK
-        if (orderdetails?.success_response) {
-            console.log("Booking already processed. Skipping.");
-            return;
+            // ✅ CRITICAL CHECK
+            if (orderdetails?.success_response) {
+                console.log("Booking already processed. Skipping.");
+                return;
+            }
+
+            // continue booking
+            await this.hotelService.hotelHandler(
+                orderdetails.order_id,
+                orderdetails.custom_order_id,
+                orderdetails.order_request,
+                orderdetails.user,
+                orderdetails.order_request_second
+            );
+
+        } catch (error) {
+            console.log('Error inside handlePaymentCaptured:', error);
+            throw error;
         }
-
-        // continue booking
-        await this.hotelService.hotelHandler(
-            orderdetails.order_id,
-            orderdetails.custom_order_id,
-            orderdetails.order_request,
-            orderdetails.user,
-            orderdetails.order_request_second
-        );
-
-    } catch (error) {
-        console.log('Error inside handlePaymentCaptured:', error);
-        throw error;
     }
-}
 
 
-    
+
     // Handle Package Payment with gateway and updating the payment and booking entries
     async handlePackagePaymentdata(body: any) {
         try {
-            console.log("============== body in webhook: "+body);
+            console.log("============== body in webhook: " + body);
             const orderid = body.payload.payment.entity.order_id;
             const response = await this.getPayment(orderid);
             const orderdetails = await this.packageBookingRepositoryService.findPackageBookingById(response);
@@ -303,7 +324,7 @@ async processWebhookEvent(signature: string, body: any) {
             const updatedPayment = await this.hotelPaymentRepositoryService.findAndUpdatePackageBooking(modifyBookingId, body);
             console.log('updated Payment:', updatedPayment);
 
-         
+
         } catch (error) {
             console.log('Error inside handlePaymentCaptured:', error);
             throw error;

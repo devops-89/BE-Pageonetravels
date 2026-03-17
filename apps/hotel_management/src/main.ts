@@ -17,6 +17,7 @@ async function bootstrap() {
     allowedHeaders: '*',
   });
 
+
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 
