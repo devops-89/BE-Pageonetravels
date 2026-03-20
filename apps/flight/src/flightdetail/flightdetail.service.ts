@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { HTTPSTboAPIService } from '../../../../libs/http-api-service/tbo-api-service';
 import { TBO_CredentialsService } from '../../../../libs/loadtbo-db-config/tbo-config.service';
 import { FlightDetailRequestDto, FlightRuleDto } from '../../../../libs/dtos/flight/flight-detail.dto';
-
+import {mapJourney,mapJourneyType,calculateCommission} from "../../../../libs/utils/flightCommission.util";
 import { TokenProviderService } from '../../../../libs/token-provider-handler/tokenProvider.service';
 import { RedisCacheService } from '../../../../libs/redis-cache-service/redis-cache-service';
 import { JOURNEYTYPE, JOURNEY } from '../../../../libs/constants/flightConstant';
@@ -604,8 +604,21 @@ export class FlightDetailService {
 
                 // 3. Call TBO API
                 const bookingDetails = await this.httptboapiservice.httpAPICall(tbo_credentials.FLIGHT_BOOKING_DETAILS, payload);
+               console.log("booking details:",bookingDetails);
+                // Calulating the commission
+                const baseFare=bookingDetails?.Response?.FlightItinerary?.Fare?.BaseFare;
+                const journey_type=mapJourneyType(bookingDetails?.Response?.FlightItinerary?.JourneyType);// (oneway,roundtrip,multitrip)
+                const journey=mapJourney(bookingDetails?.Response?.FlightItinerary?.TripIndicator);
 
-                return { ...commonResponse, bookingDetails };
+                const flightType = `FLIGHT_${journey_type}_${journey}` as COMMISSION_TYPE;
+      const commissionType = await this.commissionRepositoryService.getCommissionbytype(flightType);
+
+                const commission=await calculateCommission(baseFare,commissionType);
+
+
+
+
+                return { ...commonResponse, bookingDetails, commission: commission };
             }
             // For incomplete bookings, return only status and payment info
             return commonResponse;

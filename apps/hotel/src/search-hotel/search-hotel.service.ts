@@ -97,7 +97,7 @@ export class SearchHotelService {
         private readonly hotelTboCodeRepositoryService: HotelTboCodeRepositoryService,
         private readonly hotelCodeRepositoryService: HotelCodeRepositoryService,
         private readonly rediscacheservice: RedisCacheService
-    ) {}
+    ) { }
 
     //  fetch all countries from my database
     async searchCountry() {
@@ -218,8 +218,8 @@ export class SearchHotelService {
             }
 
             const CountryCode: string = hotel_details?.HotelDetails?.[0]?.CountryCode || '';
-           
-            
+
+
             const commissionType = await this.commissionRepositoryService.getCommissionbytype(CountryCode === 'IN' ? COMMISSION_TYPE.HOTEL_DOMESTIC : COMMISSION_TYPE.HOTEL_INTERNATIONAL);
             const response = {
                 ...hotel_details,
@@ -336,8 +336,8 @@ export class SearchHotelService {
                 IsDetailedResponse: body.IsDetailedResponse,
                 ...(body.Filters &&
                     Object.values(body.Filters).some((v) => v) && {
-                        Filters: body.Filters,
-                    }),
+                    Filters: body.Filters,
+                }),
             }));
 
             // Step 2: Fire all chunked requests in parallel
@@ -355,7 +355,11 @@ export class SearchHotelService {
                 if (result.status === 'fulfilled' && result.value?.Status?.Code === 200) {
                     result.value.HotelResult.forEach((hotel) => {
                         const meta = hotel_details.Hotels.find((h) => h.HotelCode === hotel.HotelCode);
-                        allResponses.push({ ...hotel, ...meta });
+                        allResponses.push({
+                            ...hotel,
+                            ...meta,
+                            commission: commissionType,
+                        });
                     });
                 }
             });
@@ -363,7 +367,6 @@ export class SearchHotelService {
             return {
                 message: 'Hotel Search List fetched successfully',
                 data: allResponses,
-                commission: commissionType,
                 totalHotels: allResponses.length,
                 totalChunks: chunksArray.length,
             };

@@ -201,6 +201,7 @@ export const bookingConfirmationTemplate = (bookingData: any, user_name: string,
       </table>
 
       <!-- IMPORTANT INFO -->
+      
     <div style="font-weight:bold; font-size:16px; margin-top:30px; text-transform:uppercase; text-decoration:underline;">
         Important Information
     </div>
